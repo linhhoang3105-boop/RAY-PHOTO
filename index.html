@@ -603,7 +603,28 @@ html{font-synthesis:none;text-rendering:optimizeLegibility}
 </style><style>.intro-screen{position:fixed;inset:0;width:100vw;max-width:none;height:100dvh;max-height:none;margin:0;padding:0;border:0;background:#0c0d0f;color:#f7edd5;z-index:1000;overflow:hidden;font-family:var(--sans,Arial,sans-serif)}.intro-screen[open]{display:flex;flex-direction:column}.intro-screen::backdrop{background:#0c0d0f}.intro-head{flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;height:calc(52px + env(safe-area-inset-top,0px));padding:calc(8px + env(safe-area-inset-top,0px)) 24px 8px}.intro-edition{font-size:9px;letter-spacing:2px;color:#cbb77e}.intro-head form{margin:0}.intro-skip,.intro-toggle{border:1px solid #776642;border-radius:6px;background:#181819;color:#f0d698;font:11px var(--sans,Arial,sans-serif);cursor:pointer;min-height:34px;padding:7px 13px}.intro-skip:hover,.intro-toggle:hover{background:#3a3020}.intro-stage{flex:1;min-height:0;position:relative;margin:0 22px}.intro-stage video,.intro-poster,.intro-poster img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain}.intro-stage video{opacity:0;transition:opacity .2s}.intro-screen[data-playing=true] .intro-stage video{opacity:1}.intro-screen[data-playing=true] .intro-poster{visibility:hidden}.intro-enter{position:absolute;inset:0;width:100%;height:100%;border:0;background:none;cursor:pointer}.intro-enter:focus-visible{outline:2px solid #e7c778;outline-offset:-4px}.intro-footer{height:calc(64px + env(safe-area-inset-bottom,0px));padding:8px 24px calc(8px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:15px;flex:none}.intro-hint{font-size:10px;color:#bcb09a;white-space:nowrap}.intro-timeline{height:2px;flex:1;min-width:25px;max-width:260px;background:#423b2c;overflow:hidden;margin-left:auto}.intro-timeline span{display:block;width:0;height:100%;background:#e7c778}.intro-time{font-size:10px;color:#d4c18a;font-variant-numeric:tabular-nums}.intro-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.intro-replay{background:none;border:1px solid #776642;border-radius:4px;color:#e7c778;padding:8px 10px;cursor:pointer;font-size:11px}@media(orientation:portrait){.intro-head{padding-left:15px;padding-right:15px}.intro-stage{margin:0 10px}.intro-footer{padding-left:15px;padding-right:15px;gap:10px}.intro-edition{font-size:8px;letter-spacing:1px}.intro-hint{font-size:9px}.intro-toggle{font-size:10px;padding-left:9px;padding-right:9px}.intro-skip{font-size:10px}.intro-timeline{max-width:140px}}@media(max-width:360px){.intro-hint{max-width:85px;white-space:normal;line-height:1.5}.intro-footer{gap:8px}.intro-time{font-size:9px}}@media(prefers-reduced-motion:reduce){.intro-stage video{transition:none}}
 .about-links{flex-wrap:wrap;align-items:center;gap:12px 20px}
 html:has(.intro-screen[open]),body:has(>.intro-screen[open]){overflow:hidden;overscroll-behavior:none}
-</style></head>
+</style><style id="ray-body-precision-style">
+/* CHỈ THÊM GIAO DIỆN CHỈNH DÁNG TINH: không sửa color engine / các tool khác. */
+.body-fine-tools{margin:12px 0 18px;border:1px solid #66563c;border-radius:7px;padding:10px 12px;background:#e7c77808}
+.body-fine-tools .fine-open{width:100%;background:#e7c778;color:#1e1a12;border-color:#e7c778;font-weight:600;font-size:13px}
+.body-fine-tools .hint{font-size:11px;margin:8px 0 10px;line-height:1.6}
+.fine-parameters{display:grid;grid-template-columns:1fr;gap:3px}
+.fine-parameters label{display:flex;justify-content:space-between;gap:10px;color:#eee0bb;font-size:12px;margin:4px 0 0}
+.fine-parameters output{color:#e7c778}
+.fine-parameters input{width:100%}
+.ray-body-precision[hidden]{display:none!important}
+.ray-body-precision{position:absolute;inset:0;z-index:19;overflow:hidden;background:#111214;touch-action:none}
+.ray-body-precision canvas{position:absolute!important;inset:0;width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;box-shadow:none!important;border-radius:0!important;cursor:crosshair;touch-action:none;display:block}
+.ray-body-precision-top{position:absolute;z-index:2;left:7px;right:7px;top:7px;display:flex;justify-content:space-between;gap:6px;align-items:center;pointer-events:none}
+.ray-body-precision-top>span{font-size:11px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff0c7;background:#131314c9;padding:7px;border-radius:6px}
+.ray-body-precision-buttons{display:flex;align-items:center;gap:3px;pointer-events:auto;background:#111214b8;border:1px solid #77633a88;padding:3px;border-radius:7px;backdrop-filter:blur(8px)}
+.ray-body-precision-buttons button{font-size:11px;min-height:32px;border:1px solid #675739;border-radius:5px;background:#2b2926;color:#f6db97;cursor:pointer;padding:4px 8px;white-space:nowrap}
+.ray-body-precision-buttons button[aria-pressed="true"]{color:#211a0e;background:#e7c778}
+#rayBodyPrecisionScale{font-size:11px;min-width:28px;text-align:center;color:#f5d996}
+.ray-body-precision-bottom{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);white-space:nowrap;max-width:96%;text-overflow:ellipsis;overflow:hidden;z-index:2;background:#141415c9;border:1px solid #74613c88;padding:7px 12px;border-radius:20px;color:#f0d9a5;font-size:11px;pointer-events:none}
+@media(max-width:460px){.ray-body-precision-top>span{display:none}.ray-body-precision-top{justify-content:center}.ray-body-precision-buttons button{padding:4px 6px}.ray-body-precision-bottom{font-size:10px}}
+</style>
+</head>
 <body>
 <dialog id="rayIntro" class="intro-screen" open aria-labelledby="rayIntroTitle" data-playing="false">
  <h2 id="rayIntroTitle" class="intro-sr">Giới thiệu RAY PHOTO</h2>
@@ -628,6 +649,20 @@ html:has(.intro-screen[open]),body:has(>.intro-screen[open]){overflow:hidden;ove
       </div>
       <div class="leak-handle" id="leakHandle" title="Kéo để đổi vị trí vệt nắng"></div>
       <div class="leak-handle" id="nangHandle" title="Kéo để đổi vị trí nắng"></div>
+    </div>
+    <div id="rayBodyPrecision" class="ray-body-precision" hidden aria-label="Phóng to và chỉnh tinh từng vùng dáng">
+      <canvas id="rayBodyPrecisionCanvas" aria-label="Kéo viền ảnh để tinh chỉnh dáng; dùng nút dịch ảnh để thay đổi vị trí nhìn"></canvas>
+      <div class="ray-body-precision-top">
+        <span id="rayBodyPrecisionName">Chỉnh điểm</span>
+        <div class="ray-body-precision-buttons">
+          <button type="button" id="rayBodyPrecisionMinus" aria-label="Thu nhỏ ảnh">−</button>
+          <span id="rayBodyPrecisionScale">2.5×</span>
+          <button type="button" id="rayBodyPrecisionPlus" aria-label="Phóng to ảnh">+</button>
+          <button type="button" id="rayBodyPrecisionPan" aria-pressed="false">Dịch ảnh</button>
+          <button type="button" id="rayBodyPrecisionClose">Toàn ảnh ✓</button>
+        </div>
+      </div>
+      <div class="ray-body-precision-bottom" id="rayBodyPrecisionHelp">Kéo nhẹ viền cần chỉnh · 2 ngón để phóng/thu</div>
     </div>
     <div class="drop" id="drop">
       <h1>RAY PHOTO</h1>
@@ -686,6 +721,16 @@ html:has(.intro-screen[open]),body:has(>.intro-screen[open]){overflow:hidden;ove
             <div class="bname"><button type="button" class="bp" id="bodyPrev" aria-label="Bộ phận trước">‹</button><p class="lbl" id="bodyName"></p><button type="button" class="bp" id="bodyNext" aria-label="Bộ phận sau">›</button></div>
             <div class="bodyhist"><button type="button" class="bbtn bundo" disabled>↶ Quay lại</button><button type="button" class="bbtn bredo" disabled>↷ Làm lại</button></div>
             <button type="button" class="bbtn" id="bodyAiAlign" disabled style="width:100%;margin-bottom:10px">Đặt vòng này theo AI</button>
+            <div class="body-fine-tools" id="bodyFineTools">
+              <button type="button" class="bbtn fine-open" id="bodyFineOpen">⌕ Phóng vùng &amp; chỉnh điểm</button>
+              <p class="hint">Phóng to đúng bộ phận đang chọn. Dùng bút kéo nhẹ viền vai, tay, eo… để chỉnh các điểm nhỏ. Thu phóng chỉ thay đổi khung nhìn, không làm giảm chất lượng ảnh xuất.</p>
+              <div class="fine-parameters">
+                <label for="bodyFineRadius">Cỡ đầu bút <output id="bodyFineRadiusText">2.5%</output></label>
+                <input id="bodyFineRadius" type="range" min="1" max="10" step="0.5" value="2.5" />
+                <label for="bodyFinePower">Lực đẩy <output id="bodyFinePowerText">55%</output></label>
+                <input id="bodyFinePower" type="range" min="10" max="100" step="5" value="55" />
+              </div>
+            </div>
             <div id="bodySliders"></div>
             <p class="hint">"Ngang" co giãn theo chiều ngang của vòng, "Dọc" theo chiều dọc — xoay vòng để đổi hướng co giãn. "Đẩy" dời phần ảnh trong vòng theo hướng đã chọn (mũi tên trên vòng): 0° sang phải, 90° xuống, 180° sang trái, 270° lên. Viền cứng quá mà thu nhỏ mạnh thì được tự giới hạn để ảnh không bị gập. Bấm đúp vào thanh để về mặc định.</p>
           </div>
@@ -1833,6 +1878,8 @@ const BODY_DEF = [
   ["chin","Cằm / nọng",.5,.20,.065,.04,0]
 ];
 const BODY = { parts:[], sel:null, open:false, hide:false, peek:false };
+/* Chi tiet fine sculpt tach khoi thuat toan vong; toa do tuyet doi theo anh goc. */
+const BODY_FINE = {strokes:[], radius:.025, power:.55};
 function bodyDefaults(){
   BODY.parts = BODY_DEF.map(d => ({ id:d[0], name:d[1], cx:d[2], cy:d[3], rx:d[4], ry:d[5], rot:d[6],
                                     size:0, wid:0, len:0, push:0, dir:0, soft:.5, place:"default" }));
@@ -2983,7 +3030,7 @@ const BODY_SL = [
 ];
 /* ---- lịch sử: mỗi lần chỉnh (một lần kéo thanh, một lần kéo vòng, một lần đặt lại) là một bước quay lại ---- */
 const BODY_HIST = { undo:[], redo:[], pending:null, tag:"" };
-const bodySnap = () => JSON.stringify(BODY.parts);
+const bodySnap = () => JSON.stringify({parts:BODY.parts, fine:BODY_FINE.strokes});
 function bodyHistUI(){
   const u = BODY_HIST.undo.length, r = BODY_HIST.redo.length;
   document.querySelectorAll(".bundo").forEach(b => { b.disabled = !u; b.textContent = "↶ Quay lại" + (u ? " · " + u : ""); });
@@ -3006,7 +3053,9 @@ function bodyBegin(tag){          // gọi TRƯỚC khi đổi: nhớ trạng th
   if(h.pending === null){ h.pending = bodySnap(); h.tag = tag; }
 }
 function bodyRestore(json){
-  JSON.parse(json).forEach(d => { const p = bodyPart(d.id); if(p) Object.assign(p, d); });
+  const saved=JSON.parse(json), parts=Array.isArray(saved)?saved:saved.parts||[];
+  parts.forEach(d => { const p = bodyPart(d.id); if(p) Object.assign(p, d); });
+  BODY_FINE.strokes=Array.isArray(saved.fine)?saved.fine.map(s=>({...s,points:s.points.map(pt=>[...pt])})):[];
   bodyUI(); syncBody(); queue(); bodyHistUI();
 }
 function bodyUndo(){
@@ -3105,6 +3154,8 @@ $("#bodyNext").onclick = bodyStep(1);
 function bodyReset(){            // ảnh mới → vòng và thanh về mặc định
   bodyDefaults();
   BODY.sel = null; BODY.hide = false; BODY.peek = false;
+  BODY_FINE.strokes=[];
+  window.RayBodyPrecision?.close();
   BODY_HIST.undo.length = 0; BODY_HIST.redo.length = 0; BODY_HIST.pending = null; BODY_HIST.tag = "";
   bodyAiReset();
   bodyUI(); syncBody(); bodyHistUI();
@@ -3121,6 +3172,7 @@ $("#bodyReset1").onclick = () => {
   const p = bodyPart(BODY.sel); if(!p) return;
   bodyEnd(); bodyBegin("reset");
   p.size = p.wid = p.len = p.push = 0; p.dir = 0; p.soft = .5;
+  BODY_FINE.strokes=BODY_FINE.strokes.filter(s=>s.part!==p.id);
   bodyUI(); syncBody(); queue();
   bodyEnd();
 };
@@ -3128,6 +3180,7 @@ $("#bodyResetAll").onclick = () => {
   bodyEnd(); bodyBegin("resetAll");
   const keep = BODY.sel;
   bodyDefaults();
+  BODY_FINE.strokes=[];
   bodyAiPlaceAll();
   BODY.sel = keep;
   bodyUI(); syncBody(); queue();
@@ -5937,11 +5990,11 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
  const resumeKey='ray-photo-active-draft';let recovery=null;
  const names={film:'Màu phim',adjust:'Điều chỉnh',sun:'Nắng',beauty:'Trang điểm',body:'Chỉnh dáng',background:'Thay nền',text:'Chữ trên ảnh',people:'Ghép người',remove:'Xóa người và vá nền',all:'Điều chỉnh'};
  const clone=o=>JSON.parse(JSON.stringify(o));
- function keyOf(snap){const beauty=snap.beauty;return JSON.stringify({p:snap.p,focus:snap.focus,sun:snap.sun,leak:snap.leak,layers:snap.layers,body:snap.body,brows:snap.brows,values:beauty.values,people:beauty.people.map(p=>({id:p.id,values:p.values})),faces:beauty.faces.map(f=>[f.length,f[1]?.x,f[1]?.y]),ready:beauty.ready,exportLong:snap.exportLong,photo:snap.photo,removal:window.RayRemove?.signature(snap.removal),compose:window.RayCompose?.signature(snap.compose)});}
+ function keyOf(snap){const beauty=snap.beauty;return JSON.stringify({p:snap.p,focus:snap.focus,sun:snap.sun,leak:snap.leak,layers:snap.layers,body:snap.body,bodyFine:snap.bodyFine,brows:snap.brows,values:beauty.values,people:beauty.people.map(p=>({id:p.id,values:p.values})),faces:beauty.faces.map(f=>[f.length,f[1]?.x,f[1]?.y]),ready:beauty.ready,exportLong:snap.exportLong,photo:snap.photo,removal:window.RayRemove?.signature(snap.removal),compose:window.RayCompose?.signature(snap.compose)});}
  function capture(){
   const beauty={maps:BEAUTY.maps,faces:BEAUTY.faces,instances:BEAUTY.instances,ready:{...BEAUTY.ready},selected:BEAUTY.selected,nextPerson:BEAUTY.nextPerson,values:{...BEAUTY.values},
    people:BEAUTY.people.map(p=>({...p,ready:{...p.ready},values:{...p.values}}))};
-  const snap={p:{...P},focus:{...F},sun:{...NK},leak:{...LK},layers:window.RayLayers?.capture()||[],body:BODY.parts.map(p=>({...p})),bodySelected:BODY.sel,beauty,brows:window.RayBrows?.capture(),exportLong,
+  const snap={p:{...P},focus:{...F},sun:{...NK},leak:{...LK},layers:window.RayLayers?.capture()||[],body:BODY.parts.map(p=>({...p})),bodyFine:BODY_FINE.strokes.map(s=>({...s,points:s.points.map(pt=>[...pt])})),bodySelected:BODY.sel,beauty,brows:window.RayBrows?.capture(),exportLong,
    removal:window.RayRemove?.capture(),photo:window.RayPhotoEdit?.capture(),compose:window.RayCompose?.capture(),preset:document.querySelector('.roll.on')?.dataset.preset||null,presetTitle:document.querySelector('.roll.on')?.title||'Điều chỉnh'};
   snap.key=keyOf(snap);
   return snap;
@@ -5953,7 +6006,9 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
    BEAUTY.job++;if(BEAUTY.busy)beautyWorkerStop();BEAUTY.busy=false;BEAUTY.peek=false;
    Object.assign(P,{stampScale:1},window.RayTone?.defaults,snap.p);Object.assign(F,snap.focus);Object.assign(NK,snap.sun);Object.assign(LK,snap.leak);exportLong=snap.exportLong??null;
    window.RayLayers?.restore(snap.layers);
-   BODY.parts=snap.body.map(p=>({...p}));BODY.sel=snap.bodySelected;BODY.peek=false;BODY_HIST.undo.length=BODY_HIST.redo.length=0;BODY_HIST.pending=null;
+   BODY.parts=snap.body.map(p=>({...p}));BODY.sel=snap.bodySelected;BODY.peek=false;
+    BODY_FINE.strokes=Array.isArray(snap.bodyFine)?snap.bodyFine.map(s=>({...s,points:s.points.map(pt=>[...pt])})):[];
+    window.RayBodyPrecision?.close();BODY_HIST.undo.length=BODY_HIST.redo.length=0;BODY_HIST.pending=null;
    const b=snap.beauty;Object.assign(BEAUTY,{maps:b.maps,faces:b.faces,instances:b.instances,ready:{...b.ready},selected:b.selected,nextPerson:b.nextPerson,faceCache:null,source});
    BEAUTY.people=b.people.map(p=>({...p,ready:{...p.ready},values:{...p.values}}));BEAUTY.values=BEAUTY.people[BEAUTY.selected]?.values||{...b.values};
    document.querySelectorAll('.roll').forEach(el=>el.classList.toggle('on',el.dataset.preset===snap.preset));syncControls();
@@ -8234,5 +8289,197 @@ DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
 </pre></template>
+<script id="ray-body-precision-script">
+/* RAY PHOTO v48 - Zoom & Fine Sculpt; additive module, no color engine change. */
+(() => {
+ 'use strict';
+ const host=document.getElementById('rayBodyPrecision');
+ const canvas=document.getElementById('rayBodyPrecisionCanvas'),ctx=canvas.getContext('2d',{alpha:false});
+ const openButton=document.getElementById('bodyFineOpen');
+ const radius=document.getElementById('bodyFineRadius'),power=document.getElementById('bodyFinePower');
+ const radiusText=document.getElementById('bodyFineRadiusText'),powerText=document.getElementById('bodyFinePowerText');
+ const scaleText=document.getElementById('rayBodyPrecisionScale');
+ const name=document.getElementById('rayBodyPrecisionName'),panBtn=document.getElementById('rayBodyPrecisionPan'),help=document.getElementById('rayBodyPrecisionHelp');
+ let zoom=2.5,focusX=0,focusY=0,pan=false,gesture=null,rafZoom=0;
+ const points=new Map();
+ const clamp1=(v,a,b)=>Math.max(a,Math.min(b,v));
+ const image=()=>({w:view.width,h:view.height,W:LASTG?.W||view.width,H:LASTG?.H||view.height,bw:LASTG?.bw||0});
+ function isOpen(){return !host.hidden;}
+ function updateLabels(){radiusText.textContent=(BODY_FINE.radius*100).toFixed(1)+'%';powerText.textContent=Math.round(BODY_FINE.power*100)+'%';}
+ function updateHelp(){panBtn.setAttribute('aria-pressed',String(pan));help.textContent=pan?'Kéo để dịch ảnh · 2 ngón để phóng/thu':'Chạm rồi kéo viền để đẩy điểm nhỏ · 2 ngón để phóng/thu';}
+ function focusSelected(){
+  const p=bodyPart(BODY.sel),g=image();if(!p||!g.w)return;
+  focusX=(g.bw+p.cx*g.W)/Math.max(1,g.W+2*g.bw)*g.w;
+  focusY=(g.bw+p.cy*g.H)/Math.max(1,g.H+g.bw+(LASTG?.bb||0))*g.h;
+  name.textContent=p.name;
+ }
+ function geometry(){
+  const w=host.clientWidth||1,h=host.clientHeight||1,img=image();
+  const scale=Math.min(w/Math.max(1,img.w),h/Math.max(1,img.h))*zoom;
+  return{w,h,img,scale,left:w/2-focusX*scale,top:h/2-focusY*scale};
+ }
+ function mapPoint(cx,cy){
+  const rc=canvas.getBoundingClientRect(),g=geometry(),i=g.img;
+  const x=(cx-rc.left-g.left)/g.scale,y=(cy-rc.top-g.top)/g.scale;
+  const sx=(x/i.w)*(i.W+2*i.bw)-i.bw,sy=(y/i.h)*(i.H+2*i.bw)-i.bw;
+  return{x:clamp1(sx/i.W,0,1),y:clamp1(sy/i.H,0,1)};
+ }
+ function schedule(){if(!isOpen()||rafZoom)return;rafZoom=requestAnimationFrame(()=>{rafZoom=0;paint();});}
+ function paint(){
+  if(!isOpen()||!view.width||!view.height)return;
+  const rc=host.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
+  const w=Math.max(1,Math.round(rc.width*dpr)),h=Math.max(1,Math.round(rc.height*dpr));
+  if(canvas.width!==w)canvas.width=w;
+  if(canvas.height!==h)canvas.height=h;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  const g=geometry();ctx.fillStyle='#111214';ctx.fillRect(0,0,g.w,g.h);
+  ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
+  ctx.drawImage(view,g.left,g.top,view.width*g.scale,view.height*g.scale);
+  scaleText.textContent=zoom.toFixed(1)+'×';
+  const pointer=gesture?.kind==='brush'&&gesture.coords?.length?gesture.coords:null;
+  if(pointer){
+    ctx.strokeStyle='#ffe1a4';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();
+    pointer.forEach((q,j)=>{
+      const px=g.left+(g.img.bw+q[0]*g.img.W)/(g.img.W+2*g.img.bw)*g.img.w*g.scale;
+      const py=g.top+(g.img.bw+q[1]*g.img.H)/(g.img.H+2*g.img.bw)*g.img.h*g.scale;
+      if(!j)ctx.moveTo(px,py);else ctx.lineTo(px,py);
+    });ctx.stroke();ctx.setLineDash([]);
+  }
+  const pos=gesture?.current;
+  if(pos&&!pan){
+    const xx=g.left+(g.img.bw+pos.x*g.img.W)/(g.img.W+2*g.img.bw)*g.img.w*g.scale;
+    const yy=g.top+(g.img.bw+pos.y*g.img.H)/(g.img.H+2*g.img.bw)*g.img.h*g.scale;
+    ctx.strokeStyle='#ffe3a1';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(xx,yy,BODY_FINE.radius*g.img.H/g.img.h*view.height*g.scale,0,Math.PI*2);ctx.stroke();
+  }
+ }
+ function open(){
+  if(!source||!BODY.sel)return;
+  host.hidden=false;zoom=2.5;pan=false;gesture=null;points.clear();
+  focusSelected();updateHelp();schedule();
+  openButton.textContent='✓ Đang phóng vùng · Xem toàn ảnh';openButton.classList.add('on');
+ }
+ function close(){
+  if(host.hidden)return;
+  host.hidden=true;gesture=null;points.clear();if(rafZoom)cancelAnimationFrame(rafZoom);rafZoom=0;
+  openButton.textContent='⌕ Phóng vùng & chỉnh điểm';openButton.classList.remove('on');
+ }
+ openButton.onclick=()=>isOpen()?close():open();
+ document.getElementById('rayBodyPrecisionClose').onclick=close;
+ document.getElementById('rayBodyPrecisionPlus').onclick=()=>{zoom=clamp1(zoom+.5,1.3,6);schedule();};
+ document.getElementById('rayBodyPrecisionMinus').onclick=()=>{zoom=clamp1(zoom-.5,1.3,6);schedule();};
+ panBtn.onclick=()=>{pan=!pan;gesture=null;points.clear();updateHelp();schedule();};
+ radius.oninput=()=>{BODY_FINE.radius=Number(radius.value)/100;updateLabels();schedule();};
+ power.oninput=()=>{BODY_FINE.power=Number(power.value)/100;updateLabels();};
+ updateLabels();
+ function resize(){if(isOpen())schedule();}
+ window.addEventListener('resize',resize,{passive:true});
+ new ResizeObserver(resize).observe(host);
+ function onDown(e){
+  if(!isOpen())return;e.preventDefault();canvas.setPointerCapture(e.pointerId);
+  points.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(points.size===2){
+    const pp=[...points.values()];gesture={kind:'pinch',dist:Math.hypot(pp[1].x-pp[0].x,pp[1].y-pp[0].y),zoom,startX:focusX,startY:focusY};return;
+  }
+  if(points.size>2)return;
+  if(pan){gesture={kind:'pan',x:e.clientX,y:e.clientY,fx:focusX,fy:focusY};}
+  else{
+    const q=mapPoint(e.clientX,e.clientY);
+    gesture={kind:'brush',coords:[[q.x,q.y]],current:q,id:e.pointerId};
+  }
+  schedule();
+ }
+ function onMove(e){
+  if(!points.has(e.pointerId))return;e.preventDefault();points.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(points.size===2&&gesture?.kind==='pinch'){
+    const pp=[...points.values()];zoom=clamp1(gesture.zoom*Math.hypot(pp[1].x-pp[0].x,pp[1].y-pp[0].y)/Math.max(5,gesture.dist),1.3,6);schedule();return;
+  }
+  if(gesture?.kind==='pan'){
+    const g=geometry();focusX=gesture.fx-(e.clientX-gesture.x)/g.scale;focusY=gesture.fy-(e.clientY-gesture.y)/g.scale;
+    focusX=clamp1(focusX,0,view.width);focusY=clamp1(focusY,0,view.height);schedule();
+  }else if(gesture?.kind==='brush'&&gesture.id===e.pointerId){
+    const q=mapPoint(e.clientX,e.clientY);gesture.current=q;
+    const a=gesture.coords[gesture.coords.length-1],g=image();
+    if(Math.hypot((q.x-a[0])*g.W,(q.y-a[1])*g.H)>Math.max(1,g.H*BODY_FINE.radius*.10))gesture.coords.push([q.x,q.y]);
+    if(gesture.coords.length>90){const first=gesture.coords[0];gesture.coords=[first,...gesture.coords.filter((_,i)=>i%2===0)];}
+    schedule();
+  }
+ }
+ function onUp(e){
+  if(!points.has(e.pointerId))return;
+  if(gesture?.kind==='brush'&&gesture.id===e.pointerId&&points.size===1){
+    const q=mapPoint(e.clientX,e.clientY),a=gesture.coords[gesture.coords.length-1];
+    if(Math.hypot(q.x-a[0],q.y-a[1])>0.0002)gesture.coords.push([q.x,q.y]);
+    const coords=gesture.coords;
+    if(coords.length>1){
+      bodyEnd();bodyBegin('fine-stroke');
+      BODY_FINE.strokes.push({part:BODY.sel,r:BODY_FINE.radius,p:BODY_FINE.power,points:coords});
+      if(BODY_FINE.strokes.length>70)BODY_FINE.strokes.splice(0,BODY_FINE.strokes.length-70);
+      bodyEnd();queue();window.RaySession?.record('Chỉnh dáng chi tiết');
+    }
+  }
+  points.delete(e.pointerId);gesture=null;
+  if(points.size===1){const p=[...points.entries()][0];gesture=pan?{kind:'pan',x:p[1].x,y:p[1].y,fx:focusX,fy:focusY}:null;}
+  schedule();
+ }
+ canvas.addEventListener('pointerdown',onDown);
+ canvas.addEventListener('pointermove',onMove);
+ canvas.addEventListener('pointerup',onUp);
+ canvas.addEventListener('pointercancel',e=>{points.delete(e.pointerId);gesture=null;schedule();});
+ canvas.addEventListener('wheel',e=>{if(!isOpen())return;e.preventDefault();zoom=clamp1(zoom+(e.deltaY<0?.25:-.25),1.3,6);schedule();},{passive:false});
+ // Giao dien moi chi quan sat bo phan duoc chon, khong thay doi vi tri vong goc.
+ const previousBodyUI=bodyUI;
+ bodyUI=function(...a){const r=previousBodyUI.apply(this,a);if(isOpen()){if(!BODY.sel||!source||document.body.dataset.editorTool!=='body')close();else{focusSelected();schedule();}}return r;};
+ new MutationObserver(()=>{if(document.body.dataset.editorTool!=='body')close();}).observe(document.body,{attributes:true,attributeFilter:['data-editor-tool']});
+ // Giữ vùng phóng khớp với bản dựng mới nhất và ảnh xuất (không render ảnh khác chất lượng).
+ const previousDraw=draw;
+ draw=function(...a){const result=previousDraw.apply(this,a);schedule();return result;};
+ window.RayBodyPrecision={open,close,repaint:schedule};
+})();
+/* Bút biến dạng mịn: tọa độ và bán kính chuẩn hóa theo chiều cao ảnh.
+   Chỉ lấy mẫu vùng nhỏ; bên ngoài cọ giữ nguyên từng pixel, giữ nguyên color engine.
+   Mỗi đoạn kéo có biên độ giới hạn, tránh kéo gập/giật ở vùng nét cao. */
+function rayFineStamp(c,W,H,x,y,dx,dy,r){
+ if(!Number.isFinite(x+y+dx+dy+r)||r<=1)return;
+ const length=Math.hypot(dx,dy);if(length<.12)return;
+ const lim=Math.min(1,r*.27/length);dx*=lim;dy*=lim;
+ const x0=Math.max(0,Math.floor(x-r-1)),y0=Math.max(0,Math.floor(y-r-1));
+ const x1=Math.min(W,Math.ceil(x+r+1)),y1=Math.min(H,Math.ceil(y+r+1));
+ if(x1<=x0||y1<=y0)return;
+ const pad=Math.ceil(Math.hypot(dx,dy))+3;
+ const sx=Math.max(0,x0-pad),sy=Math.max(0,y0-pad),ex=Math.min(W,x1+pad),ey=Math.min(H,y1+pad);
+ const bw=ex-sx,bh=ey-sy,src=c.getImageData(sx,sy,bw,bh),S=src.data;
+ const res=c.createImageData(x1-x0,y1-y0),D=res.data;
+ const xx=x0-sx,yy=y0-sy,ww=x1-x0,hh=y1-y0;
+ for(let j=0;j<hh;j++)for(let i=0;i<ww;i++){
+  const px=x0+i+.5,py=y0+j+.5,dist=Math.hypot(px-x,py-y);
+  let w=0;
+  if(dist<r){const s=1-dist/r;w=s*s*(3-2*s);}
+  const u=clamp1Fine(xx+i-dx*w,0,bw-1),v=clamp1Fine(yy+j-dy*w,0,bh-1);
+  const ax=Math.floor(u),ay=Math.floor(v),bx=Math.min(bw-1,ax+1),by=Math.min(bh-1,ay+1);
+  const fx=u-ax,fy=v-ay,o=(j*ww+i)*4,a=(ay*bw+ax)*4,b=(ay*bw+bx)*4,d=(by*bw+ax)*4,e=(by*bw+bx)*4;
+  for(let ch=0;ch<4;ch++)D[o+ch]=S[a+ch]*(1-fx)*(1-fy)+S[b+ch]*fx*(1-fy)+S[d+ch]*(1-fx)*fy+S[e+ch]*fx*fy;
+ }
+ c.putImageData(res,x0,y0);
+}
+function clamp1Fine(v,a,b){return Math.max(a,Math.min(b,v));}
+function rayFineWarp(c,W,H){
+ if(!BODY_FINE.strokes.length)return;
+ for(const stroke of BODY_FINE.strokes){
+  const pts=stroke.points||[],r=Math.max(2,stroke.r*H),power=clamp1Fine(stroke.p,0,1);
+  for(let k=1;k<pts.length;k++){
+   const a=pts[k-1],b=pts[k],dx=(b[0]-a[0])*W,dy=(b[1]-a[1])*H;
+   const dist=Math.hypot(dx,dy);if(dist<.35)continue;
+   const count=Math.max(1,Math.min(5,Math.ceil(dist/(r*.25))));
+   for(let s=0;s<count;s++){
+    const t=(s+.5)/count;
+    rayFineStamp(c,W,H,(a[0]+(b[0]-a[0])*t)*W,(a[1]+(b[1]-a[1])*t)*H,dx/count*power,dy/count*power,r);
+   }
+  }
+ }
+}
+// Bổ sung bước bút sau chỉnh dáng hiện có, không thay thuật toán vòng và không can thiệp bộ lọc phim.
+const rayOriginalBodyWarp=bodyWarp;
+bodyWarp=function(c,W,H){rayOriginalBodyWarp(c,W,H);if(!BODY.peek)rayFineWarp(c,W,H);};
+</script>
 </body>
 </html>
