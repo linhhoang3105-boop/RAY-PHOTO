@@ -623,6 +623,26 @@ html:has(.intro-screen[open]),body:has(>.intro-screen[open]){overflow:hidden;ove
 #rayBodyPrecisionScale{font-size:11px;min-width:28px;text-align:center;color:#f5d996}
 .ray-body-precision-bottom{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);white-space:nowrap;max-width:96%;text-overflow:ellipsis;overflow:hidden;z-index:2;background:#141415c9;border:1px solid #74613c88;padding:7px 12px;border-radius:20px;color:#f0d9a5;font-size:11px;pointer-events:none}
 @media(max-width:460px){.ray-body-precision-top>span{display:none}.ray-body-precision-top{justify-content:center}.ray-body-precision-buttons button{padding:4px 6px}.ray-body-precision-bottom{font-size:10px}}
+
+/* V50 - Hai cach chinh truc tiep: vung co dinh hoac but nho; khong xuat dau huong dan. */
+.ray-body-mode-tabs{position:absolute;z-index:3;top:53px;left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:4px;background:rgba(17,18,20,.82);border:1px solid rgba(231,199,120,.35);border-radius:12px;white-space:nowrap;backdrop-filter:blur(8px)}
+.ray-body-mode-tabs button{border:1px solid transparent;border-radius:8px;background:transparent;color:#f3dfb6;min-height:37px;padding:6px 12px;font-size:12px;cursor:pointer}
+.ray-body-mode-tabs button.on{background:#e7c778;color:#17140e;font-weight:650}
+.ray-body-precision-bottom{white-space:normal;text-align:center;max-width:min(94%,420px);line-height:1.35}
+.ray-body-size{position:absolute;z-index:3;bottom:48px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 10px;background:#171717d9;border:1px solid #e7c77855;border-radius:9px;white-space:nowrap;color:#f9e8bc;font-size:11px;min-width:250px;max-width:94%;}
+.ray-body-size input{width:min(38vw,190px);accent-color:#e7c778;touch-action:pan-x;}
+.ray-body-size label{min-width:53px}.ray-body-size output{min-width:29px;text-align:right;color:#e7c778}
+@media(max-width:460px){.ray-body-mode-tabs{top:49px}.ray-body-mode-tabs button{font-size:11px;min-height:36px;padding:6px 10px}}
+/* V49 - vong chinh dang: net dut ivory mo, nen trong suot, khong in vao anh. */
+body[data-editor-tool="body"] .film-workspace:not(.is-result-preview):not(.session-peeking) .body-oval.on {
+ display:block!important;
+ border:1.5px dashed rgba(255,225,163,.68);
+ background:rgba(255,219,147,.055);
+ box-shadow:0 0 0 1px rgba(20,18,14,.42), 0 0 11px rgba(249,216,146,.13);
+}
+body[data-editor-tool="body"] .film-workspace:not(.is-result-preview):not(.session-peeking) .body-oval.on .bo-h{opacity:.66}
+/* Chi dan duoc ve bang canvas phu, khong dua vao render/export. */
+#rayBodyPrecisionCanvas{cursor:crosshair;}
 </style>
 </head>
 <body>
@@ -662,7 +682,12 @@ html:has(.intro-screen[open]),body:has(>.intro-screen[open]){overflow:hidden;ove
           <button type="button" id="rayBodyPrecisionClose">Toàn ảnh ✓</button>
         </div>
       </div>
-      <div class="ray-body-precision-bottom" id="rayBodyPrecisionHelp">Kéo nhẹ viền cần chỉnh · 2 ngón để phóng/thu</div>
+      <div class="ray-body-mode-tabs" role="group" aria-label="Cách chỉnh dáng">
+        <button type="button" id="rayBodyRegionMode" class="on" aria-pressed="true">◎ Vùng cố định</button>
+        <button type="button" id="rayBodyBrushMode" aria-pressed="false">✎ Bút nắn nhỏ</button>
+      </div>
+      <div class="ray-body-size"><label for="rayBodyToolSize" id="rayBodyToolSizeLabel">Cỡ vùng</label><input type="range" id="rayBodyToolSize" min="3" max="16" step="0.5" value="9" aria-label="Chỉnh kích thước vùng tác động"/><output id="rayBodyToolSizeValue">9%</output></div>
+      <div class="ray-body-precision-bottom" id="rayBodyPrecisionHelp">Chạm để đặt vùng · kéo ra / vào trực tiếp</div>
     </div>
     <div class="drop" id="drop">
       <h1>RAY PHOTO</h1>
@@ -722,13 +747,13 @@ html:has(.intro-screen[open]),body:has(>.intro-screen[open]){overflow:hidden;ove
             <div class="bodyhist"><button type="button" class="bbtn bundo" disabled>↶ Quay lại</button><button type="button" class="bbtn bredo" disabled>↷ Làm lại</button></div>
             <button type="button" class="bbtn" id="bodyAiAlign" disabled style="width:100%;margin-bottom:10px">Đặt vòng này theo AI</button>
             <div class="body-fine-tools" id="bodyFineTools">
-              <button type="button" class="bbtn fine-open" id="bodyFineOpen">⌕ Phóng vùng &amp; chỉnh điểm</button>
+              <button type="button" class="bbtn fine-open" id="bodyFineOpen">◎ Chỉnh dáng trực tiếp</button>
               <p class="hint">Phóng to đúng bộ phận đang chọn. Dùng bút kéo nhẹ viền vai, tay, eo… để chỉnh các điểm nhỏ. Thu phóng chỉ thay đổi khung nhìn, không làm giảm chất lượng ảnh xuất.</p>
               <div class="fine-parameters">
                 <label for="bodyFineRadius">Cỡ đầu bút <output id="bodyFineRadiusText">2.5%</output></label>
                 <input id="bodyFineRadius" type="range" min="1" max="10" step="0.5" value="2.5" />
                 <label for="bodyFinePower">Lực đẩy <output id="bodyFinePowerText">55%</output></label>
-                <input id="bodyFinePower" type="range" min="10" max="100" step="5" value="55" />
+                <input id="bodyFinePower" type="range" min="5" max="100" step="5" value="25" />
               </div>
             </div>
             <div id="bodySliders"></div>
@@ -1879,7 +1904,7 @@ const BODY_DEF = [
 ];
 const BODY = { parts:[], sel:null, open:false, hide:false, peek:false };
 /* Chi tiet fine sculpt tach khoi thuat toan vong; toa do tuyet doi theo anh goc. */
-const BODY_FINE = {strokes:[], radius:.025, power:.55};
+const BODY_FINE = {strokes:[], radius:.025, power:.25};
 function bodyDefaults(){
   BODY.parts = BODY_DEF.map(d => ({ id:d[0], name:d[1], cx:d[2], cy:d[3], rx:d[4], ry:d[5], rot:d[6],
                                     size:0, wid:0, len:0, push:0, dir:0, soft:.5, place:"default" }));
@@ -8300,18 +8325,32 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
  const radiusText=document.getElementById('bodyFineRadiusText'),powerText=document.getElementById('bodyFinePowerText');
  const scaleText=document.getElementById('rayBodyPrecisionScale');
  const name=document.getElementById('rayBodyPrecisionName'),panBtn=document.getElementById('rayBodyPrecisionPan'),help=document.getElementById('rayBodyPrecisionHelp');
- let zoom=2.5,focusX=0,focusY=0,pan=false,gesture=null,rafZoom=0;
+ const regionBtn=document.getElementById('rayBodyRegionMode'),brushBtn=document.getElementById('rayBodyBrushMode');
+ const sizeSlider=document.getElementById('rayBodyToolSize'),sizeLabel=document.getElementById('rayBodyToolSizeLabel'),sizeValue=document.getElementById('rayBodyToolSizeValue');
+ let zoom=2.5,focusX=0,focusY=0,pan=false,mode='region',gesture=null,rafZoom=0,cursor=null,lastPart=null,livePreview=null,liveCtx=null;
+ let regionCenter=null,regionRadius=.075;
  const points=new Map();
  const clamp1=(v,a,b)=>Math.max(a,Math.min(b,v));
- const image=()=>({w:view.width,h:view.height,W:LASTG?.W||view.width,H:LASTG?.H||view.height,bw:LASTG?.bw||0});
+ const image=()=>({w:view.width,h:view.height,W:LASTG?.W||view.width,H:LASTG?.H||view.height,bw:LASTG?.bw||0,bb:LASTG?.bb||0});
  function isOpen(){return !host.hidden;}
  function updateLabels(){radiusText.textContent=(BODY_FINE.radius*100).toFixed(1)+'%';powerText.textContent=Math.round(BODY_FINE.power*100)+'%';}
- function updateHelp(){panBtn.setAttribute('aria-pressed',String(pan));help.textContent=pan?'Kéo để dịch ảnh · 2 ngón để phóng/thu':'Chạm rồi kéo viền để đẩy điểm nhỏ · 2 ngón để phóng/thu';}
+ function updateToolSize(){
+  const brush=mode==='brush';sizeLabel.textContent=brush?'Cỡ bút':'Cỡ vùng';
+  sizeSlider.min=brush?'1':'3';sizeSlider.max=brush?'10':'16';sizeSlider.value=((brush?BODY_FINE.radius:regionRadius)*100).toFixed(1);
+  sizeValue.textContent=(Math.round((brush?BODY_FINE.radius:regionRadius)*1000)/10)+'%';
+ }
+ function updateHelp(){
+  updateToolSize();panBtn.setAttribute('aria-pressed',String(pan));
+  regionBtn.classList.toggle('on',mode==='region'&&!pan);brushBtn.classList.toggle('on',mode==='brush'&&!pan);
+  regionBtn.setAttribute('aria-pressed',String(mode==='region'&&!pan));brushBtn.setAttribute('aria-pressed',String(mode==='brush'&&!pan));
+  help.textContent=pan?'Kéo để dịch ảnh · Hai ngón thu phóng':mode==='region'?'Vòng đứng yên · Kéo trong vòng để nắn ra/vào · Chạm ngoài vòng để đặt lại':'Bút mờ đánh dấu vùng nhỏ · Kéo trực tiếp đường viền';
+ }
  function focusSelected(){
   const p=bodyPart(BODY.sel),g=image();if(!p||!g.w)return;
   focusX=(g.bw+p.cx*g.W)/Math.max(1,g.W+2*g.bw)*g.w;
   focusY=(g.bw+p.cy*g.H)/Math.max(1,g.H+g.bw+(LASTG?.bb||0))*g.h;
   name.textContent=p.name;
+  if(!gesture){if(lastPart!==p.id){regionCenter={x:p.cx,y:p.cy};regionRadius=Math.max(.03,Math.min(.16,Math.max(p.rx,p.ry)));lastPart=p.id;}if(!cursor)cursor={x:p.cx,y:p.cy};}
  }
  function geometry(){
   const w=host.clientWidth||1,h=host.clientHeight||1,img=image();
@@ -8321,10 +8360,50 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
  function mapPoint(cx,cy){
   const rc=canvas.getBoundingClientRect(),g=geometry(),i=g.img;
   const x=(cx-rc.left-g.left)/g.scale,y=(cy-rc.top-g.top)/g.scale;
-  const sx=(x/i.w)*(i.W+2*i.bw)-i.bw,sy=(y/i.h)*(i.H+2*i.bw)-i.bw;
+  const sx=(x/i.w)*(i.W+2*i.bw)-i.bw,sy=(y/i.h)*(i.H+i.bw+i.bb)-i.bw;
   return{x:clamp1(sx/i.W,0,1),y:clamp1(sy/i.H,0,1)};
  }
  function schedule(){if(!isOpen()||rafZoom)return;rafZoom=requestAnimationFrame(()=>{rafZoom=0;paint();});}
+ function screenPoint(p,g){
+  const i=g.img,tx=g.left+(i.bw+p.x*i.W)*i.w/(i.W+2*i.bw)*g.scale;
+  const ty=g.top+(i.bw+p.y*i.H)*i.h/(i.H+i.bw+i.bb)*g.scale;
+  return{x:tx,y:ty};
+ }
+ function regionRadiusScreen(g){
+  const i=g.img;return Math.max(12,regionRadius*i.H*i.h/(i.H+i.bw+i.bb)*g.scale);
+ }
+ function regionContains(q){
+  if(!regionCenter)return false;const i=image();
+  return Math.hypot((q.x-regionCenter.x)*i.W,(q.y-regionCenter.y)*i.H)<=regionRadius*i.H;
+ }
+ function screenRadius(g){
+  const i=g.img;return Math.max(5,BODY_FINE.radius*i.H*i.h/(i.H+i.bw+i.bb)*g.scale);
+ }
+ function preparePreview(){
+  if(!view.width||!view.height)return;
+  livePreview=document.createElement('canvas');livePreview.width=view.width;livePreview.height=view.height;
+  liveCtx=livePreview.getContext('2d',{willReadFrequently:true});liveCtx.drawImage(view,0,0);
+ }
+ function previewSegment(a,b){
+  if(!liveCtx||!livePreview)return;
+  const i=image(), sx=livePreview.width/(i.W+2*i.bw),sy=livePreview.height/(i.H+i.bw+i.bb);
+  const dx=(b[0]-a[0])*i.W*sx,dy=(b[1]-a[1])*i.H*sy;
+  const r=Math.max(2,BODY_FINE.radius*i.H*sy),dist=Math.hypot(dx,dy);
+  if(dist<.35)return;
+  const steps=Math.max(1,Math.min(5,Math.ceil(dist/(r*.25))));
+  for(let k=0;k<steps;k++){
+   const f=(k+.5)/steps;
+   const x=(i.bw+(a[0]+(b[0]-a[0])*f)*i.W)*sx;
+   const y=(i.bw+(a[1]+(b[1]-a[1])*f)*i.H)*sy;
+   rayFineStamp(liveCtx,livePreview.width,livePreview.height,x,y,dx/steps*BODY_FINE.power,dy/steps*BODY_FINE.power,r);
+  }
+ }
+ function regionPreview(st){
+  preparePreview();if(!st||!liveCtx||!livePreview)return;
+  const i=image(),sx=livePreview.width/(i.W+2*i.bw),sy=livePreview.height/(i.H+i.bw+i.bb);
+  const x=(i.bw+st.center.x*i.W)*sx,y=(i.bw+st.center.y*i.H)*sy;
+  rayFineStamp(liveCtx,livePreview.width,livePreview.height,x,y,st.dx*i.W*sx*BODY_FINE.power,st.dy*i.H*sy*BODY_FINE.power,Math.max(2,st.r*i.H*sy));
+ }
  function paint(){
   if(!isOpen()||!view.width||!view.height)return;
   const rc=host.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
@@ -8334,40 +8413,81 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const g=geometry();ctx.fillStyle='#111214';ctx.fillRect(0,0,g.w,g.h);
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  ctx.drawImage(view,g.left,g.top,view.width*g.scale,view.height*g.scale);
+  const img=(gesture&&(gesture.kind==='brush'||gesture.kind==='region')&&livePreview)?livePreview:view;
+  ctx.drawImage(img,g.left,g.top,view.width*g.scale,view.height*g.scale);
   scaleText.textContent=zoom.toFixed(1)+'×';
-  const pointer=gesture?.kind==='brush'&&gesture.coords?.length?gesture.coords:null;
-  if(pointer){
-    ctx.strokeStyle='#ffe1a4';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();
-    pointer.forEach((q,j)=>{
-      const px=g.left+(g.img.bw+q[0]*g.img.W)/(g.img.W+2*g.img.bw)*g.img.w*g.scale;
-      const py=g.top+(g.img.bw+q[1]*g.img.H)/(g.img.H+2*g.img.bw)*g.img.h*g.scale;
-      if(!j)ctx.moveTo(px,py);else ctx.lineTo(px,py);
-    });ctx.stroke();ctx.setLineDash([]);
+  // Vung co dinh: vi tri va kich thuoc khong troi theo ngon tay trong luc keo.
+  if(mode==='region'&&!pan&&regionCenter){
+   const p=screenPoint(regionCenter,g),rr=regionRadiusScreen(g);
+   ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,rr,0,Math.PI*2);
+   ctx.fillStyle='rgba(255,220,152,.07)';ctx.fill();
+   ctx.setLineDash([6,5]);ctx.strokeStyle='rgba(30,25,17,.8)';ctx.lineWidth=3.5;ctx.stroke();
+   ctx.strokeStyle='rgba(255,232,183,.93)';ctx.lineWidth=1.7;ctx.stroke();ctx.setLineDash([]);
+   ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle='#ffe6ad';ctx.fill();
+   ctx.restore();
+  }else if(mode==='brush'&&!pan){
+   const part=bodyPart(BODY.sel);
+   if(part){const cp=screenPoint({x:part.cx,y:part.cy},g),i=g.img;
+    const rx=part.rx*i.H*i.w/(i.W+2*i.bw)*g.scale,ry=part.ry*i.H*i.h/(i.H+i.bw+i.bb)*g.scale;
+    ctx.save();ctx.translate(cp.x,cp.y);ctx.rotate(part.rot*Math.PI/180);
+    ctx.beginPath();ctx.ellipse(0,0,Math.max(1,rx),Math.max(1,ry),0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,227,174,.36)';ctx.lineWidth=1.2;ctx.setLineDash([4,7]);ctx.stroke();ctx.restore();
+   }
   }
-  const pos=gesture?.current;
-  if(pos&&!pan){
-    const xx=g.left+(g.img.bw+pos.x*g.img.W)/(g.img.W+2*g.img.bw)*g.img.w*g.scale;
-    const yy=g.top+(g.img.bw+pos.y*g.img.H)/(g.img.H+2*g.img.bw)*g.img.h*g.scale;
-    ctx.strokeStyle='#ffe3a1';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(xx,yy,BODY_FINE.radius*g.img.H/g.img.h*view.height*g.scale,0,Math.PI*2);ctx.stroke();
+  // 2. Vet keo ngan, hien mo kem mui ten huong keo.
+  const trail=gesture?.kind==='brush'&&gesture.coords?.length?gesture.coords:null;
+  if(trail&&trail.length>1){
+   ctx.save();ctx.lineWidth=1.5;ctx.strokeStyle='rgba(255,224,159,.72)';ctx.setLineDash([3,5]);ctx.beginPath();
+   trail.forEach((q,j)=>{const p=screenPoint({x:q[0],y:q[1]},g);if(!j)ctx.moveTo(p.x,p.y);else ctx.lineTo(p.x,p.y);});
+   ctx.stroke();ctx.setLineDash([]);
+   const tail=screenPoint({x:trail[Math.max(0,trail.length-2)][0],y:trail[Math.max(0,trail.length-2)][1]},g);
+   const head=screenPoint(gesture.current||{x:trail.at(-1)[0],y:trail.at(-1)[1]},g);
+   const dx=head.x-tail.x,dy=head.y-tail.y,dd=Math.hypot(dx,dy);
+   if(dd>3){const ux=dx/dd,uy=dy/dd;ctx.beginPath();ctx.moveTo(head.x,head.y);ctx.lineTo(head.x-8*ux-4*uy,head.y-8*uy+4*ux);ctx.moveTo(head.x,head.y);ctx.lineTo(head.x-8*ux+4*uy,head.y-8*uy-4*ux);ctx.strokeStyle='rgba(255,235,189,.93)';ctx.lineWidth=1.6;ctx.stroke();}
+   ctx.restore();
+  }
+  // 3. Dau but luon duoc hien thi (ke ca khi chua cham tren mobile).
+  const pos=gesture?.kind==='brush'?(gesture.current||cursor):cursor;
+  if(pos&&!pan&&mode==='brush'&&gesture?.kind!=='pinch'){
+   const p=screenPoint(pos,g),rr=screenRadius(g);
+   ctx.save();
+   const glow=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rr);
+   glow.addColorStop(0,'rgba(255,223,155,.20)');
+   glow.addColorStop(.48,'rgba(255,223,155,.11)');
+   glow.addColorStop(1,'rgba(255,223,155,0)');
+   ctx.fillStyle=glow;ctx.beginPath();ctx.arc(p.x,p.y,rr,0,Math.PI*2);ctx.fill();
+   ctx.setLineDash([4,4]);ctx.beginPath();ctx.arc(p.x,p.y,rr,0,Math.PI*2);
+   ctx.lineWidth=2.8;ctx.strokeStyle='rgba(28,24,19,.63)';ctx.stroke();
+   ctx.lineWidth=1.5;ctx.strokeStyle='rgba(255,235,187,.94)';ctx.stroke();ctx.setLineDash([]);
+   ctx.fillStyle='rgba(255,234,184,.94)';ctx.strokeStyle='rgba(22,18,12,.64)';ctx.lineWidth=1;
+   ctx.beginPath();ctx.arc(p.x,p.y,2.7,0,Math.PI*2);ctx.fill();ctx.stroke();
+   ctx.restore();
   }
  }
  function open(){
   if(!source||!BODY.sel)return;
-  host.hidden=false;zoom=2.5;pan=false;gesture=null;points.clear();
+  host.hidden=false;zoom=2.5;pan=false;mode='region';gesture=null;points.clear();cursor=null;lastPart=null;regionCenter=null;livePreview=null;liveCtx=null;
   focusSelected();updateHelp();schedule();
-  openButton.textContent='✓ Đang phóng vùng · Xem toàn ảnh';openButton.classList.add('on');
+  openButton.textContent='✓ Chỉnh dáng trực tiếp · Xem toàn ảnh';openButton.classList.add('on');
  }
  function close(){
   if(host.hidden)return;
-  host.hidden=true;gesture=null;points.clear();if(rafZoom)cancelAnimationFrame(rafZoom);rafZoom=0;
-  openButton.textContent='⌕ Phóng vùng & chỉnh điểm';openButton.classList.remove('on');
+  host.hidden=true;gesture=null;points.clear();cursor=null;lastPart=null;livePreview=null;liveCtx=null;if(rafZoom)cancelAnimationFrame(rafZoom);rafZoom=0;
+  openButton.textContent='◎ Chỉnh dáng trực tiếp';openButton.classList.remove('on');
  }
  openButton.onclick=()=>isOpen()?close():open();
  document.getElementById('rayBodyPrecisionClose').onclick=close;
  document.getElementById('rayBodyPrecisionPlus').onclick=()=>{zoom=clamp1(zoom+.5,1.3,6);schedule();};
  document.getElementById('rayBodyPrecisionMinus').onclick=()=>{zoom=clamp1(zoom-.5,1.3,6);schedule();};
- panBtn.onclick=()=>{pan=!pan;gesture=null;points.clear();updateHelp();schedule();};
+ function selectMode(next){mode=next;pan=false;gesture=null;livePreview=null;liveCtx=null;points.clear();updateHelp();schedule();}
+ regionBtn.onclick=()=>selectMode('region');
+ brushBtn.onclick=()=>selectMode('brush');
+ sizeSlider.oninput=()=>{
+  const v=Number(sizeSlider.value)/100;
+  if(mode==='region')regionRadius=v;else{BODY_FINE.radius=v;radius.value=String(v*100);updateLabels();}
+  sizeValue.textContent=Number(sizeSlider.value)+'%';schedule();
+ };
+ panBtn.onclick=()=>{pan=!pan;gesture=null;livePreview=null;liveCtx=null;points.clear();updateHelp();schedule();};
  radius.oninput=()=>{BODY_FINE.radius=Number(radius.value)/100;updateLabels();schedule();};
  power.oninput=()=>{BODY_FINE.power=Number(power.value)/100;updateLabels();};
  updateLabels();
@@ -8378,37 +8498,58 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   if(!isOpen())return;e.preventDefault();canvas.setPointerCapture(e.pointerId);
   points.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(points.size===2){
-    const pp=[...points.values()];gesture={kind:'pinch',dist:Math.hypot(pp[1].x-pp[0].x,pp[1].y-pp[0].y),zoom,startX:focusX,startY:focusY};return;
+    livePreview=null;liveCtx=null;cursor=null;
+    const pp=[...points.values()];gesture={kind:'pinch',dist:Math.hypot(pp[1].x-pp[0].x,pp[1].y-pp[0].y),zoom,startX:focusX,startY:focusY};schedule();return;
   }
   if(points.size>2)return;
   if(pan){gesture={kind:'pan',x:e.clientX,y:e.clientY,fx:focusX,fy:focusY};}
-  else{
+  else if(mode==='region'){
+    const q=mapPoint(e.clientX,e.clientY);cursor=q;
+    // Cham ngoai vong = doi vi tri; vong duoc khoa trong suot mot net keo.
+    if(!regionContains(q))regionCenter={x:q.x,y:q.y};
+    const fixed={...regionCenter};
+    gesture={kind:'region',id:e.pointerId,center:fixed,r:regionRadius,origin:q,current:q};
+    preparePreview();
+  }else{
     const q=mapPoint(e.clientX,e.clientY);
-    gesture={kind:'brush',coords:[[q.x,q.y]],current:q,id:e.pointerId};
+    cursor=q;preparePreview();gesture={kind:'brush',coords:[[q.x,q.y]],current:q,id:e.pointerId};
   }
   schedule();
  }
  function onMove(e){
-  if(!points.has(e.pointerId))return;e.preventDefault();points.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(!points.has(e.pointerId)){if(!pan&&e.pointerType!=='touch'){cursor=mapPoint(e.clientX,e.clientY);schedule();}return;}
+  e.preventDefault();points.set(e.pointerId,{x:e.clientX,y:e.clientY});
   if(points.size===2&&gesture?.kind==='pinch'){
     const pp=[...points.values()];zoom=clamp1(gesture.zoom*Math.hypot(pp[1].x-pp[0].x,pp[1].y-pp[0].y)/Math.max(5,gesture.dist),1.3,6);schedule();return;
   }
   if(gesture?.kind==='pan'){
     const g=geometry();focusX=gesture.fx-(e.clientX-gesture.x)/g.scale;focusY=gesture.fy-(e.clientY-gesture.y)/g.scale;
     focusX=clamp1(focusX,0,view.width);focusY=clamp1(focusY,0,view.height);schedule();
+  }else if(gesture?.kind==='region'&&gesture.id===e.pointerId){
+    const q=mapPoint(e.clientX,e.clientY);gesture.current=q;cursor=q;
+    regionPreview({center:gesture.center,r:gesture.r,dx:q.x-gesture.origin.x,dy:q.y-gesture.origin.y});schedule();
   }else if(gesture?.kind==='brush'&&gesture.id===e.pointerId){
-    const q=mapPoint(e.clientX,e.clientY);gesture.current=q;
+    const q=mapPoint(e.clientX,e.clientY);gesture.current=q;cursor=q;
     const a=gesture.coords[gesture.coords.length-1],g=image();
-    if(Math.hypot((q.x-a[0])*g.W,(q.y-a[1])*g.H)>Math.max(1,g.H*BODY_FINE.radius*.10))gesture.coords.push([q.x,q.y]);
+    if(Math.hypot((q.x-a[0])*g.W,(q.y-a[1])*g.H)>Math.max(1,g.H*BODY_FINE.radius*.10)){previewSegment(a,[q.x,q.y]);gesture.coords.push([q.x,q.y]);}
     if(gesture.coords.length>90){const first=gesture.coords[0];gesture.coords=[first,...gesture.coords.filter((_,i)=>i%2===0)];}
     schedule();
   }
  }
  function onUp(e){
   if(!points.has(e.pointerId))return;
-  if(gesture?.kind==='brush'&&gesture.id===e.pointerId&&points.size===1){
+  if(gesture?.kind==='region'&&gesture.id===e.pointerId&&points.size===1){
+    const q=mapPoint(e.clientX,e.clientY),orig=gesture.origin;
+    const dx=q.x-orig.x,dy=q.y-orig.y,i=image();
+    if(Math.hypot(dx*i.W,dy*i.H)>1){
+      bodyEnd();bodyBegin('fixed-region');
+      BODY_FINE.strokes.push({kind:'region',part:BODY.sel,r:gesture.r,p:BODY_FINE.power,points:[[gesture.center.x,gesture.center.y],[dx,dy]]});
+      if(BODY_FINE.strokes.length>70)BODY_FINE.strokes.splice(0,BODY_FINE.strokes.length-70);
+      bodyEnd();queue();window.RaySession?.record('Nắn vùng cố định');
+    }
+  }else if(gesture?.kind==='brush'&&gesture.id===e.pointerId&&points.size===1){
     const q=mapPoint(e.clientX,e.clientY),a=gesture.coords[gesture.coords.length-1];
-    if(Math.hypot(q.x-a[0],q.y-a[1])>0.0002)gesture.coords.push([q.x,q.y]);
+    if(Math.hypot(q.x-a[0],q.y-a[1])>0.0002){previewSegment(a,[q.x,q.y]);gesture.coords.push([q.x,q.y]);}cursor=q;
     const coords=gesture.coords;
     if(coords.length>1){
       bodyEnd();bodyBegin('fine-stroke');
@@ -8417,14 +8558,15 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       bodyEnd();queue();window.RaySession?.record('Chỉnh dáng chi tiết');
     }
   }
-  points.delete(e.pointerId);gesture=null;
+  points.delete(e.pointerId);gesture=null;livePreview=null;liveCtx=null;
   if(points.size===1){const p=[...points.entries()][0];gesture=pan?{kind:'pan',x:p[1].x,y:p[1].y,fx:focusX,fy:focusY}:null;}
   schedule();
  }
  canvas.addEventListener('pointerdown',onDown);
  canvas.addEventListener('pointermove',onMove);
  canvas.addEventListener('pointerup',onUp);
- canvas.addEventListener('pointercancel',e=>{points.delete(e.pointerId);gesture=null;schedule();});
+ canvas.addEventListener('pointercancel',e=>{points.delete(e.pointerId);gesture=null;livePreview=null;liveCtx=null;schedule();});
+ canvas.addEventListener('pointerleave',()=>{if(!points.size) {cursor=null;schedule();}});
  canvas.addEventListener('wheel',e=>{if(!isOpen())return;e.preventDefault();zoom=clamp1(zoom+(e.deltaY<0?.25:-.25),1.3,6);schedule();},{passive:false});
  // Giao dien moi chi quan sat bo phan duoc chon, khong thay doi vi tri vong goc.
  const previousBodyUI=bodyUI;
@@ -8464,8 +8606,14 @@ function rayFineStamp(c,W,H,x,y,dx,dy,r){
 function clamp1Fine(v,a,b){return Math.max(a,Math.min(b,v));}
 function rayFineWarp(c,W,H){
  if(!BODY_FINE.strokes.length)return;
- for(const stroke of BODY_FINE.strokes){
+  for(const stroke of BODY_FINE.strokes){
   const pts=stroke.points||[],r=Math.max(2,stroke.r*H),power=clamp1Fine(stroke.p,0,1);
+  if(stroke.kind==='region'){
+   if(pts.length<2)continue;
+   const center=pts[0],diff=pts[1];
+   rayFineStamp(c,W,H,center[0]*W,center[1]*H,diff[0]*W*power,diff[1]*H*power,r);
+   continue;
+  }
   for(let k=1;k<pts.length;k++){
    const a=pts[k-1],b=pts[k],dx=(b[0]-a[0])*W,dy=(b[1]-a[1])*H;
    const dist=Math.hypot(dx,dy);if(dist<.35)continue;
