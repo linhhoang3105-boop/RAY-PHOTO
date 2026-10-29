@@ -6141,7 +6141,7 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
 (()=>{
  'use strict';
  const core=RayQuality,qualityNote=document.createElement('p');qualityNote.className='hint export-quality-note';qualityNote.setAttribute('role','status');document.getElementById('sizeSeg').after(qualityNote);let saving=false;
- function sync(){if(!source){qualityNote.textContent='Ảnh lưu được dựng từ ảnh gốc, độc lập với chế độ xem trước Nhẹ.';return;}const p=core.plan(source.width,source.height,exportLong);qualityNote.textContent='Ảnh gốc '+source.width+' × '+source.height+' · Lưu phần ảnh '+p.width+' × '+p.height+' px.'+(p.limited?' Đã giới hạn 16 MP để phù hợp bộ nhớ; khung viền được cộng thêm.':' Khung viền được cộng thêm.');}
+ function sync(){if(!source){qualityNote.textContent='Miễn phí toàn bộ · Xuất ảnh đầy đủ hiệu ứng. Không cần thanh toán.';return;}const p=core.plan(source.width,source.height,exportLong);qualityNote.textContent='Ảnh gốc '+source.width+' × '+source.height+' · Lưu phần ảnh '+p.width+' × '+p.height+' px.'+(p.limited?' Đã giới hạn 16 MP để phù hợp bộ nhớ; khung viền được cộng thêm.':' Khung viền được cộng thêm.');}
  const oldSync=syncControls;syncControls=function(){oldSync();sync();};const oldDraw=draw;draw=function(){oldDraw();sync();};document.getElementById('sizeSeg').addEventListener('click',sync);
  async function exportFile(){
   if(!source)throw new Error('Mở một ảnh trước nhé.');if(saving||BEAUTY.busy||BODY_AI.busy||window.RayCompose?.busy||window.RayRemove?.busy)throw new Error('Đợi xử lý xong hoặc bấm Dừng trước khi lưu.');
@@ -6152,7 +6152,7 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
   try{await window.RayCompose?.ensureAssets();await window.RaySession?.apply();await nextFrame();const type=window.RayCompose?.outputType()||'image/jpeg';const result=await core.output({source,longEdge:exportLong,type,render:(target,input)=>{const out=access.kind==='basic'?window.RayAccess.renderBasic(()=>render(target,input)):render(target,input);if(access.kind!=='basic')try{window.RayPreview?.showExport(target,input.width,input.height);}catch{}return out;},make:()=>document.createElement('canvas'),notify:p=>{busy.textContent=p.attempt?'Máy thiếu bộ nhớ — đang thử bản gọn hơn…':'Đang dựng ảnh '+p.width+' × '+p.height+'…';}});window.RayAccess?.assertValid(access);return{...result,name:stamp().replace(/\.jpg$/i,type==='image/png'?'.png':'.jpg'),origin:access.kind==='basic'?'darkroom-basic':'darkroom',draftId:access.draftId||window.RaySession?.documentKey,basicCopy:access.kind==='basic'};}
   finally{saving=false;busy.classList.remove('on');busy.textContent='Đang dựng bản đầy đủ…';saveBtn.disabled=!source;}
  }
- saveBtn.onclick=async()=>{try{const file=await exportFile();if(window.parent!==window)window.parent.BuongToiHost?.onExport(file);if(IOS){const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Chưa mở được ảnh để lưu vào Ảnh.'));reader.readAsDataURL(file.blob);});openSheet({blob:file.blob,dataUrl},file.name,file.width,file.height);}else{const a=document.createElement('a'),url=URL.createObjectURL(file.blob);a.download=file.name;a.href=url;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),8000);}if(file.fallback||file.limited)note('Đã lưu '+file.width+' × '+file.height+' px để phù hợp bộ nhớ.');}catch(error){note(error.message||'Chưa lưu được ảnh.');}};
+ saveBtn.onclick=async()=>{try{const file=await exportFile();if(window.parent!==window)window.parent.BuongToiHost?.onExport(file);if(IOS){/* Blob URL avoids a huge base64 copy on iPhone; share sheet or long-press to save. */openSheet({blob:file.blob},file.name,file.width,file.height);}else{const a=document.createElement('a'),url=URL.createObjectURL(file.blob);a.download=file.name;a.href=url;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),8000);}if(file.fallback||file.limited)note('Đã lưu '+file.width+' × '+file.height+' px để phù hợp bộ nhớ.');}catch(error){note(error.message||'Chưa lưu được ảnh.');}};
  window.RayQualityExport={exportFile};sync();
 })();
 </script>
@@ -6513,7 +6513,7 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
     }
     const items2 = await store2.all();
     const next = 1 + items2.reduce((max, item) => Math.max(max, Number(item.creativeNumber) || 0, Number(/^Công thức (\d+)$/.exec(item.name)?.[1]) || 0), 0);
-    const name = "C\xF4ng th\u1EE9c " + String(next).padStart(2, "0"), recipe = capture(snapshot, name), premium = advanced(recipe), photoPremium = projectAdvanced(snapshot);
+    const name = "C\xF4ng th\u1EE9c " + String(next).padStart(2, "0"), recipe = capture(snapshot, name), premium = false, photoPremium = false;
     samePhoto();
     const photoDraftId = photoPremium ? await session2.forkDraft(state, name, { variant: "creative", premiumDraft: true }) : documentKey;
     const now = Date.now(), record = { id: crypto.randomUUID?.() || [...crypto.getRandomValues(new Uint8Array(16))].map((n) => n.toString(16).padStart(2, "0")).join(""), name, recipe, creativeNumber: next, created: now, updated: now, draft: premium, requiresPremium: premium, parentId: null, code: null, photoDraftId, photoPremium, thumbnail: await picture };
@@ -6553,7 +6553,7 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
     return window.RaySession;
   }
   async function api(path, { method = "GET", body } = {}) {
-    if (portable) throw new Error("M\xE3 chia s\u1EBB v\xE0 Premium d\xF9ng tr\xEAn b\u1EA3n web. B\u1EA3n HTML v\u1EABn cho ch\u1EC9nh \u1EA3nh, l\u01B0u m\xE0u v\xE0 gi\u1EEF nh\xE1p tr\xEAn thi\u1EBFt b\u1ECB.");
+    if (portable) throw new Error("Mã chia sẻ chỉ hoạt động khi có dịch vụ mã màu. Trên bản HTML, bạn vẫn chỉnh ảnh, lưu ảnh và lưu công thức cục bộ bình thường.");
     if (method !== "GET" && !csrf) await refreshAccess();
     const res = await fetch("/api/ray/" + path, { method, credentials: "same-origin", cache: "no-store", headers: method === "GET" ? {} : { "content-type": "application/json", "x-ray-csrf": csrf || "" }, ...body ? { body: JSON.stringify(body) } : {} });
     const data = await res.json();
@@ -6577,83 +6577,19 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
       return { active: false };
     }
   }
-  function cancelled() {
-    const e = new Error("Nh\xE1p \u0111\u1EA7y \u0111\u1EE7 v\u1EABn \u0111\u01B0\u1EE3c gi\u1EEF. B\u1EA1n c\xF3 th\u1EC3 ch\u1EC9nh ti\u1EBFp.");
-    e.code = "RAY_CANCELLED";
-    return e;
-  }
-  var gate = document.createElement("dialog");
-  gate.id = "rayPremiumDialog";
-  gate.className = "my-colors-dialog premium-dialog";
-  gate.setAttribute("aria-labelledby", "premiumTitle");
-  gate.innerHTML = '<div class="my-dialog-head"><div><p class="my-eyebrow">RAY PHOTO PREMIUM</p><h2 id="premiumTitle">Gi\u1EEF tr\u1ECDn m\xE0u b\u1EA1n t\u1EA1o.</h2></div></div><p id="premiumReason"></p><p class="premium-price">79.000\u0111 <span>/ 12 th\xE1ng</span></p><p class="my-draft-safe" id="premiumDraftSafe">Nh\xE1p n\xE2ng cao v\u1EABn \u0111\u01B0\u1EE3c gi\u1EEF nguy\xEAn tr\xEAn thi\u1EBFt b\u1ECB.</p><p class="my-hint">L\u01B0u b\u1EA3n c\u01A1 b\u1EA3n t\u1EA1o m\u1ED9t b\u1EA3n ri\xEAng, b\u1ECF ph\u1EA7n Premium. B\u1EA3n nh\xE1p g\u1ED1c, \u1EA3nh v\xE0 l\u1ECBch s\u1EED ch\u1EC9nh s\u1EEDa v\u1EABn c\xF2n \u0111\u1EC3 b\u1EA1n quay l\u1EA1i.</p><p id="premiumMessage" class="my-status" role="status"></p><div class="premium-actions"><button type="button" class="my-action my-gold" id="unlockRayPremium">M\u1EDF kh\xF3a Premium</button><button type="button" class="my-action" id="saveRayBasic">L\u01B0u b\u1EA3n c\u01A1 b\u1EA3n</button><button type="button" class="my-action my-quiet" id="continueRayEditing">Ch\u1EC9nh ti\u1EBFp \xB7 gi\u1EEF nh\xE1p</button></div>';
-  document.body.append(gate);
-  var resolveGate = null;
-  function finishGate(value) {
-    gate.close();
-    const done = resolveGate;
-    resolveGate = null;
-    done?.(value);
-  }
-  gate.addEventListener("cancel", (e) => {
-    e.preventDefault();
-    finishGate("cancel");
-  });
-  $("continueRayEditing").onclick = () => finishGate("cancel");
-  $("saveRayBasic").onclick = () => finishGate("basic");
-  $("unlockRayPremium").onclick = async () => {
-    const b = $("unlockRayPremium");
-    b.disabled = true;
-    try {
-      await api("premium/checkout", { method: "POST", body: { plan: "annual" } });
-    } catch (e) {
-      $("premiumMessage").textContent = e.message;
-    } finally {
-      b.disabled = false;
-    }
-  };
-  async function chooseAccess(reason) {
-    const premium = await refreshAccess();
-    if (premium.active) return { kind: "full", proof: premium };
-    if (source) await session().ensureSaved();
-    $("premiumReason").textContent = reason;
-    $("premiumMessage").textContent = "";
-    $("premiumDraftSafe").textContent = source ? "\u0110\xE3 l\u01B0u nh\xE1p n\xE2ng cao \u0111\u1EA7y \u0111\u1EE7 tr\xEAn thi\u1EBFt b\u1ECB. Kh\xF4ng mua v\u1EABn ch\u1EC9nh ti\u1EBFp \u0111\u01B0\u1EE3c." : "C\xF4ng th\u1EE9c n\xE2ng cao \u0111\u01B0\u1EE3c gi\u1EEF trong M\xE0u c\u1EE7a t\xF4i d\u01B0\u1EDBi d\u1EA1ng nh\xE1p.";
-    gate.showModal();
-    const kind = await new Promise((resolve) => resolveGate = resolve);
-    return { kind, proof: premium };
-  }
-  function withBasicRender(fn) {
-    const savedP = { ...P }, layers = RayLayers.capture();
-    try {
-      Object.assign(P, basicState(P));
-      RayLayers.restore(layers.map(basicLayer).filter(Boolean));
-      return fn();
-    } finally {
-      for (const key of Object.keys(P)) if (!(key in savedP)) delete P[key];
-      Object.assign(P, savedP);
-      RayLayers.restore(layers);
-    }
+  // RAY PHOTO full-featured free edition: no checkout or entitlement requirement,
+  // no reduced-quality or reduced-effect export. The export path still calls
+  // RayAccess, so retain the stable interface without a payment gate.
+  async function chooseAccess(_reason) {
+    return { kind: "full", proof: null };
   }
   window.RayAccess = {
-    isAdvancedSnapshot: projectAdvanced,
+    isAdvancedSnapshot: () => false,
     async prepareExport() {
-      const documentKey = session().documentKey, snapshot = session().snapshot();
-      if (!projectAdvanced(snapshot)) return { kind: "full", draftId: session().documentKey };
-      await session().ensureSaved();
-      const access = await chooseAccess("\u1EA2nh c\xF3 ch\u1EC9nh s\u1EEDa Premium: s\xE1ng/t\u1ED1i v\xF9ng, b\xFAt \xE1nh s\xE1ng, \u1EA3nh in ho\u1EB7c v\xF9ng n\xE9t. L\u01B0u b\u1EA3n c\u01A1 b\u1EA3n gi\u1EEF ri\xEAng c\xE1c l\u1EDBp Free; nh\xE1p \u0111\u1EA7y \u0111\u1EE7 v\u1EABn c\xF2n.");
-      if (access.kind === "cancel") throw cancelled();
-      if (session().documentKey !== documentKey) throw cancelled();
-      if (access.kind === "basic") {
-        const state = basicDraft(session().serialize(), session().keyOf), draftId = await session().forkDraft(state);
-        return { kind: "basic", draftId };
-      }
-      return { ...access, draftId: session().documentKey };
+      return { kind: "full", draftId: session()?.documentKey || null };
     },
-    renderBasic: withBasicRender,
-    assertValid(access) {
-      if (access?.proof?.active && access.proof.expiresAt <= Date.now()) throw new Error("Premium v\u1EEBa h\u1EBFt h\u1EA1n. Nh\xE1p \u0111\u1EA7y \u0111\u1EE7 v\u1EABn \u0111\u01B0\u1EE3c gi\u1EEF; h\xE3y m\u1EDF l\u1EA1i m\u1EE5c l\u01B0u \u0111\u1EC3 ch\u1ECDn b\u1EA3n c\u01A1 b\u1EA3n.");
-    }
+    renderBasic: (fn) => fn(),
+    assertValid: () => true
   };
   var dialog = document.createElement("dialog");
   dialog.id = "myColorsDialog";
@@ -6749,13 +6685,13 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
     };
   }
   document.addEventListener("input", (e) => {
-    if (previewBefore && !e.target.closest("#myColorsDialog,#rayPremiumDialog")) keepTrial();
+    if (previewBefore && !e.target.closest("#myColorsDialog")) keepTrial();
   }, { capture: true });
   document.addEventListener("click", (e) => {
     if (previewBefore && e.target.closest(".roll,.session-toolbar,.session-apply-bar,.editor-tabs")) keepTrial();
   }, { capture: true });
   async function putRecipe(recipe, { id = null, parentId = null, draft = false, code = null } = {}) {
-    const valid = validate(recipe), record = { id: id || uid(), recipe: valid, name: valid.name, updated: Date.now(), created: Date.now(), draft: !!draft, requiresPremium: advanced(valid), parentId, code };
+    const valid = validate(recipe), record = { id: id || uid(), recipe: valid, name: valid.name, updated: Date.now(), created: Date.now(), draft: false, requiresPremium: false, parentId, code };
     await store.put(record);
     return record;
   }
@@ -6808,34 +6744,18 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
   }
   async function saveCurrent() {
     if (working) return;
-    if (!source) {
-      message("M\u1EDF \u1EA3nh v\xE0 ch\u1EC9nh m\xE0u tr\u01B0\u1EDBc khi l\u01B0u c\xF4ng th\u1EE9c.", true);
-      return;
-    }
+    if (!source) { message("Mở ảnh và chỉnh màu trước khi lưu công thức.", true); return; }
     working = true;
     try {
       await session().ensureSaved();
-      const snapshot = session().snapshot(), recipe = capture(snapshot, nameOf($("myColorName").value)), originalId = editingId;
-      if (advanced(recipe)) {
-        await session().ensureSaved();
-        const previous = originalId ? await store.get(originalId) : null, previousAdvanced = previous && advanced(previous.recipe), draft = await putRecipe(recipe, { id: previousAdvanced && previous.draft ? originalId : null, parentId: originalId, draft: true });
-        await renderList();
-        const access = await chooseAccess("C\xF4ng th\u1EE9c c\xF3 ph\u1EA7n Premium. \u0110\xE3 gi\u1EEF nh\xE1p \u0111\u1EA7y \u0111\u1EE7; l\u01B0u b\u1EA3n c\u01A1 b\u1EA3n gi\u1EEF ri\xEAng c\xE1c l\u1EDBp Free \u0111\u1EC3 ti\u1EBFp t\u1EE5c b\u1ECF ho\u1EB7c th\xEAm l\u1EDBp. N\xE9t b\xFAt v\xE0 v\xF9ng ch\u1EC9nh g\u1EAFn v\u1EDBi \u1EA3nh n\u1EB1m trong nh\xE1p.");
-        if (access.kind === "basic") {
-          await putRecipe(basicRecipe(recipe), { id: previous && !previousAdvanced ? originalId : null, parentId: draft.id });
-          message("\u0110\xE3 l\u01B0u m\xE0u c\u01A1 b\u1EA3n ri\xEAng. Nh\xE1p m\xE0u n\xE2ng cao v\xE0 nh\xE1p \u1EA3nh g\u1ED1c v\u1EABn c\xF2n.");
-        } else if (access.kind === "full") {
-          await putRecipe(recipe, { id: originalId || draft.id });
-          message("\u0110\xE3 l\u01B0u c\xF4ng th\u1EE9c \u0111\u1EA7y \u0111\u1EE7. N\xE9t b\xFAt theo \u1EA3nh kh\xF4ng n\u1EB1m trong m\xE3 chia s\u1EBB.");
-        } else message("\u0110\xE3 gi\u1EEF nh\xE1p m\xE0u n\xE2ng cao. B\u1EA1n c\xF3 th\u1EC3 th\u1EED, \u0111\u1ED5i t\xEAn v\xE0 ch\u1EC9nh ti\u1EBFp b\u1EA5t c\u1EE9 l\xFAc n\xE0o.");
-      } else {
-        await putRecipe(recipe, { id: originalId });
-        message(projectAdvanced(snapshot) ? "\u0110\xE3 l\u01B0u c\xF4ng th\u1EE9c Free. C\xE1c v\xF9ng ch\u1EC9nh Premium ch\u1EC9 n\u1EB1m trong nh\xE1p \u1EA3nh \u0111\u1EA7y \u0111\u1EE7." : originalId ? "\u0110\xE3 c\u1EADp nh\u1EADt c\xF4ng th\u1EE9c m\xE0u. M\xE3 \u0111\xE3 chia s\u1EBB tr\u01B0\u1EDBc \u0111\xF3 gi\u1EEF c\xF4ng th\u1EE9c c\u0169." : "\u0110\xE3 l\u01B0u m\xE0u mi\u1EC5n ph\xED. M\u1ED7i l\u1EDBp v\u1EABn s\u1EEDa \u0111\u01B0\u1EE3c; ch\u1ECDn S\u1EEDa c\xF4ng th\u1EE9c \u0111\u1EC3 b\u1ECF ho\u1EB7c th\xEAm l\u1EDBp.");
-      }
+      const recipe = capture(session().snapshot(), nameOf($("myColorName").value));
+      const originalId = editingId;
+      await putRecipe(recipe, { id: originalId, draft: false });
       resetEditing();
       await renderList();
+      message(originalId ? "Đã cập nhật công thức đầy đủ, không giới hạn hiệu ứng." : "Đã lưu công thức đầy đủ vào Màu của tôi.");
     } catch (e) {
-      message(e.message, true);
+      message(e.message || "Chưa lưu được công thức.", true);
     } finally {
       working = false;
     }
@@ -6855,16 +6775,7 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
   };
   async function share(record) {
     try {
-      let recipe = record.recipe;
-      if (advanced(recipe)) {
-        const access = await chooseAccess("Chia s\u1EBB \u0111\u1EA7y \u0111\u1EE7 ph\u1EA7n n\xE2ng cao c\u1EA7n Premium h\u1EE3p l\u1EC7. L\u01B0u b\u1EA3n c\u01A1 b\u1EA3n gi\u1EEF ri\xEAng c\xF4ng th\u1EE9c Free; nh\xE1p \u0111\u1EA7y \u0111\u1EE7 v\u1EABn c\xF2n.");
-        if (access.kind === "cancel") return;
-        if (access.kind === "basic") {
-          recipe = basicRecipe(recipe);
-          record = await putRecipe(recipe, { parentId: record.id });
-          await renderList();
-        }
-      }
+      const recipe = record.recipe; // All custom recipes are shareable; no tier stripping.
       const response = record.code ? { code: record.code } : await api("presets", { method: "POST", body: recipe });
       record = { ...record, code: response.code, updated: Date.now() };
       await store.put(record);
@@ -6895,11 +6806,11 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
       return;
     }
     for (const item of items2) {
-      const requiresPremium = advanced(item.recipe), row = document.createElement("article");
+      const requiresPremium = false, row = document.createElement("article");
       row.className = "my-preset-card";
       const head = document.createElement("div");
       head.className = "my-preset-title";
-      head.append(text("h3", item.name), text("span", item.draft ? "Nh\xE1p n\xE2ng cao \xB7 ch\u01B0a m\u1EDF kh\xF3a" : requiresPremium ? "Premium" : "Mi\u1EC5n ph\xED", "my-tier"));
+      head.append(text("h3", item.name), text("span", "Dùng được đầy đủ", "my-tier"));
       if (item.thumbnail instanceof Blob) {
         const picture = document.createElement("img");
         picture.className = "my-recipe-preview";
@@ -6910,9 +6821,9 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
       }
       const info = text("p", item.recipe.layers.length + " l\u1EDBp m\xE0u" + (item.recipe.tools?.brush ? " \xB7 C\xF3 th\xF4ng s\u1ED1 b\xFAt; kh\xF4ng c\xF3 n\xE9t b\xFAt" : "") + (item.code ? " \xB7 M\xE3 " + item.code : ""), "my-hint"), actions = document.createElement("div");
       actions.className = "my-row-actions";
-      actions.append(button(requiresPremium ? "D\xF9ng th\u1EED" : "\xC1p d\u1EE5ng", () => {
+      actions.append(button("Áp dụng", () => {
         try {
-          applyRecipe(item.recipe, { trial: requiresPremium });
+          applyRecipe(item.recipe);
           dialog.close();
           host?.toast?.("\u0110\xE3 th\xEAm m\xE0u " + item.name + ". Ho\xE0n t\xE1c \u0111\u1EC3 tr\u1EDF l\u1EA1i.");
         } catch (e) {
@@ -6994,24 +6905,19 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
       const code = cleanCode($("myColorCode").value), response = await api("presets/" + code);
       pendingImport = { code, recipe: validate(response.recipe) };
       cancelPreview();
-      if (advanced(pendingImport.recipe)) await putRecipe(pendingImport.recipe, { draft: true, code });
+      // Imported recipes do not need premium drafts.
       const section = $("myImportedColor");
-      section.replaceChildren(text("h3", pendingImport.recipe.name), text("p", pendingImport.recipe.layers.length + " l\u1EDBp m\xE0u \xB7 " + (advanced(pendingImport.recipe) ? "N\xE2ng cao \xB7 \u0111\u01B0\u1EE3c th\u1EED v\xE0 gi\u1EEF nh\xE1p" : "Mi\u1EC5n ph\xED"), "my-hint"));
+      section.replaceChildren(text("h3", pendingImport.recipe.name), text("p", pendingImport.recipe.layers.length + " lớp màu · sử dụng đầy đủ", "my-hint"));
       section.append(button("Xem th\u1EED tr\xEAn \u1EA3nh", () => {
         try {
-          applyRecipe(pendingImport.recipe, { trial: true });
+          applyRecipe(pendingImport.recipe);
           dialog.close();
         } catch (err) {
           message(err.message, true);
         }
       }), button("L\u01B0u v\xE0o M\xE0u c\u1EE7a t\xF4i", async () => {
         try {
-          let recipe = pendingImport.recipe;
-          if (advanced(recipe)) {
-            const choice = await chooseAccess("M\xE3 n\xE0y c\xF3 ph\u1EA7n Premium. B\u1EA1n c\xF3 th\u1EC3 gi\u1EEF nh\xE1p v\xE0 th\u1EED mi\u1EC5n ph\xED; l\u01B0u b\u1EA3n c\u01A1 b\u1EA3n kh\xF4ng x\xF3a b\u1EA3n n\xE2ng cao.");
-            if (choice.kind === "cancel") return;
-            if (choice.kind === "basic") recipe = basicRecipe(recipe);
-          }
+          const recipe = pendingImport.recipe; // Keep every layer when importing.
           await putRecipe(recipe, { code: advanced(recipe) === advanced(pendingImport.recipe) ? pendingImport.code : null });
           await renderList();
           message("\u0110\xE3 th\xEAm m\xE0u v\xE0o b\u1ED9 s\u01B0u t\u1EADp tr\xEAn thi\u1EBFt b\u1ECB.");
@@ -7075,10 +6981,6 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
   items.append(entry);
   group.append(heading, items);
   $("rolls").prepend(group);
-  for (const group2 of [$("grpBrush"), $("grpLocalTone"), $("bgBlur")?.closest(".grp"), document.querySelector('input[data-k="bgBlur"]')?.closest(".grp"), $("grpPrint")?.closest(".grp")].filter((g, i, list) => g && list.indexOf(g) === i)) {
-    const label = group2.querySelector(".lbl");
-    if (label) label.after(text("p", "PREMIUM \xB7 D\xF9ng th\u1EED mi\u1EC5n ph\xED; lu\xF4n gi\u1EEF nh\xE1p. C\xE1c gi\xE1 tr\u1ECB c\xF3 s\u1EB5n trong preset Free v\u1EABn \u0111\u01B0\u1EE3c gi\u1EEF.", "my-brush-premium"));
-  }
   var storageNote = text("p", "Nh\xE1p l\u01B0u \u0111\u1EA7y \u0111\u1EE7 tr\xEAn thi\u1EBFt b\u1ECB n\xE0y. X\xF3a d\u1EEF li\u1EC7u tr\xECnh duy\u1EC7t c\xF3 th\u1EC3 l\xE0m m\u1EA5t nh\xE1p.", "hint my-draft-note");
   $("dateTxt").closest(".grp").append(storageNote);
   function recipeDetails(recipe) {
@@ -7143,7 +7045,7 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
     for (const record of records) {
       const tile = button("", () => {
         try {
-          applyRecipe(record.recipe, { trial: advanced(record.recipe) });
+          applyRecipe(record.recipe);
           window.BuongToiApp.showTools("film");
           tile.setAttribute("aria-pressed", "true");
           notifyCreative("\u0110\xE3 th\xEAm hi\u1EC7u \u1EE9ng " + record.name + ". Ho\xE0n t\xE1c \u0111\u1EC3 tr\u1EDF l\u1EA1i.");
@@ -7162,7 +7064,7 @@ $('backgroundUndoStroke').disabled=!has||!b.strokes.length||busy;
         tile.append(img);
       } else tile.append(text("span", "\u2726", "my-effect-placeholder"));
       tile.append(text("span", record.name, "my-effect-name"));
-      if (advanced(record.recipe)) tile.append(text("small", "Th\u1EED Premium", "my-effect-tier"));
+      // All saved recipes can be used without trial labels.
       items.append(tile);
     }
   }
@@ -8761,7 +8663,8 @@ bodyWarp=function(c,W,H){rayOriginalBodyWarp(c,W,H);if(!BODY.peek)rayFineWarp(c,
   overlay.style.left=r.left+'px';overlay.style.top=r.top+'px';overlay.style.width=r.width+'px';overlay.style.height=r.height+'px';
   if(overlay.width!==W)overlay.width=W;if(overlay.height!==H)overlay.height=H;
   const ctx=overlay.getContext('2d');ctx.clearRect(0,0,W,H);
-  if(!state.enabled||!source||!r.width||!['body','all'].includes(document.body.dataset.editorTool))return;
+  if(!state.enabled||!source||!r.width||!['body','all'].includes(document.body.dataset.editorTool)||
+   (document.body.classList.contains('ray54-guide-clean')&&['face','chin'].includes($('r54Part').value)))return;
   const a=metric();if(!a.ok)return;
   const mask=a.mask;if(!mask)return;
   const fg=mask.foreground||mask.data,mw=mask.width,mh=mask.height;
@@ -8846,7 +8749,7 @@ bodyWarp=function(c,W,H){rayOriginalBodyWarp(c,W,H);if(!BODY.peek)rayFineWarp(c,
   if(ready!==lastReady){lastReady=ready;refresh();}
  },950);
  // Expose small test hooks: no remote services, no changes to other modules.
- window.RayGeometry54={metric,metricFor,readSetting,plan,refresh,apply,slimAll,reset,scan,paintOverlay};
+ window.RayGeometry54={metric,metricFor,readSetting,plan,commit,refresh,apply,slimAll,reset,scan,paintOverlay};
  refresh();
 })();
 </script>
@@ -8881,8 +8784,7 @@ bodyWarp=function(c,W,H){rayOriginalBodyWarp(c,W,H);if(!BODY.peek)rayFineWarp(c,
 #r55Mask{position:absolute;z-index:12;pointer-events:none;max-width:none!important;max-height:none!important;border:none!important;box-shadow:none!important}
 @media(max-width:400px){#rayFace55{padding:10px}#rayFace55 .r55-field{grid-template-columns:100px 1fr}}
 /* Guides are UI-only. They must never be present during a save/after applying a face template. */
-body.ray54-guide-clean #r55Mask,body.ray54-guide-clean #r54Overlay,
-body.ray54-guide-clean #bodyOval,
+body.ray54-guide-clean #r55Mask,
 .film-workspace.is-result-preview #r55Mask,
 .film-workspace.is-result-preview #r54Overlay,
 .film-workspace.is-result-preview #bodyOval, .film-workspace.is-result-preview .body-oval, .film-workspace.is-result-preview .focus-oval, .film-workspace.is-result-preview .ray55-guide {display:none!important;}
@@ -8899,7 +8801,7 @@ body.ray54-guide-clean #bodyOval,
  const $=id=>document.getElementById(id),c=(x,a,b)=>Math.max(a,Math.min(b,x));
  const body=$('bodyBox'),wrap=$('canvasWrap'),view=$('view');if(!body||!wrap||!view)return;
  const panel=document.createElement('section');panel.id='rayFace55';
- panel.innerHTML=`<header><h3>✧ Chỉnh mặt theo tỷ lệ</h3><span class="r55-tag">v60 · bổ sung cho v54</span></header>
+ panel.innerHTML=`<header><h3>✧ Chỉnh mặt theo tỷ lệ</h3><span class="r55-tag">v64 · chỉnh mặt và dáng</span></header>
  <p class="r55-desc">1. Quét AI → 2. Chọn mẫu → 3. Bấm <b>Áp dáng mặt ngay</b>. Kết quả là ảnh thực, không phải nét vẽ. Nếu muốn điều chỉnh thêm, kéo thanh ngay bên dưới. Giữ nguyên các công cụ v54.</p>
  <div class="r55-actions"><button type="button" id="r55Scan" class="r55-primary">✧ AI quét &amp; đo khuôn mặt</button><button type="button" id="r55Guide">Ẩn mặt nạ</button></div>
  <div class="r55-field"><label for="r55Person">Người trong ảnh</label><select id="r55Person"><option value="0">Người 1</option></select></div>
@@ -8920,7 +8822,7 @@ body.ray54-guide-clean #bodyOval,
  </div>
  <div class="r55-actions"><button type="button" id="r60CommitFine" class="r55-primary" disabled>✓ Giữ chỉnh từng phần</button><button type="button" id="r60ClearFine">Đưa các thanh về 0</button></div>
  <p class="r55-small" id="r60Feedback" role="status">Sau khi AI nhận diện, kéo thử Mặt ngang −20% để kiểm tra ảnh đổi trực tiếp.</p>
- <p class="r55-small">Mốc vàng và nét đứt chỉ là đường hướng dẫn khi bấm <b>Hiện mặt nạ</b>. Khuôn mẫu là tham chiếu hình học, không phải tiêu chuẩn vẻ đẹp. Mặt nghiêng chỉ áp nắn viền ngoài, không ép đối xứng mắt/mũi. Có Hoàn tác.</p>`;
+ <p class="r55-small">Mốc vàng và nét đứt chỉ là đường hướng dẫn khi bấm <b>Hiện mặt nạ</b>. Khi bấm <b>Áp dáng mặt ngay</b>, mặt nạ khuôn mặt sẽ tự ẩn để xem ảnh thật; riêng vòng/chỉ dẫn chỉnh hình thể v54 vẫn giữ nguyên để tiếp tục tinh chỉnh. Khuôn mẫu là tham chiếu hình học, không phải tiêu chuẩn vẻ đẹp. Mặt nghiêng chỉ áp nắn viền ngoài, không ép đối xứng mắt/mũi. Có Hoàn tác.</p>`;
  body.insertBefore(panel,body.firstElementChild);
  // Reposition the REAL v54 component selector and sliders immediately under the ratio block.
  // Their original listeners and bodyWarp engine remain unchanged.
@@ -8942,9 +8844,10 @@ body.ray54-guide-clean #bodyOval,
   const context=overlay.getContext('2d');
   if(context)context.clearRect(0,0,overlay.width,overlay.height);
   document.body.classList.add('ray54-guide-clean');
+  if(['face','chin'].includes(BODY.sel)&&reason!=='manual'){BODY.hide=true;bodyUI();syncBody();}
   q('Guide').textContent='Hiện mặt nạ';
   if(reason==='save'&&q('Status'))q('Status').dataset.guidesHidden='true';
-  // Hide other guide canvases too; do NOT alter their computational state.
+  // Only hide face guides here. Body / shape guides from v54 remain available for manual refinement.
   queue();
  }
  function showGuides(){
@@ -9190,7 +9093,7 @@ body.ray54-guide-clean #bodyOval,
    if(!strokes.length){hideGuides('apply');update('Gương mặt đang rất gần khuôn mẫu này, chưa có thay đổi đủ lớn để áp. Hãy chọn khuôn mẫu khác hoặc kéo thanh chỉnh từng phần ngay bên dưới.');return;}
   replace(strokes,'Mặt nạ khuôn mẫu '+t.name);
   hideGuides('apply');
-  update('Đã áp '+t.name+' · '+(g.oblique?'mặt nghiêng: chỉ nắn viền má, hàm, cằm':'mặt chính diện: chỉnh viền ngoài, mắt, mũi, môi, cằm')+' ở mức '+q('Intensity').value+'%. Đã ẩn mặt nạ; ảnh lưu không có đường hướng dẫn.');
+  update('Đã áp '+t.name+' · '+(g.oblique?'mặt nghiêng: chỉ nắn viền má, hàm, cằm':'mặt chính diện: chỉnh viền ngoài, mắt, mũi, môi, cằm')+' ở mức '+q('Intensity').value+'%. Mặt nạ khuôn mặt đã tự ẩn để xem ảnh thật; vòng chỉnh hình thể v54 vẫn giữ để bà tinh chỉnh tiếp. Ảnh lưu không có đường hướng dẫn khuôn mặt.');
  }
  async function scan(){if(!source){update('Mở ảnh trước khi quét AI.');return;}if(state.scanning)return;
   state.scanning=true;q('Scan').disabled=true;update('Đang tải và chạy Face Landmarker. Lần đầu cần mạng.');
@@ -9231,6 +9134,159 @@ body.ray54-guide-clean #bodyOval,
   try{return stableRender57(target,image);}finally{window.RayLivePreviewMode=old;}
  };
  update();
+})();
+</script>
+
+<style id="ray62-overall-style">
+#rayOverall62{border:1px solid #c3a15d;border-radius:11px;padding:14px;margin:10px 0 16px;background:linear-gradient(145deg,#28271f,#1a1c21);color:#f2e6ce}
+#rayOverall62 h3{font:650 16px/1.5 var(--sans);color:#efd18a;margin:0 0 6px}
+#rayOverall62 p{font:12px/1.65 var(--sans);color:#d0c4af;margin:7px 0 12px}
+#rayOverall62 .ray62-line{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}
+#rayOverall62 label{font-size:13px;color:#f0ddb5}
+#rayOverall62 select{flex:1 1 160px;min-width:0;max-width:100%;padding:10px;border-radius:6px;background:#292830;color:#f9efd7;border:1px solid #85714c;font-size:13px}
+#rayOverall62 .ray62-actions{display:flex;gap:8px;flex-wrap:wrap;margin:11px 0}
+#rayOverall62 button{min-height:43px;padding:9px 12px;flex:1 1 125px;border:1px solid #776444;border-radius:7px;background:#29272b;color:#f0dbad;cursor:pointer;font:600 13px var(--sans)}
+#rayOverall62 button.ray62-primary{background:#e7c778;border-color:#e7c778;color:#221c13;flex-basis:100%}
+#rayOverall62 button:disabled{opacity:.4;cursor:not-allowed}
+#ray62OverallStatus{font-size:12px;line-height:1.6;white-space:pre-line;background:#1c1c1f;border-radius:7px;padding:10px;color:#ead09c}
+#rayOverall62 .ray62-diagnostic{font-size:11px;color:#c8bda8;margin-bottom:4px}
+#ray62UndoTop{display:none}
+.film-workspace.is-result-preview #ray62UndoTop{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:5px 12px;background:#302a20;color:#f2d38e;border:1px solid #806b44;border-radius:6px;cursor:pointer}
+@media(max-width:520px){#rayOverall62{padding:11px}#rayOverall62 button{font-size:12px}}
+</style>
+<script id="ray62-overall-workflow">
+/* RAY PHOTO: reversible one-tap *estimated* body-ratio preview from existing v54 AI and masks.
+   Does not claim a universal ideal proportion; never changes film/color render or AI detectors.
+   Only accepts regions that have both an AI placement and a measured subject boundary. */
+(()=>{'use strict';
+ const $=id=>document.getElementById(id);
+ const clamp=(x,lo,hi)=>Math.min(hi,Math.max(lo,x));
+ const body=$('bodyBox'),ratio=$('rayRatio54');if(!body||!ratio)return;
+ const section=document.createElement('section');section.id='rayOverall62';
+ section.innerHTML=`<h3>✧ Dáng tổng thể · Áp tỷ lệ sau AI</h3>
+ <p>AI đo viền trên ảnh rồi gợi ý điều chỉnh theo tương quan 2D giữa các bộ phận. Không có một tỷ lệ cơ thể chuẩn cho mọi người; quần áo rộng hay tư thế nghiêng có thể khiến phép đo sai.</p>
+ <div class="ray62-line"><label for="ray62Mode">Mục tiêu</label><select id="ray62Mode"><option value="balanced">Cân đối nhẹ theo ảnh</option><option value="slimmer">Gọn hơn · vẫn tự nhiên</option><option value="keep">Giữ tỷ lệ đang có</option></select></div>
+ <div class="ray62-actions"><button type="button" id="ray62Scan">✧ Quét AI &amp; tính tỷ lệ</button><button type="button" id="ray62Apply" class="ray62-primary" disabled>✓ Áp dáng tổng thể · Xem ảnh ngay</button></div>
+ <div id="ray62OverallStatus" role="status" aria-live="polite">Quét AI để đo các vùng cơ thể trước khi áp dụng. Kết quả sẽ hiện toàn ảnh không vòng, còn vòng vẫn dùng được khi chỉnh tiếp.</div>
+ <div class="ray62-actions"><button type="button" id="ray62Undo" disabled>↶ Không ưng · Quay lại</button><button type="button" id="ray62Refine">Điều chỉnh từng bộ phận</button></div>
+ <p class="ray62-diagnostic">Các vùng thiếu mốc AI hoặc mặt nạ người sẽ được bỏ qua, không tự đoán kích thước cơ thể dưới lớp áo. Có thể hoàn tác kết quả trong thanh ↶ của RAY.</p>`;
+ ratio.insertAdjacentElement('beforebegin',section);
+ const status=msg=>$('ray62OverallStatus').textContent=msg;
+ const names={waist:'Eo',belly:'Bụng',hip:'Hông',armL:'Tay trái',armR:'Tay phải',thL:'Đùi trái',thR:'Đùi phải'};
+ const rules={
+  waist:{balanced:[.62,.77],slimmer:[.60,.72],kind:'rộng vùng / khoảng vai'},
+  belly:{balanced:[.70,.85],slimmer:[.67,.78],kind:'rộng vùng / khoảng vai'},
+  hip:{balanced:[.88,1.10],slimmer:[.85,1.03],kind:'rộng vùng / khoảng vai'},
+  armL:{balanced:[.17,.27],slimmer:[.16,.24],kind:'rộng vùng / dài mặt'},
+  armR:{balanced:[.17,.27],slimmer:[.16,.24],kind:'rộng vùng / dài mặt'},
+  thL:{balanced:[.24,.48],slimmer:[.24,.44],kind:'rộng vùng / dài mặt'},
+  thR:{balanced:[.24,.48],slimmer:[.24,.44],kind:'rộng vùng / dài mặt'}
+ };
+ let token=0,lastApplied=false,beforeKey='',afterKey='';
+ function measure(){
+  const api=window.RayGeometry54;
+  const mode=$('ray62Mode').value;
+  if(!source)return{ok:false,why:'Mở ảnh trước khi quét AI.'};
+  if(BODY_AI.busy||BEAUTY.busy)return{ok:false,why:'AI đang xử lý. Đợi quét xong rồi thử lại.'};
+  if(!BODY_AI.people.length)return{ok:false,why:'Chưa có vùng AI cơ thể. Bấm Quét AI & tính tỷ lệ.'};
+  if(BODY_AI.people.length!==1||BEAUTY.people.length>1)return{ok:false,why:'Ảnh nhóm: chưa có mặt nạ riêng từng người, không tự động chỉnh toàn thân để tránh chỉnh nhầm.'};
+  if(!BEAUTY.maps?.foreground||BEAUTY.source!==source)return{ok:false,why:'Chưa có mặt nạ viền người. Bấm Quét AI & tính tỷ lệ.'};
+  const available=[],skipped=[],changes=[];
+  for(const [id,r] of Object.entries(rules)){
+   const m=api?.metricFor(id);
+   if(!m?.ok||m.unit!==r.kind){skipped.push(names[id]);continue;}
+   available.push({id,m});
+   if(mode==='keep')continue;
+   const [lo,hi]=r[mode];
+   // Gently converge towards reference BAND, not an invented exact universal perfect ratio.
+   let delta=0;
+   if(m.ratio>hi)delta=hi/m.ratio-1;
+   else if(m.ratio<lo&&mode==='balanced')delta=lo/m.ratio-1;
+   delta=clamp(delta,mode==='slimmer'?-.105:-.085,.045);
+   if(Math.abs(delta)>.004)changes.push({p:m.p,axis:'x',delta,ratio:m.ratio,id});
+  }
+  if(available.length<2)return{ok:false,why:'AI chỉ đo được '+available.length+' vùng. Cần ít nhất 2 vùng có viền đáng tin cậy để áp dáng tổng thể; hãy thử ảnh toàn thân rõ và không bị che.',available,skipped};
+  return{ok:true,available,changes,skipped,mode};
+ }
+ function refresh(){
+  const measured=measure();$('ray62Apply').disabled=!measured.ok||measured.mode==='keep'||!measured.changes?.length;
+  $('ray62Scan').disabled=!source||BODY_AI.busy||BEAUTY.busy;
+  if(!measured.ok){status(measured.why+(measured.skipped?.length?'\nChưa đo: '+measured.skipped.join(', '):''));return measured;}
+  const c=measured.changes;
+  status('Đã đo '+measured.available.length+' vùng có mốc AI và viền người.'+
+   (c.length?'\nĐề xuất thay đổi: '+c.map(e=>names[e.id]+' '+(e.delta>0?'+':'')+Math.round(e.delta*100)+'%').join(' · '):'\nCác tỷ lệ đo được đang nằm trong dải tham khảo: không cần tự động bóp dáng.')+
+   (measured.skipped.length?'\nKhông đủ dữ liệu: '+measured.skipped.join(', '):'')+
+   '\nĐây là tỷ lệ hiển thị 2D, không phải số đo cơ thể thật.');
+  return measured;
+ }
+ async function scan(){
+  if(!source)return;
+  const id=++token;
+  $('ray62Scan').disabled=true;status('Đang quét AI tư thế, mặt và viền người…');
+  try{
+   await window.RayGeometry54.scan();
+   if(id!==token)return;
+   refresh();
+  }catch(e){status('AI chưa hoàn thành: '+String(e.message||e));}
+  finally{$('ray62Scan').disabled=false;}
+ }
+ function apply(){
+  const computed=measure();if(!computed.ok){refresh();return;}
+  if(computed.mode==='keep'||!computed.changes.length){refresh();return;}
+  // Close pending slider history and preserve a single pre-change undo point.
+  bodyEnd();
+  beforeKey=bodySnap();
+  bodyBegin('ray62-all');
+  const changed=window.RayGeometry54.commit(computed.changes,'Áp tỷ lệ dáng tổng thể');
+  bodyEnd();
+  if(!changed){status('Tỷ lệ đã nằm ở mức đang chọn hoặc chạm giới hạn an toàn. Không có pixel nào mới được ghi.');return;}
+  lastApplied=true;afterKey=bodySnap();
+  BODY.hide=true;bodyUI();syncBody();queue();
+  window.RayFace55?.hideGuides('result');
+  window.RaySession?.showResult(true);
+  $('ray62Undo').disabled=false;
+  status('Đã áp trên '+computed.changes.length+' vùng AI đo được · đang xem dáng toàn ảnh, không có vòng che.'+
+   '\nNếu chưa ưng, bấm ↶ Không ưng · Quay lại; nếu muốn nắn tiếp, bấm Điều chỉnh từng bộ phận.'+
+   (computed.skipped.length?'\nVùng chưa đo không được chỉnh: '+computed.skipped.join(', '):''));
+ }
+ function undo(){
+  if(!lastApplied||!source)return;
+  // Restore only if nothing else has been edited since the automatic application.
+  const before=beforeKey;
+  if(!before)return;
+  bodyEnd();
+  const current=bodySnap();
+  if(current===before){lastApplied=false;$('ray62Undo').disabled=true;return;}
+  if(current!==afterKey){status('Bà đã chỉnh thêm vùng khác sau khi áp dáng AI. Hãy dùng nút ↶ của RAY để quay lại từng bước, tránh mất các chỉnh sửa mới.');lastApplied=false;$('ray62Undo').disabled=true;return;}
+  // Use the app's main Undo so draft, face edits and session history stay in sync.
+  window.RaySession?.undo();
+  lastApplied=false;beforeKey='';afterKey='';$('ray62Undo').disabled=true;
+  BODY.hide=false;bodyUI();syncBody();queue();
+  status('Đã quay lại bước trước khi áp dáng tổng thể. Ảnh được giữ nguyên để bà thử mẫu khác.');
+ }
+ function refine(){
+  if(!source)return;
+  window.RaySession?.showResult(false);
+  BODY.hide=false;
+  BODY.sel=BODY.sel||'waist';
+  bodyUI();syncBody();queue();
+  document.getElementById('bodyCtl')?.scrollIntoView({behavior:'smooth',block:'nearest'});
+  status('Chọn vùng muốn chỉnh → kéo các thanh To/nhỏ, Ngang, Dọc… Ảnh thay đổi ngay. Khi xem tổng thể, bấm Áp dụng ✓ ở thanh dưới.');
+ }
+ $('ray62Apply').onclick=apply;$('ray62Undo').onclick=undo;$('ray62Refine').onclick=refine;
+ $('ray62Scan').onclick=scan;$('ray62Mode').onchange=refresh;
+ const bar=document.querySelector('.session-apply-bar');
+ if(bar){const top=document.createElement('button');top.type='button';top.id='ray62UndoTop';top.textContent='↶ Bỏ dáng AI';top.onclick=undo;bar.insertBefore(top,bar.querySelector('.session-resume'));}
+ // Session is restored automatically by v54 on photo replacement; don't carry undo between photos.
+ let lastSource=source,stamp='';
+ setInterval(()=>{
+  if(source!==lastSource){lastSource=source;lastApplied=false;beforeKey='';afterKey='';$('ray62Undo').disabled=true;}
+  const next=[BODY_AI.people.length,BEAUTY.people.length,BEAUTY.source===source,BEAUTY.maps?.foreground?.length||0,bodySnap().length].join(':');
+  if(next!==stamp){stamp=next;refresh();}
+  const top=$('ray62UndoTop');if(top)top.disabled=!lastApplied;
+ },1100);
+ window.RayOverall62={measure,refresh,scan,apply,undo,refine};
+ refresh();
 })();
 </script>
 </body>
