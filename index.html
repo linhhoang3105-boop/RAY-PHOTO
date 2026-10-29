@@ -8818,5 +8818,192 @@ bodyWarp=function(c,W,H){rayOriginalBodyWarp(c,W,H);if(!BODY.peek)rayFineWarp(c,
 })();
 </script>
 
+
+<style id="ray55-face-style">
+#rayFace55{background:linear-gradient(145deg,#292720,#1d1d21);border:1px solid #c29d5f;border-radius:11px;padding:14px;margin:8px 0 16px;color:#ede5d4;font-size:13px}
+#rayFace55 *{box-sizing:border-box}#rayFace55 header{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+#rayFace55 h3{font-size:16px;color:#f1d18d;line-height:1.5;margin:0;font-weight:650}
+#rayFace55 .r55-tag{font-size:11px;color:#e8c984;border:1px solid #856c43;border-radius:15px;padding:3px 8px}
+#rayFace55 .r55-desc{font-size:12px;line-height:1.55;color:#d4c7b1;margin:8px 0 14px}
+#rayFace55 .r55-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}
+#rayFace55 button,#rayFace55 select{min-height:44px;font-size:13px;padding:9px 10px;border-radius:7px;border:1px solid #816e50;background:#302c2a;color:#f5e8cc;cursor:pointer;max-width:100%}
+#rayFace55 button:disabled{opacity:.42;cursor:not-allowed}
+#rayFace55 .r55-primary{background:#e7c778;color:#282219;border-color:#e7c778;font-weight:750}
+#rayFace55 .r55-field{display:grid;grid-template-columns:minmax(90px, 125px) 1fr;align-items:center;gap:8px;margin:9px 0}
+#rayFace55 .r55-field label{font-size:12px;color:#ddcda7}
+#rayFace55 .r55-field select{width:100%;min-width:0}
+#rayFace55 .r55-field input{width:100%;accent-color:#e7c778}
+#rayFace55 .r55-rows{display:grid;grid-template-columns:1.3fr .55fr .55fr;gap:1px;background:#5e5347;border:1px solid #5e5347;border-radius:6px;overflow:hidden;margin:10px 0}
+#rayFace55 .r55-rows>div{background:#242327;padding:8px 6px;font-size:11.5px;line-height:1.4;min-width:0}
+#rayFace55 .r55-rows>.r55-head{color:#f1d18d;font-weight:650;background:#39342d}
+#rayFace55 .r55-num{font-variant-numeric:tabular-nums;text-align:right}
+#rayFace55 .r55-result{padding:10px;border:1px solid #675438;background:#1f2022;border-radius:7px;line-height:1.6;margin:9px 0;white-space:pre-line}
+#rayFace55 .r55-small{font-size:11px;line-height:1.55;color:#cbbfae;margin:7px 0}
+#r55Mask{position:absolute;z-index:12;pointer-events:none;max-width:none!important;max-height:none!important;border:none!important;box-shadow:none!important}
+@media(max-width:400px){#rayFace55{padding:10px}#rayFace55 .r55-field{grid-template-columns:100px 1fr}}
+</style>
+<script id="ray55-face-geometry">
+/* RAY PHOTO v55 -- ADD-ON FACE GEOMETRY ONLY.
+   Reuses MediaPipe FaceLandmarker output already stored in BEAUTY.people.
+   Phi-inspired reference and face-shape archetypes are OPTIONAL 2D examples,
+   never a verified beauty standard or true physical measurements.
+   All retouch updates are stored in BODY_FINE.strokes, already part of app snapshots,
+   undo/redo/drafts, and applied in bodyWarp before unchanged color renderer.
+*/
+(()=>{'use strict';
+ const $=id=>document.getElementById(id),c=(x,a,b)=>Math.max(a,Math.min(b,x));
+ const body=$('bodyBox'),wrap=$('canvasWrap'),view=$('view');if(!body||!wrap||!view)return;
+ const panel=document.createElement('section');panel.id='rayFace55';
+ panel.innerHTML=`<header><h3>✧ Mặt nạ tỷ lệ vàng &amp; khuôn mẫu</h3><span class="r55-tag">v55 · AI thật</span></header>
+ <p class="r55-desc">Chọn ảnh → quét gương mặt → xem mốc mắt, mũi, môi, cằm và so với khuôn mẫu. Đường nét đứt chỉ là đích tham khảo, không xuất hiện trong ảnh lưu.</p>
+ <div class="r55-actions"><button type="button" id="r55Scan" class="r55-primary">✧ AI quét &amp; đo khuôn mặt</button><button type="button" id="r55Guide">Ẩn mặt nạ</button></div>
+ <div class="r55-field"><label for="r55Person">Người trong ảnh</label><select id="r55Person"><option value="0">Người 1</option></select></div>
+ <div class="r55-field"><label for="r55Template">Khuôn mẫu</label><select id="r55Template"><option value="phi">Tỷ lệ vàng φ · tham khảo</option><option value="diamond">Mặt kim cương</option><option value="oval">Mặt oval</option><option value="vline">Mặt V-line</option><option value="natural">Giữ tỷ lệ hiện tại</option></select></div>
+ <div class="r55-rows" id="r55Metrics"><div class="r55-head">Phép đo</div><div class="r55-head r55-num">Hiện tại</div><div class="r55-head r55-num">Mẫu</div><div>Chưa quét AI</div><div class="r55-num">—</div><div class="r55-num">—</div></div>
+ <div class="r55-result" id="r55Status" role="status" aria-live="polite">Bấm “AI quét &amp; đo khuôn mặt”. Phần này hoạt động độc lập với vòng chỉnh dáng cũ.</div>
+ <div class="r55-field"><label for="r55Intensity">Mức chỉnh nhẹ</label><div style="display:flex;align-items:center;gap:8px"><input type="range" id="r55Intensity" min="0" max="100" step="5" value="35"><output id="r55IntensityLabel">35%</output></div></div>
+ <div class="r55-actions"><button type="button" class="r55-primary" id="r55Apply" disabled>Áp dụng khuôn mẫu nhẹ</button><button type="button" id="r55Reset">Gỡ chỉnh khuôn mẫu v55</button></div>
+ <p class="r55-small">Vàng: mốc AI hiện tại · trắng ngà nét đứt: hướng dẫn mục tiêu (Phi/mặt kim cương/oval/V-line). Đây là mức khớp HÌNH HỌC 2D, không phải điểm sắc đẹp. Ảnh nghiêng hoặc có tóc, kính, tay che mặt làm tỷ lệ thiếu tin cậy. Chỉnh sửa mặc định nhỏ và có thể Hoàn tác.</p>`;
+ body.insertBefore(panel,body.firstElementChild);
+ const overlay=document.createElement('canvas');overlay.id='r55Mask';overlay.setAttribute('aria-hidden','true');wrap.appendChild(overlay);
+ const state={visible:true,scanning:false,src:null,faces:0,faceId:0};
+ const templates={
+  phi:{name:'Tỷ lệ vàng φ (tham khảo)',aspect:1.618,eyeGap:1.0,noseMouth:1/1.618,mouthFace:.43,jawCheek:.76,foreheadCheek:.90},
+  diamond:{name:'Mặt kim cương',aspect:1.54,eyeGap:1.0,noseMouth:.66,mouthFace:.43,jawCheek:.69,foreheadCheek:.83},
+  oval:{name:'Mặt oval',aspect:1.52,eyeGap:1.0,noseMouth:.66,mouthFace:.43,jawCheek:.84,foreheadCheek:.94},
+  vline:{name:'Mặt V-line',aspect:1.60,eyeGap:1.0,noseMouth:.65,mouthFace:.43,jawCheek:.64,foreheadCheek:.91}
+ };
+ const map=[['aspect','Dài mặt / rộng gò má'],['eyeGap','Khoảng mắt / rộng mắt'],['noseMouth','Rộng mũi / rộng môi'],['mouthFace','Rộng môi / rộng mặt'],['jawCheek','Rộng hàm / gò má'],['foreheadCheek','Trán / gò má']];
+ const q=i=>$('r55'+i),fmt=x=>Number.isFinite(x)?x.toFixed(3):'—';
+ const getPeople=()=>BEAUTY.people?.filter(p=>Array.isArray(p.face)&&p.face.length>400)||[];
+ const selected=()=>getPeople()[Number(q('Person').value)||0]||null;
+ const p=(f,i)=>f?.[i]&&Number.isFinite(f[i].x)&&Number.isFinite(f[i].y)?f[i]:null;
+ const dst=(a,b)=>Math.hypot((a.x-b.x)*source.width,(a.y-b.y)*source.height);
+ const mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+ function geom(){if(!source||BEAUTY.source!==source)return null;const face=selected()?.face;if(!face)return null;
+  const need=[10,152,234,454,127,356,172,397,33,133,362,263,98,327,61,291,1];
+  if(need.some(i=>!p(face,i)))return null;
+  const get=i=>face[i],head=mid(get(234),get(454)),eyeL=mid(get(33),get(133)),eyeR=mid(get(362),get(263)),nose=mid(get(98),get(327)),mouth=mid(get(61),get(291));
+  const fw=dst(get(234),get(454)),height=dst(get(10),get(152)),ew=(dst(get(33),get(133))+dst(get(362),get(263)))/2;
+  const gap=dst(get(133),get(362)),nw=dst(get(98),get(327)),mw=dst(get(61),get(291)),jw=dst(get(172),get(397)),fore=dst(get(127),get(356));
+  if(fw<12||height<12||ew<4||mw<3||nw<2)return null;
+  const values={aspect:height/fw,eyeGap:gap/ew,noseMouth:nw/mw,mouthFace:mw/fw,jawCheek:jw/fw,foreheadCheek:fore/fw};
+  const eyeMid=mid(eyeL,eyeR),leftNose=dst(get(1),eyeL),rightNose=dst(get(1),eyeR),yaw=Math.abs(leftNose-rightNose)/Math.max(1,leftNose+rightNose);
+  const eyes=Math.max(dst(eyeL,eyeR),1),roll=Math.atan2((eyeR.y-eyeL.y)*source.height,(eyeR.x-eyeL.x)*source.width);
+  // An image has only 2D projection. Detect strong nose asymmetry, not a calibrated yaw angle.
+  const oblique=yaw>.23;
+  return {face,head,eyeL,eyeR,eyeMid,nose,mouth,chin:get(152),faceTop:get(10),cheekL:get(234),cheekR:get(454),jawL:get(172),jawR:get(397),fw,height,ew,roll,eyes,values,yaw,oblique};
+ }
+ function choose(){const v=q('Template').value;return v==='natural'?null:templates[v];}
+ function score(g,t){if(!g||!t||g.oblique)return null;
+  const weights={aspect:2,eyeGap:.7,noseMouth:.9,mouthFace:.8,jawCheek:1.25,foreheadCheek:.65};let sum=0,n=0;
+  for(const [k,w] of Object.entries(weights)){const a=g.values[k],b=t[k];if(!(a>0&&b>0))continue;sum+=w*Math.abs(Math.log(a/b));n+=w;}
+  return n?Math.round(c((1-sum/n/.55)*100,0,100)):null;
+ }
+ function syncPeople(){const current=q('Person').value||'0',people=getPeople();q('Person').replaceChildren();
+  if(!people.length){const opt=document.createElement('option');opt.value='0';opt.textContent='Chưa có mặt';q('Person').append(opt);return;}
+  people.forEach((_,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent='Người '+(i+1);q('Person').append(opt);});q('Person').value=String(c(Number(current)||0,0,people.length-1));
+ }
+ let raf=0;function schedule(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;paint();});}
+ function update(msg){if(!source){q('Status').textContent='Mở ảnh trước khi quét AI.';q('Apply').disabled=true;schedule();return;}
+  const g=geom(),t=choose(),rows=q('Metrics');rows.replaceChildren();
+  const cell=(txt,klass)=>{let el=document.createElement('div');el.textContent=txt;if(klass)el.className=klass;rows.appendChild(el);};
+  ['Phép đo','Hiện tại','Mẫu'].forEach((x,i)=>cell(x,'r55-head'+(i?' r55-num':'')));
+  for(const [key,title] of map){cell(title);cell(g?fmt(g.values[key]):'—','r55-num');cell(t?fmt(t[key]):'Gốc','r55-num');}
+  q('Apply').disabled=!g||!t||g.oblique||state.scanning||!q('Intensity').value ||Number(q('Intensity').value)===0;
+  q('IntensityLabel').textContent=q('Intensity').value+'%';
+  if(msg){q('Status').textContent=msg;}else if(!g){q('Status').textContent='Chưa có mốc mặt. Bấm AI quét & đo khuôn mặt.';}
+  else {const s=score(g,t);q('Status').textContent='Đã nhận diện mặt · '+(g.oblique?'Góc mặt nghiêng: chỉ hiển thị mốc, không chấm mức khớp hoặc tự chỉnh.':'Mức khớp khuôn mẫu: '+(t?(s+' / 100'):'giữ nguyên')+' (chỉ so hình học 2D).')+'\nMốc: mắt, mũi, môi, cằm. Đây là tỷ lệ của ảnh gốc trước chỉnh; không phải số đo cơ thể thật.';}
+  schedule();
+ }
+ function imageRect(){const a=wrap.getBoundingClientRect(),b=view.getBoundingClientRect(),bw=LASTG?.bw||0,bb=LASTG?.bb||0,W=LASTG?.W||source?.width||1,H=LASTG?.H||source?.height||1;
+  const tw=W+2*bw,th=H+bw+bb;return {x:b.left-a.left,y:b.top-a.top,w:b.width,h:b.height,toX:u=>(bw+u*W)/tw*b.width,toY:v=>(bw+v*H)/th*b.height};}
+ function paint(){const rect=imageRect(),scale=Math.min(2,window.devicePixelRatio||1);overlay.style.left=rect.x+'px';overlay.style.top=rect.y+'px';overlay.style.width=rect.w+'px';overlay.style.height=rect.h+'px';
+  const ww=Math.max(1,Math.round(rect.w*scale)),hh=Math.max(1,Math.round(rect.h*scale));if(overlay.width!==ww)overlay.width=ww;if(overlay.height!==hh)overlay.height=hh;
+  const ctx=overlay.getContext('2d');ctx.clearRect(0,0,ww,hh);const g=geom();if(!state.visible||!g||!rect.w||!['body','all'].includes(document.body.dataset.editorTool))return;
+  ctx.setTransform(scale,0,0,scale,0,0);const X=x=>rect.toX(x),Y=y=>rect.toY(y);
+  const dot=(a,r=2.7)=>{ctx.beginPath();ctx.arc(X(a.x),Y(a.y),r,0,Math.PI*2);ctx.fill();};
+  const path=(ids,color,dash=[])=>{ctx.beginPath();let began=false;for(const i of ids){const a=p(g.face,i);if(!a)continue;if(!began)ctx.moveTo(X(a.x),Y(a.y)),began=true;else ctx.lineTo(X(a.x),Y(a.y));}ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.setLineDash(dash);ctx.stroke();ctx.setLineDash([]);};
+  const oval=[10,338,297,332,284,251,389,356,454,323,361,288,397,365,379,378,400,377,152,148,176,149,150,136,172,58,132,93,234,127,162,21,54,103,67,109,10];
+  path(oval,'rgba(233,184,89,.85)');path([33,160,158,133,153,144,33],'rgba(233,184,89,.87)');path([362,385,387,263,373,380,362],'rgba(233,184,89,.87)');
+  path([98,1,327],'rgba(233,184,89,.87)');path([61,40,0,270,291,321,17,91,61],'rgba(233,184,89,.87)');
+  ctx.fillStyle='rgba(241,192,99,.9)';[g.eyeL,g.eyeR,g.nose,g.mouth,g.chin].forEach(a=>dot(a));
+  const t=choose();if(!t)return;ctx.strokeStyle='rgba(253,247,222,.95)';ctx.fillStyle='rgba(253,247,222,.8)';ctx.setLineDash([5,4]);ctx.lineWidth=1.6;
+  const ellipse=(center,rx,ry,angle=0)=>{ctx.beginPath();ctx.ellipse(X(center.x),Y(center.y),Math.max(2,rx),Math.max(2,ry),angle,0,Math.PI*2);ctx.stroke();};
+  const px=rect.w/Math.max(1,source.width),py=rect.h/Math.max(1,source.height),facePixels=g.fw*px,faceHeight=g.height*py;
+  const targetFaceWidth=g.height/t.aspect;ellipse(g.head,targetFaceWidth*px*.50,faceHeight*.50,g.roll);
+  const eyeW=g.ew*px;const targetEyeW=g.eyes/t.eyeGap*px;
+  ellipse(g.eyeL,Math.min(facePixels*.18,targetEyeW*.5),Math.max(3,eyeW*.20),g.roll);ellipse(g.eyeR,Math.min(facePixels*.18,targetEyeW*.5),Math.max(3,eyeW*.20),g.roll);
+  const mouthW=t.mouthFace*targetFaceWidth*px;ellipse(g.mouth,mouthW*.5,Math.max(3,faceHeight*.048),g.roll);
+  ellipse(g.nose,Math.min(facePixels*.26,mouthW*t.noseMouth*.5),Math.max(3,faceHeight*.085),g.roll);
+  ellipse(g.chin,t.jawCheek*targetFaceWidth*px*.36,Math.max(3,faceHeight*.16),g.roll);
+  ctx.setLineDash([]);
+ }
+ function faceEdits(g,t,intensity){if(!g||!t||g.oblique)return [];
+  const d=(desired,actual,cap)=>c((desired/Math.max(actual,1e-5)-1)*intensity,-cap,cap);
+  const rect=(point,rx,ry,sx,sy)=>({part:'ray55-template',mode:'local-scale',points:[],cx:point.x,cy:point.y,rx,ry,sx,sy});
+  const fpx=g.fw/source.width,fpy=g.height/source.height;
+  const aspectSX=d(g.values.aspect,t.aspect,.075);const eyeSX=d(g.values.eyeGap,t.eyeGap,.055);
+  const mouthSX=d(t.mouthFace,g.values.mouthFace,.065);const noseSX=d(t.noseMouth,g.values.noseMouth,.055);
+  const jawSX=d(t.jawCheek,g.values.jawCheek,.065);
+  const result=[];
+  if(Math.abs(aspectSX)>.0001)result.push(rect(g.head,fpx*.52,fpy*.52,aspectSX,0));
+  const eyeRad=Math.max(.008,g.ew/source.width*.66);for(const e of [g.eyeL,g.eyeR])if(Math.abs(eyeSX)>.0001)result.push(rect(e,eyeRad,eyeRad*source.width/source.height*.52,eyeSX,0));
+  if(Math.abs(noseSX)>.0001)result.push(rect(g.nose,Math.max(.008,g.fw/source.width*.18),Math.max(.01,g.height/source.height*.12),noseSX,0));
+  if(Math.abs(mouthSX)>.0001)result.push(rect(g.mouth,Math.max(.008,g.fw/source.width*.32),Math.max(.008,g.height/source.height*.11),mouthSX,0));
+  if(Math.abs(jawSX)>.0001){const chin={x:g.chin.x,y:g.chin.y-fpy*.095};result.push(rect(chin,fpx*.38,fpy*.20,jawSX,0));}
+  return result;
+ }
+ // Extra localized affine warp AFTER original brush. Only per-region pixels change; near boundary influence tends to zero.
+ function applyLocal(cxt,W,H,s){const cx=s.cx*W,cy=s.cy*H,rx=Math.max(3,s.rx*W),ry=Math.max(3,s.ry*H);
+  const x0=Math.max(0,Math.floor(cx-rx-2)),y0=Math.max(0,Math.floor(cy-ry-2)),x1=Math.min(W,Math.ceil(cx+rx+2)),y1=Math.min(H,Math.ceil(cy+ry+2));if(x1<=x0||y1<=y0)return;
+  const pad=Math.ceil(Math.max(rx*Math.abs(s.sx),ry*Math.abs(s.sy)))+4;
+  const sx0=Math.max(0,x0-pad),sy0=Math.max(0,y0-pad),sx1=Math.min(W,x1+pad),sy1=Math.min(H,y1+pad);
+  const bw=sx1-sx0,bh=sy1-sy0,S=cxt.getImageData(sx0,sy0,bw,bh).data;
+  const iw=x1-x0,ih=y1-y0,output=cxt.createImageData(iw,ih),D=output.data;
+  for(let j=0;j<ih;j++)for(let i=0;i<iw;i++){
+   const xp=x0+i+.5,yp=y0+j+.5,dx=xp-cx,dy=yp-cy,r2=(dx/rx)**2+(dy/ry)**2;
+   let u=xp-.5-sx0,v=yp-.5-sy0;
+   if(r2<1){const k=1-r2,f=k*k*(3-2*k);u=(cx+dx/(1+s.sx*f))-.5-sx0;v=(cy+dy/(1+s.sy*f))-.5-sy0;}
+   u=c(u,0,bw-1);v=c(v,0,bh-1);const x=Math.floor(u),y=Math.floor(v),xx=Math.min(bw-1,x+1),yy=Math.min(bh-1,y+1),fx=u-x,fy=v-y;
+   const a=(y*bw+x)*4,b=(y*bw+xx)*4,d=(yy*bw+x)*4,e=(yy*bw+xx)*4,o=(j*iw+i)*4;
+   for(let ch=0;ch<4;ch++)D[o+ch]=S[a+ch]*(1-fx)*(1-fy)+S[b+ch]*fx*(1-fy)+S[d+ch]*(1-fx)*fy+S[e+ch]*fx*fy;
+  }
+  cxt.putImageData(output,x0,y0);
+ }
+ const original=rayFineWarp;
+ rayFineWarp=function(cxt,W,H){original(cxt,W,H);for(const s of BODY_FINE.strokes)if(s.part==='ray55-template'&&s.mode==='local-scale')applyLocal(cxt,W,H,s);};
+ function replace(strokes,label){const old=BODY_FINE.strokes.filter(s=>s.part==='ray55-template');const prev=BODY_FINE.strokes.filter(s=>s.part!=='ray55-template');
+  if(!old.length&&!strokes.length)return;
+  window.RaySession?.record('Trước '+label);
+  BODY_FINE.strokes=prev.concat(strokes);queue();window.RaySession?.record(label);window.RaySession?.refresh();
+ }
+ function apply(){const g=geom(),t=choose();if(!g||!t){update('Chưa có mốc mặt hoặc chưa chọn khuôn mẫu.');return;}if(g.oblique){update('Ảnh nghiêng: chưa áp tự động để tránh lệch mắt/mũi. Hãy dùng ảnh mặt gần chính diện hoặc chỉnh tay.');return;}
+  if(getPeople().length>1){const other=getPeople().some(x=>x!==selected()&&x.face?.[1]&&Math.hypot((x.face[1].x-g.head.x)*source.width,(x.face[1].y-g.head.y)*source.height)<g.fw*.9);
+   if(other){update('Hai khuôn mặt quá sát nhau; tạm không áp tự động để tránh ảnh hưởng người bên cạnh.');return;}}
+  const amount=Number(q('Intensity').value)/100,strokes=faceEdits(g,t,amount);
+  replace(strokes,'Mặt nạ khuôn mẫu '+t.name);
+  update('Đã áp '+t.name+' ở mức '+q('Intensity').value+'% trên vùng mặt. Thay đổi thật được lưu vào lịch sử của RAY; bấm Hoàn tác để trở lại. Các phép đo phía trên vẫn là từ ảnh GỐC.');
+ }
+ async function scan(){if(!source){update('Mở ảnh trước khi quét AI.');return;}if(state.scanning)return;
+  state.scanning=true;q('Scan').disabled=true;update('Đang tải và chạy Face Landmarker. Lần đầu cần mạng.');
+  try{if(!BEAUTY.busy&&(!getPeople().length||BEAUTY.source!==source))$('beautyScan').click();
+   for(let i=0;i<180;i++){if(!BEAUTY.busy&&(getPeople().length||i>3))break;await new Promise(r=>setTimeout(r,350));}
+   syncPeople();if(getPeople().length)update('AI trả về '+getPeople().length+' gương mặt. Đã đo các mốc mắt, mũi, môi và cằm.');else update('AI không trả về mốc mặt đáng tin cậy. Kiểm tra kết nối và thử ảnh chính diện rõ hơn.');
+  }catch(e){update('Không chạy được AI: '+String(e.message||e));}
+  finally{state.scanning=false;q('Scan').disabled=false;update();}
+ }
+ q('Scan').onclick=scan;q('Template').onchange=()=>update();q('Person').onchange=()=>update();q('Intensity').oninput=()=>update();
+ q('Guide').onclick=()=>{state.visible=!state.visible;q('Guide').textContent=state.visible?'Ẩn mặt nạ':'Hiện mặt nạ';schedule();};
+ q('Apply').onclick=apply;q('Reset').onclick=()=>{replace([],'Gỡ mặt nạ v55');update('Đã gỡ những thay đổi của v55; các chỉnh sửa khác giữ nguyên.');};
+ window.addEventListener('resize',schedule,{passive:true});if(window.ResizeObserver)new ResizeObserver(schedule).observe(view);
+ let lastSource=null,lastFaces='';setInterval(()=>{
+  const faces=getPeople(),stamp=[faces.length,BEAUTY.selected,BEAUTY.source===source,source?.width,source?.height].join(':');
+  if(source!==lastSource||stamp!==lastFaces){lastSource=source;lastFaces=stamp;syncPeople();update();}
+ },900);
+ window.RayFace55={geometry:geom,templates,score,update,scan,paint,faceEdits,applyLocal};
+ update();
+})();
+</script>
 </body>
 </html>
