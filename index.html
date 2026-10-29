@@ -624,15 +624,6 @@ html:has(.intro-screen[open]),body:has(>.intro-screen[open]){overflow:hidden;ove
 .ray-body-precision-bottom{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);white-space:nowrap;max-width:96%;text-overflow:ellipsis;overflow:hidden;z-index:2;background:#141415c9;border:1px solid #74613c88;padding:7px 12px;border-radius:20px;color:#f0d9a5;font-size:11px;pointer-events:none}
 @media(max-width:460px){.ray-body-precision-top>span{display:none}.ray-body-precision-top{justify-content:center}.ray-body-precision-buttons button{padding:4px 6px}.ray-body-precision-bottom{font-size:10px}}
 
-/* V50 - Hai cach chinh truc tiep: vung co dinh hoac but nho; khong xuat dau huong dan. */
-.ray-body-mode-tabs{position:absolute;z-index:3;top:53px;left:50%;transform:translateX(-50%);display:flex;gap:5px;padding:4px;background:rgba(17,18,20,.82);border:1px solid rgba(231,199,120,.35);border-radius:12px;white-space:nowrap;backdrop-filter:blur(8px)}
-.ray-body-mode-tabs button{border:1px solid transparent;border-radius:8px;background:transparent;color:#f3dfb6;min-height:37px;padding:6px 12px;font-size:12px;cursor:pointer}
-.ray-body-mode-tabs button.on{background:#e7c778;color:#17140e;font-weight:650}
-.ray-body-precision-bottom{white-space:normal;text-align:center;max-width:min(94%,420px);line-height:1.35}
-.ray-body-size{position:absolute;z-index:3;bottom:48px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:7px 10px;background:#171717d9;border:1px solid #e7c77855;border-radius:9px;white-space:nowrap;color:#f9e8bc;font-size:11px;min-width:250px;max-width:94%;}
-.ray-body-size input{width:min(38vw,190px);accent-color:#e7c778;touch-action:pan-x;}
-.ray-body-size label{min-width:53px}.ray-body-size output{min-width:29px;text-align:right;color:#e7c778}
-@media(max-width:460px){.ray-body-mode-tabs{top:49px}.ray-body-mode-tabs button{font-size:11px;min-height:36px;padding:6px 10px}}
 /* V49 - vong chinh dang: net dut ivory mo, nen trong suot, khong in vao anh. */
 body[data-editor-tool="body"] .film-workspace:not(.is-result-preview):not(.session-peeking) .body-oval.on {
  display:block!important;
@@ -682,12 +673,7 @@ body[data-editor-tool="body"] .film-workspace:not(.is-result-preview):not(.sessi
           <button type="button" id="rayBodyPrecisionClose">Toàn ảnh ✓</button>
         </div>
       </div>
-      <div class="ray-body-mode-tabs" role="group" aria-label="Cách chỉnh dáng">
-        <button type="button" id="rayBodyRegionMode" class="on" aria-pressed="true">◎ Vùng cố định</button>
-        <button type="button" id="rayBodyBrushMode" aria-pressed="false">✎ Bút nắn nhỏ</button>
-      </div>
-      <div class="ray-body-size"><label for="rayBodyToolSize" id="rayBodyToolSizeLabel">Cỡ vùng</label><input type="range" id="rayBodyToolSize" min="3" max="16" step="0.5" value="9" aria-label="Chỉnh kích thước vùng tác động"/><output id="rayBodyToolSizeValue">9%</output></div>
-      <div class="ray-body-precision-bottom" id="rayBodyPrecisionHelp">Chạm để đặt vùng · kéo ra / vào trực tiếp</div>
+      <div class="ray-body-precision-bottom" id="rayBodyPrecisionHelp">Kéo nhẹ viền cần chỉnh · 2 ngón để phóng/thu</div>
     </div>
     <div class="drop" id="drop">
       <h1>RAY PHOTO</h1>
@@ -747,7 +733,7 @@ body[data-editor-tool="body"] .film-workspace:not(.is-result-preview):not(.sessi
             <div class="bodyhist"><button type="button" class="bbtn bundo" disabled>↶ Quay lại</button><button type="button" class="bbtn bredo" disabled>↷ Làm lại</button></div>
             <button type="button" class="bbtn" id="bodyAiAlign" disabled style="width:100%;margin-bottom:10px">Đặt vòng này theo AI</button>
             <div class="body-fine-tools" id="bodyFineTools">
-              <button type="button" class="bbtn fine-open" id="bodyFineOpen">◎ Chỉnh dáng trực tiếp</button>
+              <button type="button" class="bbtn fine-open" id="bodyFineOpen">⌕ Phóng vùng &amp; chỉnh điểm</button>
               <p class="hint">Phóng to đúng bộ phận đang chọn. Dùng bút kéo nhẹ viền vai, tay, eo… để chỉnh các điểm nhỏ. Thu phóng chỉ thay đổi khung nhìn, không làm giảm chất lượng ảnh xuất.</p>
               <div class="fine-parameters">
                 <label for="bodyFineRadius">Cỡ đầu bút <output id="bodyFineRadiusText">2.5%</output></label>
@@ -3337,8 +3323,8 @@ async function bodyAiEngine(assets, onStatus){
       bytes = new Uint8Array(await response.arrayBuffer());
     }finally{ clearTimeout(timer); }
     const options = {baseOptions:{modelAssetBuffer:bytes, delegate:"CPU"}, runningMode:"IMAGE"};
-    if(kind === "pose") Object.assign(options, {numPoses:3, minPoseDetectionConfidence:.55, minPosePresenceConfidence:.55});
-    else Object.assign(options, {numFaces:3, minFaceDetectionConfidence:.55, minFacePresenceConfidence:.55,
+    if(kind === "pose") Object.assign(options, {numPoses:8, minPoseDetectionConfidence:.55, minPosePresenceConfidence:.55});
+    else Object.assign(options, {numFaces:8, minFaceDetectionConfidence:.55, minFacePresenceConfidence:.55,
                                 outputFaceBlendshapes:false, outputFacialTransformationMatrixes:false});
     tasks[kind] = await (kind === "pose" ? api.PoseLandmarker : api.FaceLandmarker).createFromOptions(files, options);
     return tasks[kind];
@@ -8325,32 +8311,19 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
  const radiusText=document.getElementById('bodyFineRadiusText'),powerText=document.getElementById('bodyFinePowerText');
  const scaleText=document.getElementById('rayBodyPrecisionScale');
  const name=document.getElementById('rayBodyPrecisionName'),panBtn=document.getElementById('rayBodyPrecisionPan'),help=document.getElementById('rayBodyPrecisionHelp');
- const regionBtn=document.getElementById('rayBodyRegionMode'),brushBtn=document.getElementById('rayBodyBrushMode');
- const sizeSlider=document.getElementById('rayBodyToolSize'),sizeLabel=document.getElementById('rayBodyToolSizeLabel'),sizeValue=document.getElementById('rayBodyToolSizeValue');
- let zoom=2.5,focusX=0,focusY=0,pan=false,mode='region',gesture=null,rafZoom=0,cursor=null,lastPart=null,livePreview=null,liveCtx=null;
- let regionCenter=null,regionRadius=.075;
+ let zoom=2.5,focusX=0,focusY=0,pan=false,gesture=null,rafZoom=0,cursor=null,lastPart=null,livePreview=null,liveCtx=null;
  const points=new Map();
  const clamp1=(v,a,b)=>Math.max(a,Math.min(b,v));
  const image=()=>({w:view.width,h:view.height,W:LASTG?.W||view.width,H:LASTG?.H||view.height,bw:LASTG?.bw||0,bb:LASTG?.bb||0});
  function isOpen(){return !host.hidden;}
  function updateLabels(){radiusText.textContent=(BODY_FINE.radius*100).toFixed(1)+'%';powerText.textContent=Math.round(BODY_FINE.power*100)+'%';}
- function updateToolSize(){
-  const brush=mode==='brush';sizeLabel.textContent=brush?'Cỡ bút':'Cỡ vùng';
-  sizeSlider.min=brush?'1':'3';sizeSlider.max=brush?'10':'16';sizeSlider.value=((brush?BODY_FINE.radius:regionRadius)*100).toFixed(1);
-  sizeValue.textContent=(Math.round((brush?BODY_FINE.radius:regionRadius)*1000)/10)+'%';
- }
- function updateHelp(){
-  updateToolSize();panBtn.setAttribute('aria-pressed',String(pan));
-  regionBtn.classList.toggle('on',mode==='region'&&!pan);brushBtn.classList.toggle('on',mode==='brush'&&!pan);
-  regionBtn.setAttribute('aria-pressed',String(mode==='region'&&!pan));brushBtn.setAttribute('aria-pressed',String(mode==='brush'&&!pan));
-  help.textContent=pan?'Kéo để dịch ảnh · Hai ngón thu phóng':mode==='region'?'Vòng đứng yên · Kéo trong vòng để nắn ra/vào · Chạm ngoài vòng để đặt lại':'Bút mờ đánh dấu vùng nhỏ · Kéo trực tiếp đường viền';
- }
+ function updateHelp(){panBtn.setAttribute('aria-pressed',String(pan));help.textContent=pan?'Đang dịch ảnh · 2 ngón để phóng/thu':'Vòng nét đứt = vùng chọn · Vòng mờ = đầu bút · Kéo nhẹ để chỉnh';}
  function focusSelected(){
   const p=bodyPart(BODY.sel),g=image();if(!p||!g.w)return;
   focusX=(g.bw+p.cx*g.W)/Math.max(1,g.W+2*g.bw)*g.w;
   focusY=(g.bw+p.cy*g.H)/Math.max(1,g.H+g.bw+(LASTG?.bb||0))*g.h;
   name.textContent=p.name;
-  if(!gesture){if(lastPart!==p.id){regionCenter={x:p.cx,y:p.cy};regionRadius=Math.max(.03,Math.min(.16,Math.max(p.rx,p.ry)));lastPart=p.id;}if(!cursor)cursor={x:p.cx,y:p.cy};}
+  if(!gesture&&(lastPart!==p.id||!cursor))cursor={x:p.cx,y:p.cy};lastPart=p.id;
  }
  function geometry(){
   const w=host.clientWidth||1,h=host.clientHeight||1,img=image();
@@ -8368,13 +8341,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   const i=g.img,tx=g.left+(i.bw+p.x*i.W)*i.w/(i.W+2*i.bw)*g.scale;
   const ty=g.top+(i.bw+p.y*i.H)*i.h/(i.H+i.bw+i.bb)*g.scale;
   return{x:tx,y:ty};
- }
- function regionRadiusScreen(g){
-  const i=g.img;return Math.max(12,regionRadius*i.H*i.h/(i.H+i.bw+i.bb)*g.scale);
- }
- function regionContains(q){
-  if(!regionCenter)return false;const i=image();
-  return Math.hypot((q.x-regionCenter.x)*i.W,(q.y-regionCenter.y)*i.H)<=regionRadius*i.H;
  }
  function screenRadius(g){
   const i=g.img;return Math.max(5,BODY_FINE.radius*i.H*i.h/(i.H+i.bw+i.bb)*g.scale);
@@ -8398,12 +8364,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
    rayFineStamp(liveCtx,livePreview.width,livePreview.height,x,y,dx/steps*BODY_FINE.power,dy/steps*BODY_FINE.power,r);
   }
  }
- function regionPreview(st){
-  preparePreview();if(!st||!liveCtx||!livePreview)return;
-  const i=image(),sx=livePreview.width/(i.W+2*i.bw),sy=livePreview.height/(i.H+i.bw+i.bb);
-  const x=(i.bw+st.center.x*i.W)*sx,y=(i.bw+st.center.y*i.H)*sy;
-  rayFineStamp(liveCtx,livePreview.width,livePreview.height,x,y,st.dx*i.W*sx*BODY_FINE.power,st.dy*i.H*sy*BODY_FINE.power,Math.max(2,st.r*i.H*sy));
- }
  function paint(){
   if(!isOpen()||!view.width||!view.height)return;
   const rc=host.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
@@ -8413,26 +8373,21 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const g=geometry();ctx.fillStyle='#111214';ctx.fillRect(0,0,g.w,g.h);
   ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';
-  const img=(gesture&&(gesture.kind==='brush'||gesture.kind==='region')&&livePreview)?livePreview:view;
+  const img=(gesture?.kind==='brush'&&livePreview)?livePreview:view;
   ctx.drawImage(img,g.left,g.top,view.width*g.scale,view.height*g.scale);
   scaleText.textContent=zoom.toFixed(1)+'×';
-  // Vung co dinh: vi tri va kich thuoc khong troi theo ngon tay trong luc keo.
-  if(mode==='region'&&!pan&&regionCenter){
-   const p=screenPoint(regionCenter,g),rr=regionRadiusScreen(g);
-   ctx.save();ctx.beginPath();ctx.arc(p.x,p.y,rr,0,Math.PI*2);
-   ctx.fillStyle='rgba(255,220,152,.07)';ctx.fill();
-   ctx.setLineDash([6,5]);ctx.strokeStyle='rgba(30,25,17,.8)';ctx.lineWidth=3.5;ctx.stroke();
-   ctx.strokeStyle='rgba(255,232,183,.93)';ctx.lineWidth=1.7;ctx.stroke();ctx.setLineDash([]);
-   ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fillStyle='#ffe6ad';ctx.fill();
-   ctx.restore();
-  }else if(mode==='brush'&&!pan){
-   const part=bodyPart(BODY.sel);
-   if(part){const cp=screenPoint({x:part.cx,y:part.cy},g),i=g.img;
-    const rx=part.rx*i.H*i.w/(i.W+2*i.bw)*g.scale,ry=part.ry*i.H*i.h/(i.H+i.bw+i.bb)*g.scale;
-    ctx.save();ctx.translate(cp.x,cp.y);ctx.rotate(part.rot*Math.PI/180);
-    ctx.beginPath();ctx.ellipse(0,0,Math.max(1,rx),Math.max(1,ry),0,0,Math.PI*2);
-    ctx.strokeStyle='rgba(255,227,174,.36)';ctx.lineWidth=1.2;ctx.setLineDash([4,7]);ctx.stroke();ctx.restore();
-   }
+  // 1. Vong chon bo phan: nhe, net dut, nen mo 5%, khong anh huong pixel.
+  const part=bodyPart(BODY.sel);
+  if(part){
+   const cp=screenPoint({x:part.cx,y:part.cy},g),i=g.img;
+   const rx=part.rx*i.H*i.w/(i.W+2*i.bw)*g.scale;
+   const ry=part.ry*i.H*i.h/(i.H+i.bw+i.bb)*g.scale;
+   ctx.save();ctx.translate(cp.x,cp.y);ctx.rotate(part.rot*Math.PI/180);
+   ctx.beginPath();ctx.ellipse(0,0,Math.max(1,rx),Math.max(1,ry),0,0,Math.PI*2);
+   ctx.fillStyle='rgba(255,225,160,.055)';ctx.fill();
+   ctx.lineWidth=2;ctx.strokeStyle='rgba(22,19,16,.42)';ctx.setLineDash([5,6]);ctx.stroke();
+   ctx.strokeStyle='rgba(255,231,183,.78)';ctx.lineWidth=1.45;ctx.lineDashOffset=0;
+   ctx.shadowColor='rgba(255,215,145,.27)';ctx.shadowBlur=8;ctx.stroke();ctx.restore();
   }
   // 2. Vet keo ngan, hien mo kem mui ten huong keo.
   const trail=gesture?.kind==='brush'&&gesture.coords?.length?gesture.coords:null;
@@ -8448,7 +8403,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   }
   // 3. Dau but luon duoc hien thi (ke ca khi chua cham tren mobile).
   const pos=gesture?.kind==='brush'?(gesture.current||cursor):cursor;
-  if(pos&&!pan&&mode==='brush'&&gesture?.kind!=='pinch'){
+  if(pos&&!pan&&gesture?.kind!=='pinch'){
    const p=screenPoint(pos,g),rr=screenRadius(g);
    ctx.save();
    const glow=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,rr);
@@ -8466,27 +8421,19 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
  }
  function open(){
   if(!source||!BODY.sel)return;
-  host.hidden=false;zoom=2.5;pan=false;mode='region';gesture=null;points.clear();cursor=null;lastPart=null;regionCenter=null;livePreview=null;liveCtx=null;
+  host.hidden=false;zoom=2.5;pan=false;gesture=null;points.clear();cursor=null;lastPart=null;livePreview=null;liveCtx=null;
   focusSelected();updateHelp();schedule();
-  openButton.textContent='✓ Chỉnh dáng trực tiếp · Xem toàn ảnh';openButton.classList.add('on');
+  openButton.textContent='✓ Đang phóng vùng · Xem toàn ảnh';openButton.classList.add('on');
  }
  function close(){
   if(host.hidden)return;
   host.hidden=true;gesture=null;points.clear();cursor=null;lastPart=null;livePreview=null;liveCtx=null;if(rafZoom)cancelAnimationFrame(rafZoom);rafZoom=0;
-  openButton.textContent='◎ Chỉnh dáng trực tiếp';openButton.classList.remove('on');
+  openButton.textContent='⌕ Phóng vùng & chỉnh điểm';openButton.classList.remove('on');
  }
  openButton.onclick=()=>isOpen()?close():open();
  document.getElementById('rayBodyPrecisionClose').onclick=close;
  document.getElementById('rayBodyPrecisionPlus').onclick=()=>{zoom=clamp1(zoom+.5,1.3,6);schedule();};
  document.getElementById('rayBodyPrecisionMinus').onclick=()=>{zoom=clamp1(zoom-.5,1.3,6);schedule();};
- function selectMode(next){mode=next;pan=false;gesture=null;livePreview=null;liveCtx=null;points.clear();updateHelp();schedule();}
- regionBtn.onclick=()=>selectMode('region');
- brushBtn.onclick=()=>selectMode('brush');
- sizeSlider.oninput=()=>{
-  const v=Number(sizeSlider.value)/100;
-  if(mode==='region')regionRadius=v;else{BODY_FINE.radius=v;radius.value=String(v*100);updateLabels();}
-  sizeValue.textContent=Number(sizeSlider.value)+'%';schedule();
- };
  panBtn.onclick=()=>{pan=!pan;gesture=null;livePreview=null;liveCtx=null;points.clear();updateHelp();schedule();};
  radius.oninput=()=>{BODY_FINE.radius=Number(radius.value)/100;updateLabels();schedule();};
  power.oninput=()=>{BODY_FINE.power=Number(power.value)/100;updateLabels();};
@@ -8503,16 +8450,10 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   }
   if(points.size>2)return;
   if(pan){gesture={kind:'pan',x:e.clientX,y:e.clientY,fx:focusX,fy:focusY};}
-  else if(mode==='region'){
-    const q=mapPoint(e.clientX,e.clientY);cursor=q;
-    // Cham ngoai vong = doi vi tri; vong duoc khoa trong suot mot net keo.
-    if(!regionContains(q))regionCenter={x:q.x,y:q.y};
-    const fixed={...regionCenter};
-    gesture={kind:'region',id:e.pointerId,center:fixed,r:regionRadius,origin:q,current:q};
-    preparePreview();
-  }else{
+  else{
     const q=mapPoint(e.clientX,e.clientY);
-    cursor=q;preparePreview();gesture={kind:'brush',coords:[[q.x,q.y]],current:q,id:e.pointerId};
+    cursor=q;preparePreview();
+    gesture={kind:'brush',coords:[[q.x,q.y]],current:q,id:e.pointerId};
   }
   schedule();
  }
@@ -8525,9 +8466,6 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   if(gesture?.kind==='pan'){
     const g=geometry();focusX=gesture.fx-(e.clientX-gesture.x)/g.scale;focusY=gesture.fy-(e.clientY-gesture.y)/g.scale;
     focusX=clamp1(focusX,0,view.width);focusY=clamp1(focusY,0,view.height);schedule();
-  }else if(gesture?.kind==='region'&&gesture.id===e.pointerId){
-    const q=mapPoint(e.clientX,e.clientY);gesture.current=q;cursor=q;
-    regionPreview({center:gesture.center,r:gesture.r,dx:q.x-gesture.origin.x,dy:q.y-gesture.origin.y});schedule();
   }else if(gesture?.kind==='brush'&&gesture.id===e.pointerId){
     const q=mapPoint(e.clientX,e.clientY);gesture.current=q;cursor=q;
     const a=gesture.coords[gesture.coords.length-1],g=image();
@@ -8538,16 +8476,7 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
  }
  function onUp(e){
   if(!points.has(e.pointerId))return;
-  if(gesture?.kind==='region'&&gesture.id===e.pointerId&&points.size===1){
-    const q=mapPoint(e.clientX,e.clientY),orig=gesture.origin;
-    const dx=q.x-orig.x,dy=q.y-orig.y,i=image();
-    if(Math.hypot(dx*i.W,dy*i.H)>1){
-      bodyEnd();bodyBegin('fixed-region');
-      BODY_FINE.strokes.push({kind:'region',part:BODY.sel,r:gesture.r,p:BODY_FINE.power,points:[[gesture.center.x,gesture.center.y],[dx,dy]]});
-      if(BODY_FINE.strokes.length>70)BODY_FINE.strokes.splice(0,BODY_FINE.strokes.length-70);
-      bodyEnd();queue();window.RaySession?.record('Nắn vùng cố định');
-    }
-  }else if(gesture?.kind==='brush'&&gesture.id===e.pointerId&&points.size===1){
+  if(gesture?.kind==='brush'&&gesture.id===e.pointerId&&points.size===1){
     const q=mapPoint(e.clientX,e.clientY),a=gesture.coords[gesture.coords.length-1];
     if(Math.hypot(q.x-a[0],q.y-a[1])>0.0002){previewSegment(a,[q.x,q.y]);gesture.coords.push([q.x,q.y]);}cursor=q;
     const coords=gesture.coords;
@@ -8606,14 +8535,8 @@ function rayFineStamp(c,W,H,x,y,dx,dy,r){
 function clamp1Fine(v,a,b){return Math.max(a,Math.min(b,v));}
 function rayFineWarp(c,W,H){
  if(!BODY_FINE.strokes.length)return;
-  for(const stroke of BODY_FINE.strokes){
+ for(const stroke of BODY_FINE.strokes){
   const pts=stroke.points||[],r=Math.max(2,stroke.r*H),power=clamp1Fine(stroke.p,0,1);
-  if(stroke.kind==='region'){
-   if(pts.length<2)continue;
-   const center=pts[0],diff=pts[1];
-   rayFineStamp(c,W,H,center[0]*W,center[1]*H,diff[0]*W*power,diff[1]*H*power,r);
-   continue;
-  }
   for(let k=1;k<pts.length;k++){
    const a=pts[k-1],b=pts[k],dx=(b[0]-a[0])*W,dy=(b[1]-a[1])*H;
    const dist=Math.hypot(dx,dy);if(dist<.35)continue;
@@ -8629,5 +8552,271 @@ function rayFineWarp(c,W,H){
 const rayOriginalBodyWarp=bodyWarp;
 bodyWarp=function(c,W,H){rayOriginalBodyWarp(c,W,H);if(!BODY.peek)rayFineWarp(c,W,H);};
 </script>
+<style id="ray54-geometry-css">
+#rayRatio54{margin:12px 0;padding:14px;border:1px solid #79623e;border-radius:10px;background:linear-gradient(150deg,#27272c,#18181c);color:#eee4d1}
+#rayRatio54 .r54-title{font-size:15px;color:#edcf87;font-weight:650;margin:0 0 8px}
+#rayRatio54 .r54-line{display:flex;align-items:center;gap:9px;margin:10px 0;flex-wrap:wrap}
+#rayRatio54 .r54-line>*{min-width:0}
+#rayRatio54 label{font-size:12px;color:#e6d5b2}
+#rayRatio54 select,#rayRatio54 input[type=number],#rayRatio54 button{border:1px solid #766447;border-radius:6px;background:#24232a;color:#f3e9d6;padding:9px 10px;min-height:39px;font-size:13px}
+#rayRatio54 select{flex:1 1 150px;max-width:100%}
+#rayRatio54 input[type=number]{width:89px;flex:none}
+#rayRatio54 button{cursor:pointer}
+#rayRatio54 button:disabled{opacity:.37;cursor:not-allowed}
+#rayRatio54 .r54-primary{background:#e7c778;color:#201b12;border-color:#e7c778;font-weight:650}
+#rayRatio54 .r54-note{color:#c7bda6;font-size:11px;line-height:1.6;margin:8px 0}
+#rayRatio54 #r54Status{font-size:12px;line-height:1.55;color:#f0d296;margin:10px 0;white-space:pre-line}
+#rayRatio54 .r54-value{font-variant-numeric:tabular-nums;min-width:45px;color:#f3d78f;text-align:right;font-size:13px}
+#rayRatio54 input[type=range]{flex:1 1 160px;accent-color:#e7c778;min-width:0}
+#rayRatio54 .r54-chip{border:1px solid #887144;color:#e7c778;font-size:10px;border-radius:20px;padding:3px 7px}
+#r54Overlay{position:absolute;pointer-events:none;z-index:9;max-width:none!important;max-height:none!important;border:none!important;box-shadow:none!important}
+@media(max-width:520px){#rayRatio54 select{flex-basis:190px}#rayRatio54 .r54-line{gap:6px}}
+</style>
+<script id="ray54-geometry-js">
+/* RAY PHOTO v54: geometry presets ONLY. Leaves v49 legacy UI, 85+ film presets, renderer, AI libraries, draft/history and fine retouch untouched.
+   Numbers are apparent 2D image ratios, not centimetres and not a universal attractiveness assessment.
+   Constrained to the existing safe ellipse warp. Multi-person auto-edit disabled until per-person mask compositing exists. */
+(()=>{'use strict';
+ const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+ const base=$('bodyBox'),wrap=$('canvasWrap'),view=$('view');if(!base||!wrap||!view)return;
+ const panel=document.createElement('section');panel.id='rayRatio54';
+ panel.innerHTML=`<p class="r54-title">◇ Tỷ lệ gương mặt &amp; cơ thể <span class="r54-chip">v54 · thử nghiệm</span></p>
+ <p class="r54-note">Giữ các vòng, bút và AI của v49 bên dưới. Phần mới đo từ mốc AI + viền người, không suy đoán số đo thật dưới quần áo.</p>
+ <div class="r54-line"><button type="button" id="r54Scan" class="r54-primary">✧ Quét AI &amp; viền</button><button type="button" id="r54Toggle">Ẩn nét mẫu</button></div>
+ <div class="r54-line"><label for="r54Part">Bộ phận</label><select id="r54Part">
+ <optgroup label="Khuôn mặt"><option value="face">Mặt · dài/rộng</option><option value="chin">Cằm / nọng · độ rộng</option></optgroup>
+ <optgroup label="Thân trên"><option value="neck">Cổ · dài/ngắn</option><option value="shL">Vai trái</option><option value="shR">Vai phải</option><option value="chest">Ngực / thân trên</option><option value="back">Lưng · đặt vùng tay</option><option value="armL">Bắp tay trái</option><option value="armR">Bắp tay phải</option></optgroup>
+ <optgroup label="Thân giữa"><option value="waist">Eo</option><option value="belly">Bụng</option><option value="hip">Hông</option><option value="butt">Mông · đặt vùng tay</option></optgroup>
+ <optgroup label="Chân"><option value="thL">Đùi trái</option><option value="thR">Đùi phải</option><option value="clL">Bắp chân trái</option><option value="clR">Bắp chân phải</option></optgroup>
+ </select></div>
+ <div class="r54-line"><label for="r54Preset">Khuôn mẫu</label><select id="r54Preset">
+ <option value="keep">Nguyên bản</option><option value="slim">Thon/gọn nhẹ · -5%</option><option value="slim10">Thon/gọn · -10%</option><option value="full">Đầy hơn · +5%</option>
+ <option value="phi" data-face="1">Tỷ lệ vàng φ · tham khảo</option>
+ <option value="diamond" data-face="1">Mặt kim cương · mô phỏng</option>
+ <option value="oval" data-face="1">Mặt oval · mô phỏng</option>
+ <option value="vline" data-face="1">Mặt V-line · mô phỏng</option>
+ <option value="percent">Tùy chỉnh ±%</option><option value="target">Nhập tỷ lệ mục tiêu</option>
+ </select></div>
+ <div class="r54-line"><label for="r54Percent">Điều chỉnh</label><input id="r54Percent" type="range" min="-25" max="25" step="1" value="-5"/><output class="r54-value" id="r54PctText">−5%</output></div>
+ <div class="r54-line"><label for="r54Target">Tỷ lệ đích</label><input type="number" id="r54Target" min="0.15" max="4" step="0.01" value="1.00"/><span class="r54-note" id="r54Metric">Chưa đo</span></div>
+ <div class="r54-line"><label for="r54Strength">Áp dụng</label><input type="range" id="r54Strength" min="0" max="100" step="5" value="40"/><output class="r54-value" id="r54StrengthText">40%</output></div>
+ <div id="r54Status" role="status" aria-live="polite">Mở ảnh, bấm Quét AI &amp; viền, chọn vùng để tính tỷ lệ.</div>
+ <div class="r54-line"><button type="button" id="r54Apply" class="r54-primary">Áp dụng vùng</button><button type="button" id="r54SlimAll">Thon thân nhẹ · 1 chạm</button><button type="button" id="r54Reset">Đưa vùng về 0</button></div>
+ <p class="r54-note">Vàng: viền ảnh hiện tại · ngà nét đứt: đích dự kiến (không lưu vào ảnh). Bụng/eo dưới áo rộng chỉ là đường viền trang phục. Kim cương/V-line/oval là mô phỏng hình học, không phải tiêu chuẩn đẹp bắt buộc. Giữ nút Hoàn tác của RAY.</p>`;
+ const aiBox=base.querySelector('.body-ai');(aiBox||base.firstElementChild).insertAdjacentElement('afterend',panel);
+ const overlay=document.createElement('canvas');overlay.id='r54Overlay';overlay.setAttribute('aria-hidden','true');wrap.appendChild(overlay);
+ const state={enabled:true,scanning:false,source:null},status=msg=>$('r54Status').textContent=msg;
+ const getPart=(id=$('r54Part').value)=>bodyPart(id);
+ const facePoints=()=>BEAUTY.people?.[BEAUTY.selected]?.face||null;
+ const pt=(face,i)=>face?.[i]&&Number.isFinite(face[i].x)&&Number.isFinite(face[i].y)?face[i]:null;
+ const gap=(a,b)=>Math.hypot((a.x-b.x)*source.width,(a.y-b.y)*source.height);
+ const faceGeometry=()=>{const f=facePoints();if(!source||!f)return null;
+  const top=pt(f,10),bottom=pt(f,152),left=pt(f,234),right=pt(f,454),jawL=pt(f,172),jawR=pt(f,397);
+  if(!top||!bottom||!left||!right)return null;
+  const length=gap(top,bottom),width=gap(left,right);
+  if(length<12||width<12)return null;
+  const jaw=jawL&&jawR?gap(jawL,jawR):null;
+  return {length,width,ratio:length/width,jaw,cheekJaw:jaw&&jaw>4?width/jaw:null};
+ };
+ function getMask(){if(!source||BEAUTY.source!==source||!BEAUTY.maps?.foreground)return null;
+  // Union mask on a group cannot safely isolate one body; group operation stays disabled.
+  if(BODY_AI.people.length>1)return null;
+  return BEAUTY.maps;
+ }
+ const pixelInside=(m,x,y)=>{const w=m.width,h=m.height,a=m.foreground||m.data;return x>=0&&x<w&&y>=0&&y<h&&a[Math.floor(y)*w+Math.floor(x)]>=155;};
+ const multi=()=>BODY_AI.people.length>1||BEAUTY.people.length>1;
+ function metricFor(id){const p=getPart(id),m=getMask();
+  if(!source)return {ok:false,why:'Chưa có ảnh'};
+  if(multi())return {ok:false,why:'Ảnh nhiều người: chưa có khóa biến dạng từng người, tránh chỉnh nhầm'};
+  if(!p)return {ok:false,why:'Thiếu vùng chỉnh'};
+  if(p.place!=='ai'&&p.place!=='manual')return {ok:false,why:'Chưa định vị '+p.name+'. Quét AI hoặc đặt vùng bằng công cụ cũ'};
+  if(id==='face'){
+   const f=faceGeometry();if(!f)return {ok:false,why:'Cần nhận diện các mốc mặt (hoặc mặt bị nghiêng/che)'};
+   return {ok:true,p,kind:'face',ratio:f.ratio,unit:'dài mặt / rộng mặt',f,mask:m};
+  }
+  if(!m)return {ok:false,why:'Chưa có mặt nạ tách người: bấm Quét AI & viền'};
+  const f=faceGeometry(),head=p=>p&&p.place==='ai'?Math.max(.015,p.ry*2)*source.height:null;
+  const hm=(f?.length||head(getPart('face'))||0);
+  if(id==='neck'){
+   // This is an estimate based on pose-landmark ellipse, NOT measured neck in centimetres.
+   if(!hm)return {ok:false,why:'Chưa có mốc chiều dài đầu để so cổ'};
+   const approx=(p.ry*2*source.height)/hm;
+   if(approx<.05||approx>3)return {ok:false,why:'Ước lượng cổ không đủ tin cậy'};
+   return {ok:true,p,kind:'length',ratio:approx,unit:'dài cổ ước lượng / dài mặt',mask:m,approx:true};
+  }
+  const w=m.width,h=m.height,cx=Math.round(clamp(p.cx,0,1)*(w-1)),cy=Math.round(clamp(p.cy,0,1)*(h-1));
+  if(!pixelInside(m,cx,cy))return {ok:false,why:'Tâm '+p.name+' nằm ngoài viền người; chỉnh lại mốc'};
+  const angle=p.rot*Math.PI/180,ux=Math.cos(angle),uy=Math.sin(angle);
+  const sample=t=>pixelInside(m,Math.round(cx+ux*t),Math.round(cy+uy*t));
+  const maxSteps=Math.max(8,Math.min(Math.round(Math.hypot(w,h)*.26),Math.round(p.rx*source.height/source.width*w*3)));
+  let L=0,R=0;while(L<maxSteps&&sample(-L-1))L++;while(R<maxSteps&&sample(R+1))R++;
+  if(L===maxSteps||R===maxSteps)return {ok:false,why:'Viền '+p.name+' vượt khỏi vùng đo (có thể chạm tóc/tay hoặc trang phục)'};
+  const width=(L+R+1)/w*source.width;
+  if(width<5)return {ok:false,why:'Vùng quá nhỏ để đo'};
+  const regions=BODY_AI.people?.[BODY_AI.selected]?.regions;
+  let ref=hm,unit='rộng vùng / dài mặt';
+  if(['waist','belly','hip','chest','back'].includes(id)&&regions?.shL&&regions?.shR){
+    ref=Math.hypot((regions.shL.cx-regions.shR.cx)*source.width,(regions.shL.cy-regions.shR.cy)*source.height);unit='rộng vùng / khoảng vai';
+  }
+  if(!ref||ref<5)return {ok:false,why:'Thiếu mốc đầu/vai để quy đổi tỷ lệ'};
+  const ratio=width/ref;
+  if(!(ratio>.07&&ratio<6))return {ok:false,why:'Tỷ lệ ngoài phạm vi tin cậy'};
+  return {ok:true,p,kind:'width',ratio,unit,mask:m,approx:['belly','back','butt','chest'].includes(id)};
+ }
+ const metric=()=>metricFor($('r54Part').value);
+ function readSetting(a){const preset=$('r54Preset').value,v=Number($('r54Percent').value)/100;
+  if(!a.ok)return null;
+  if(preset==='diamond'||preset==='oval'||preset==='vline'){
+   if(a.kind!=='face')return null;
+   // modest shape contour simulations, NOT exact Marquardt mask.
+   const profiles={diamond:[['face','x',.025],['chin','x',-.075]],oval:[['face','x',-.035],['chin','y',.025]],vline:[['face','x',-.025],['chin','x',-.09]]};
+   return {type:'shape',shape:preset,deltas:profiles[preset],label:'Mẫu hình mặt (mô phỏng)'};
+  }
+  let delta=0;
+  if(preset==='slim')delta=-.05;else if(preset==='slim10')delta=-.10;else if(preset==='full')delta=.05;else if(preset==='percent')delta=clamp(v,-.25,.25);
+  else if(preset==='target'){const t=Number($('r54Target').value);if(!(t>.15&&t<4))return null;delta=clamp(t/a.ratio-1,-.25,.25);}
+  else if(preset==='phi'){
+   if(a.kind!=='face'&&!(a.p.id==='waist'&&a.unit==='rộng vùng / khoảng vai'))return null;
+   const target=a.kind==='face'?1.618:1/1.618;
+   delta=clamp(target/a.ratio-1,-.25,.25);
+  }
+  if(preset==='keep')delta=0;
+  return {type:'adjust',delta,axis:(a.kind==='face'||a.kind==='length')?'y':'x',label:(delta>=0?'+':'')+(delta*100).toFixed(1)+'%'};
+ }
+ function desired(a){const setting=readSetting(a);if(!setting)return null; if($('r54Preset').value==='phi')return a.kind==='face'?1.618:1/1.618;return setting.type==='adjust'?a.ratio*(1+setting.delta):null;}
+ function plan(a){const setting=readSetting(a),strength=Number($('r54Strength').value)/100;
+  if(!setting)return [];
+  if(setting.type==='shape')return setting.deltas.map(([id,axis,d])=>({p:getPart(id),axis,delta:d*strength})).filter(e=>e.p?.place==='ai'||e.p?.place==='manual');
+  return [{p:a.p,axis:setting.axis,delta:setting.delta*strength}];
+ }
+ function refresh(){const face=$('r54Part').value==='face';
+  for(const opt of $('r54Preset').options)if(opt.dataset.face)opt.disabled=!face;
+  if(!face&&$('r54Preset').selectedOptions[0]?.disabled)$('r54Preset').value='slim';
+  const a=metric(),setting=readSetting(a);
+  $('r54Metric').textContent=a.ok?'Hiện tại '+a.ratio.toFixed(3)+' · '+a.unit:'Chưa đo';
+  $('r54PctText').textContent=(Number($('r54Percent').value)>0?'+':'')+$('r54Percent').value+'%';
+  $('r54StrengthText').textContent=$('r54Strength').value+'%';
+  $('r54Target').disabled=$('r54Preset').value!=='target';
+  $('r54Percent').disabled=$('r54Preset').value!=='percent';
+  $('r54Apply').disabled=!a.ok||!setting||!plan(a).length;
+  if(a.ok&&$('r54Preset').value!=='target')$('r54Target').value=(desired(a)??a.ratio).toFixed(3);
+  if(!state.scanning){
+   if(!a.ok)status(a.why);
+   else if(!setting)status('Mẫu φ chỉ hỗ trợ tỷ lệ dài/rộng mặt và eo/vai; các dáng khác dùng tỷ lệ ±%.');
+   else status(a.p.name+': '+a.ratio.toFixed(3)+' ('+a.unit+'). '+($('r54Preset').value==='phi'?'Mục tiêu φ tham khảo; giới hạn thay đổi tối đa 25% mỗi lần. ':'')+(a.approx?'Chỉ là ước lượng theo trang phục/mốc, không phải số đo người thật.':'Thử mức nhẹ trước để tránh méo nền.')+(setting.type==='shape'?' Mẫu mặt chỉ mô phỏng theo 2 vùng, chưa phải mặt nạ Phi Mask đầy đủ.':''));
+  }
+  scheduleOverlay();
+ }
+ // Idempotent geometric presets: repeated click at the same strength must not double-warp.
+ // Keep user's older/manual slider adjustments; replace only the contribution of this add-on.
+ function commit(entries,label){if(!entries.length)return false;
+  if(state.source!==source)state.source=source;
+  const wanted=new Map();for(const e of entries){if(!e.p)continue;
+    const field=e.axis==='y'?'len':'wid',key=e.p.id+':'+field;
+    const d=clamp(e.delta,-.18,.18);
+    wanted.set(key,{p:e.p,field,contrib:Math.log(1+d)/(Math.LN2*BODY_E)});
+  }
+  // Face templates can use both face and chin. Clear the previous preset portion when switching shape.
+  if(entries.some(e=>e.p?.id==='face'||e.p?.id==='chin'))for(const key of ['face:wid','face:len','chin:wid','chin:len']){
+    if(!wanted.has(key)&&Math.abs(getPart(key.split(':')[0])?.['ray54'+key.split(':')[1]]||0)>.00001){
+      const [id,field]=key.split(':');wanted.set(key,{p:getPart(id),field,contrib:0});
+    }
+  }
+  const changes=[];
+  for(const [key,item] of wanted){if(!item.p)continue;
+    const old=item.p['ray54'+item.field]||0,step=item.contrib-old;
+    if(Math.abs(step)<.00001)continue;
+    const next=clamp(item.p[item.field]+step,-.65,.65);
+    if(Math.abs(next-item.p[item.field])<.00001)continue;
+    changes.push({...item,key,next});
+  }
+  if(!changes.length)return false;
+  window.RaySession?.record('Trước '+label);
+  for(const x of changes){x.p[x.field]=x.next;x.p.place=x.p.place==='ai'?'ai':'manual';x.p['ray54'+x.field]=x.contrib;}
+  BODY.sel=entries[0].p.id;BODY.hide=true;bodyUI();syncBody();queue();window.RaySession?.record(label);
+  return true;
+ }
+ function apply(){const a=metric();if(!a.ok){status(a.why);return;}
+  const entries=plan(a);if(!entries.length){status('Chưa có mô hình đo/điểm đặt vùng để biến đổi');return;}
+  if(commit(entries,'Chỉnh tỷ lệ '+a.p.name))status('Đã áp mức nhẹ trên '+a.p.name+'. Kiểm tra đường viền thật và ảnh xuất; hoàn tác nếu bị méo.');
+  else status('Thông số bằng 0 hoặc đã đạt giới hạn an toàn, ảnh không đổi.');
+  scheduleOverlay();
+ }
+ function slimAll(){if(multi()){status('Không áp dụng toàn thân cho ảnh nhóm khi chưa khóa từng người.');return;}
+  if(!source){status('Chưa có ảnh');return;}
+  const ids=['armL','armR','waist','belly','hip'],items=[];let skip=[];
+  for(const id of ids){const a=metricFor(id);if(a.ok)items.push({p:a.p,axis:'x',delta:-.035*Number($('r54Strength').value)/100});else skip.push(id);}
+  if(items.length<2){status('Cần ít nhất hai vùng được AI đo rõ. Chưa áp dụng: '+skip.join(', '));return;}
+  if(commit(items,'Thon thân nhẹ nhiều vùng'))status('Đã chỉnh '+items.length+' vùng mức nhẹ (−3,5% × mức áp dụng). Bỏ qua vùng thiếu mốc: '+(skip.join(', ')||'không')+'. Vùng bụng dưới váy/áo rộng chỉ đổi viền trang phục.');
+  else status('Không có thay đổi.');
+  scheduleOverlay();
+ }
+ function reset(){const p=getPart();if(!p)return;
+  window.RaySession?.record('Trước đặt lại '+p.name);p.wid=0;p.len=0;p.ray54wid=0;p.ray54len=0;BODY.hide=true;bodyUI();syncBody();queue();window.RaySession?.record('Đặt lại '+p.name);status('Đã đưa các thanh ngang/dọc của '+p.name+' về 0.');scheduleOverlay();
+ }
+ function coords(){const wr=wrap.getBoundingClientRect(),r=view.getBoundingClientRect();return {left:r.left-wr.left,top:r.top-wr.top,width:r.width,height:r.height};}
+ let raf=0;function scheduleOverlay(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;paintOverlay();});}
+ function paintOverlay(){const r=coords(),dpr=Math.min(2,devicePixelRatio||1),W=Math.max(1,Math.round(r.width*dpr)),H=Math.max(1,Math.round(r.height*dpr));
+  overlay.style.left=r.left+'px';overlay.style.top=r.top+'px';overlay.style.width=r.width+'px';overlay.style.height=r.height+'px';
+  if(overlay.width!==W)overlay.width=W;if(overlay.height!==H)overlay.height=H;
+  const ctx=overlay.getContext('2d');ctx.clearRect(0,0,W,H);
+  if(!state.enabled||!source||!r.width||!['body','all'].includes(document.body.dataset.editorTool))return;
+  const a=metric();if(!a.ok)return;
+  const mask=a.mask;if(!mask)return;
+  const fg=mask.foreground||mask.data,mw=mask.width,mh=mask.height;
+  const bw=LASTG?.bw||0,bb=LASTG?.bb||0,picW=(LASTG?.W||source.width)+2*bw,picH=(LASTG?.H||source.height)+bw+bb;
+  const toX=u=>(bw+u*(LASTG?.W||source.width))/picW*r.width;
+  const toY=v=>(bw+v*(LASTG?.H||source.height))/picH*r.height;
+  const entries=plan(a);
+  const move=(u,v)=>{let x=u*source.width,y=v*source.height;
+   for(const e of entries){const p=e.p,rad=p.rot*Math.PI/180,cs=Math.cos(rad),sn=Math.sin(rad),dx=x-p.cx*source.width,dy=y-p.cy*source.height;
+    const lx=cs*dx+sn*dy,ly=-sn*dx+cs*dy,Rx=Math.max(1,p.rx*source.height),Ry=Math.max(1,p.ry*source.height),rr=(lx/Rx)**2+(ly/Ry)**2;
+    if(rr>=1)continue;const v1=clamp(1-Math.sqrt(rr),0,1),fall=v1*v1*(3-2*v1),k=1+e.delta*fall;
+    const xx=e.axis==='x'?lx*k:lx,yy=e.axis==='y'?ly*k:ly;
+    x=p.cx*source.width+cs*xx-sn*yy;y=p.cy*source.height+sn*xx+cs*yy;
+   }
+   return [x/source.width,y/source.height];
+  };
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  for(let t=0;t<2;t++){
+   ctx.save();ctx.strokeStyle=t?'rgba(255,244,212,.95)':'rgba(244,192,99,.68)';ctx.lineWidth=t?1.7:1;ctx.setLineDash(t?[3.5,4.5]:[]);ctx.beginPath();
+   for(let y=1;y<mh-1;y+=2)for(let x=1;x<mw-1;x+=2){const i=y*mw+x;if(fg[i]<155)continue;
+    if(fg[i-1]>=155&&fg[i+1]>=155&&fg[i-mw]>=155&&fg[i+mw]>=155)continue;
+    let u=(x+.5)/mw,v=(y+.5)/mh;if(t)[u,v]=move(u,v);
+    ctx.moveTo(toX(u),toY(v));ctx.lineTo(toX(u)+.9,toY(v)+.9);
+   }ctx.stroke();ctx.restore();
+  }
+ }
+ async function scan(){if(state.scanning||!source){status('Mở ảnh trước khi quét AI.');return;}
+  state.scanning=true;$('r54Scan').disabled=true;status('Đang quét mốc tư thế, mặt và tách viền. Lần đầu cần kết nối mạng.');
+  const wait=async cond=>{for(let i=0;i<240;i++){if(cond())return;await new Promise(r=>setTimeout(r,500));}throw new Error('Quá thời gian quét AI');};
+  try{
+   if(!BODY_AI.busy)bodyAiScan.click();await wait(()=>!BODY_AI.busy);
+   if(!BODY_AI.people.length){status('AI không nhận diện được tư thế. Công cụ thủ công v49 vẫn hoạt động.');return;}
+   if(BEAUTY.source!==source||!BEAUTY.maps?.foreground){if(!BEAUTY.busy)beautyScan.click();await wait(()=>!BEAUTY.busy);}
+   refresh();status('Tìm thấy '+BODY_AI.people.length+' đối tượng tư thế/mặt. '+(multi()?'Ảnh nhiều người: tạm khóa áp tỷ lệ tự động.':'Chọn vùng để đo và chỉnh, có thể sửa mốc thủ công.'));
+  }catch(e){status('Chưa quét được AI: '+String(e.message||e)+'; vẫn chỉnh thủ công được.');}
+  finally{state.scanning=false;$('r54Scan').disabled=false;scheduleOverlay();}
+ }
+ $('r54Scan').onclick=scan;
+ $('r54Toggle').onclick=()=>{state.enabled=!state.enabled;$('r54Toggle').textContent=state.enabled?'Ẩn nét mẫu':'Hiện nét mẫu';scheduleOverlay();};
+ $('r54Part').onchange=refresh;$('r54Preset').onchange=refresh;
+ $('r54Percent').oninput=()=>{$('r54Preset').value='percent';refresh();};
+ $('r54Target').oninput=()=>{$('r54Preset').value='target';refresh();};
+ $('r54Strength').oninput=refresh;$('r54Apply').onclick=apply;$('r54SlimAll').onclick=slimAll;$('r54Reset').onclick=reset;
+ $('bodyAiPerson').addEventListener('change',()=>setTimeout(refresh,100));
+ bodyAiScan.addEventListener('click',()=>setTimeout(refresh,1500));beautyScan.addEventListener('click',()=>setTimeout(refresh,1500));
+ window.addEventListener('resize',scheduleOverlay,{passive:true});if(window.ResizeObserver)new ResizeObserver(scheduleOverlay).observe(view);
+ let lastSource=null,lastReady='';setInterval(()=>{
+  if(source!==lastSource){lastSource=source;state.source=source;refresh();}
+  const ready=[BODY_AI.people.length,BEAUTY.people.length,BEAUTY.maps?.foreground?.length||0,BEAUTY.source===source].join(':');
+  if(ready!==lastReady){lastReady=ready;refresh();}
+ },950);
+ // Expose small test hooks: no remote services, no changes to other modules.
+ window.RayGeometry54={metric,metricFor,readSetting,plan,refresh,apply,slimAll,reset,scan,paintOverlay};
+ refresh();
+})();
+</script>
+
 </body>
 </html>
