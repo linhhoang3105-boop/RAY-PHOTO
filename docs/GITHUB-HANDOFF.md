@@ -2,7 +2,7 @@
 
 Repo đích: https://github.com/linhhoang3105-boop/RAY-PHOTO
 
-**Bản hiện hành: v117.** Nâng cấp công thức AI và bù sáng riêng khuôn mặt; gộp hai lựa chọn cứu sáng gần nhau. Toàn bộ 90 màu Bộ lọc và engine gốc giữ nguyên. [Hướng dẫn sửa tiếp AI](AI-COMPOSER-HANDOFF.md). Hướng dẫn chạy và xuất lại mã nguồn được cập nhật trong [SOURCE-HANDOFF.md](SOURCE-HANDOFF.md).
+**Bản hiện hành: v118.** Một chạm khoanh người theo điểm mặt khi ngược sáng nặng, bù sáng riêng người và xử lý cảnh theo chạng vạng/sương núi. Giữ nguyên90 màu Bộ lọc, các engine và kết quả cứu sáng hỗn hợp v117. [Hướng dẫn sửa tiếp AI](AI-COMPOSER-HANDOFF.md).
 
 Lần nhập nguồn v115 ban đầu bổ sung dự án đầy đủ từ nguồn RAY v115 đã phát hành, gồm 598 file nguồn/tài nguyên: editor, các engine chức năng, backend, mô hình AI, font, kiểm thử, cấu hình build và wrapper Android/iOS. Nguồn được đối chiếu với ZIP đã kiểm chứng SHA-256 `a49f66acd5a105088be27fdd99c3acb1416d28b6f04495a471432b8100113a3b`; commit nguồn RAY là `9c186b9f9d93356b10fbf7f3e3ec48f633766fbe`.
 
@@ -30,6 +30,10 @@ Hai file `index.html` và `RAY-PHOTO-v48.html` từng được tải lên gốc 
 Repo GitHub không tự triển khai lên website RAY đang chạy. Các quy trình GitHub Pages hoặc hosting khác cần được cấu hình riêng. API chia sẻ cần database riêng; ảnh/nháp trên thiết bị và dữ liệu database của website hiện hành không nằm trong mã nguồn.
 
 ## Kiểm chứng bản hiện hành
+
+Bản v118: **827 bài,825 đạt,0 lỗi,2 bỏ qua** (mô hình tùy chọn). Ba ảnh tham chiếu nhận diện/khoanh người tự động; ảnh và mask không nằm trong repo. Build hosting/standalone/portable đã kiểm tra:200 tài nguyên public và87 script standalone. [Báo cáo v118](qa/ai-composer-severe-v118.md). Commit nguồn Sites:`e3e4700a9d13ef38449602afb864c9ea3e4e6855`. Tag nguồn riêng:`v118`.
+
+## Kiểm chứng v117 trước đó
 
 Bản v117: `npm test` có **810 bài, 808 đạt, 0 lỗi, 2 bỏ qua** (mô hình tùy chọn). Build hosting, standalone và portable đã kiểm tra; 200 tài nguyên public khớp nguồn. Có kiểm tra qua engine thật trên ảnh bóng tay che mặt; ảnh/mask thử không đưa vào repo. [Báo cáo v117](qa/ai-composer-person-v117.md). Commit nguồn Sites: `d5113c75e56770e794f856b800f8cfeef6616a76`.
 

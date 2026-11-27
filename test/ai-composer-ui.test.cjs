@@ -115,3 +115,35 @@ test('missing sky is reported honestly and older recipes open without invented s
  const h=harness();await compose(h,'Natural');const controller=h.h.RayAIComposer.controller,plan=controller.state.variants[0];assert.equal(plan.components.some(c=>c.id==='palette-sky'),false);const note=h.body.querySelector('#rayAIComposerPaletteNote');assert.match(note.textContent,/Trời: chưa xác định rõ/);assert.ok(!h.body.querySelectorAll('.aic-palette-chip').some(c=>c.textContent==='Trời'));
  const legacy=controller.recipe('Công thức trước màu cảnh');legacy.components=legacy.components.filter(c=>!c.id.startsWith('palette-'));delete legacy.analysis.palette;const fresh=harness();await fresh.body.querySelector('#rayAIComposerButton').click();await fresh.h.RayAIComposer.controller.loadRecipe(legacy,{adapt:false});await fresh.flush();assert.equal(fresh.h.RayAIComposer.controller.state.error,null);assert.equal(fresh.body.querySelectorAll('.aic-palette-swatches').length,0);assert.equal(fresh.body.querySelector('#rayAIComposerPaletteNote').hidden,true);assert.ok(fresh.body.querySelector('.aic-mix'));assert.deepEqual(fresh.h.RayAIComposer.recipe.components.map(c=>c.id),legacy.components.map(c=>c.id));
 });
+
+function refinementUI(infer){
+ const Runtime=require('../dist/darkroom/ai-composer-runtime.js'),Selection=require('../dist/darkroom/remove-selection-core.js');let host,pauses=0,resumes=0;
+ const h=harness({configure(c){
+  // napi-rs maps a zero canvas dimension to its default size; observe the
+  // actual zero-size cleanup calls instead of that Node-only getter behavior.
+  const create=c.document.createElement;c.document.createElement=tag=>{const el=create(tag);if(tag==='canvas'){el.resetDimensions=new Set();for(const key of ['width','height']){let proto=el,descriptor;while(proto&&!descriptor){descriptor=Object.getOwnPropertyDescriptor(proto,key);proto=Object.getPrototypeOf(proto);}Object.defineProperty(el,key,{get(){return descriptor.get.call(el);},set(value){if(value===0)el.resetDimensions.add(key);descriptor.set.call(el,value);}});}}return el;};
+  c.BODY_AI_ASSETS={roots:['local-models']};c.RayRemoveSelection=Selection;c.RayRemoveAI={infer,segment(){throw Error('Composer must never use the shared selector job');}};c.RayPreview={pause(){pauses++;return()=>{resumes++;};},layoutChanged(){}};c.RayAIComposerRuntime={...Runtime,create(value){host=value;return Runtime.create(value);}};}});
+ return{...h,refine:(recognition,a)=>host.refineRecognition(h.h.source,recognition,a,()=>{}),get pauses(){return pauses;},get resumes(){return resumes;}};
+}
+const selectedFace=(x=.45)=>[{x:x-.07,y:.28},{x,y:.35},{x:x+.07,y:.28},{x:x+.07,y:.42},{x:x-.07,y:.42}];
+function darkPersonRecognition(faces=[selectedFace()]){const W=16,H=16;return{maps:{width:W,height:H,foreground:new Uint8Array(W*H).fill(255),skin:new Uint8Array(W*H).fill(120),hair:new Uint8Array(W*H).fill(30)},faces};}
+function darkPersonAnalysis(x=.45){return{backgroundBrightness:.55,recovery:{faces:[{confidence:.95,mean:.08,p90:.16,focus:{cx:x,cy:.35,rx:.09,ry:.10}}]}};}
+function rawPerson(point){const W=16,H=16,data=new Float32Array(W*H),cx=Math.floor(point.x*W);for(let y=3;y<16;y++)for(let x=Math.max(0,cx-2);x<=Math.min(W-1,cx+2);x++)data[y*W+x]=.95;return{width:W,height:H,data};}
+test('severe-person refinement uses isolated native inference at bounded resolution and retains skin, hair and source pixels',async()=>{
+ let input,calls=0;const h=refinementUI(async(c,kind,point,assets)=>{calls++;input=c;assert.equal(kind,'object');assert.equal(c.width,512);assert.equal(c.height,384);assert.equal(assets.root,'local-models');assert.equal(assets.object,'local-models/magic_touch.tflite');assert.equal(assets.refine,false);return rawPerson(point);});
+ const {createCanvas}=require('@napi-rs/canvas');h.h.source=createCanvas(1600,1200);const ctx=h.h.source.getContext('2d');ctx.fillStyle='#1b1511';ctx.fillRect(0,0,1600,1200);const before=Buffer.from(ctx.getImageData(0,0,1600,1200).data),r=darkPersonRecognition(),old=r.maps.foreground.slice(),out=await h.refine(r,darkPersonAnalysis());
+ assert.equal(calls,1);assert.notEqual(out,r);assert.notEqual(out.maps.foreground,r.maps.foreground);assert.equal(out.maps.personGuided,true);assert.equal(r.maps.personGuided,undefined);assert.equal(out.maps.skin,r.maps.skin);assert.equal(out.maps.hair,r.maps.hair);assert.deepEqual(r.maps.foreground,old);assert.equal(out.maps.foreground[0],0);assert.ok(out.maps.foreground[5*16+7]>200);assert.deepEqual(Buffer.from(ctx.getImageData(0,0,1600,1200).data),before);assert.ok(input.resetDimensions.has('width'));assert.ok(input.resetDimensions.has('height'));assert.equal(h.pauses,1);assert.equal(h.resumes,1);
+});
+test('refining a dark face protects other lit people and does not depend on recovery-face ordering',async()=>{
+ const points=[],h=refinementUI(async(c,kind,p)=>{points.push(p.x);return rawPerson(p);}),r=darkPersonRecognition([selectedFace(.3),selectedFace(.7)]),out=await h.refine(r,darkPersonAnalysis(.7));assert.deepEqual(points,[.3,.7]);assert.notEqual(out,r);assert.equal(out.maps.personGuided,true);for(const x of [.3,.7])assert.ok(out.maps.foreground[5*16+Math.floor(x*16)]>200);assert.equal(h.resumes,1);
+});
+test('failed, uncertain, face-only or partially detected people keep the complete original mask and release the canvas',async()=>{
+ const cases=[async()=>{throw Error('offline model');},async()=>({width:16,height:16,data:new Float32Array(256).fill(.4)}),async(c,k,p)=>{const r=rawPerson(p);r.data.fill(0);for(let y=4;y<7;y++)for(let x=6;x<9;x++)r.data[y*16+x]=.95;return r;},async(c,k,p)=>{if(p.x>.5)throw Error('second person failed');return rawPerson(p);}];
+ for(const infer of cases){let input;const h=refinementUI(async(...args)=>{input=args[0];return infer(...args);}),r=darkPersonRecognition([selectedFace(.3),selectedFace(.7)]),out=await h.refine(r,darkPersonAnalysis(.7));assert.equal(out,r);assert.equal(out.maps.personGuided,undefined);assert.ok(input.resetDimensions.has('width'));assert.ok(input.resetDimensions.has('height'));assert.equal(h.resumes,1);}
+});
+test('normal light and more than three known people skip optional segmentation rather than dropping anyone',async()=>{
+ let calls=0;const h=refinementUI(async(...args)=>{calls++;return rawPerson(args[2]);}),r=darkPersonRecognition(),a=darkPersonAnalysis();a.recovery.faces[0].mean=.28;assert.equal(await h.refine(r,a),r);const group=darkPersonRecognition([selectedFace(.2),selectedFace(.4),selectedFace(.6),selectedFace(.8)]);assert.equal(await h.refine(group,darkPersonAnalysis(.4)),group);assert.equal(calls,0);assert.equal(h.pauses,0);
+});
+test('changing photo while isolated person inference is pending discards its mask and still releases the canvas',async()=>{
+ let resolve,input;const promise=new Promise(r=>{resolve=r;}),h=refinementUI(async(c)=>{input=c;return promise;}),r=darkPersonRecognition(),work=h.refine(r,darkPersonAnalysis());h.h.source=h.image(true);resolve(rawPerson({x:.45,y:.35}));assert.equal(await work,r);assert.ok(input.resetDimensions.has('width'));assert.ok(input.resetDimensions.has('height'));assert.equal(h.resumes,1);
+});

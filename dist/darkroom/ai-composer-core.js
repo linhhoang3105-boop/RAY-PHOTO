@@ -64,7 +64,7 @@
   const scale=Math.min(1,128/Math.max(fw*W,fh*H)),width=Math.max(8,Math.round(fw*W*scale)),height=Math.max(8,Math.round(fh*H*scale)),full=new Float32Array(width*height),dark=new Float32Array(width*height),cut=clamp((p10+p90)*.55,.12,.30);
   for(let y=0;y<height;y++)for(let x=0;x<width;x++){
    const u=left+(x+.5)/width*fw,v=top+(y+.5)/height*fh,rad=((u-f.cx)/(f.rx*1.5))**2+((v-f.cy)/(f.ry*1.6))**2;if(rad>1)continue;
-   const k=(Math.min(H-1,Math.floor(v*H))*W+Math.min(W-1,Math.floor(u*W)))*4,h=hair?.at(u,v)||0,fg=foreground?.at(u,v)??1,sk=skin.at(u,v),weight=fg*Math.max(sk,rad<.55&&h<.15?.52:0)*(1-clamp((h-.18)/.42))*data[k+3]/255;
+   const k=(Math.min(H-1,Math.floor(v*H))*W+Math.min(W-1,Math.floor(u*W)))*4,h=hair?.at(u,v)||0,fg=foreground?.at(u,v)??1,sk=skin.at(u,v),weight=fg*Math.max(sk,p90>=.40&&rad<.55&&h<.15?.52:0)*(1-clamp((h-.18)/.42))*data[k+3]/255;
    full[y*width+x]=weight;dark[y*width+x]=weight*clamp((cut+.045-lum(data[k],data[k+1],data[k+2]))/.07);
   }
   function vector(plane,feather){
@@ -115,7 +115,7 @@
   }
   const percentile=q=>{if(!count)return 0;let cumulative=0;for(let i=0;i<256;i++){cumulative+=histogram[i];if(cumulative>=count*q)return i/255;}return 1;},mean=count?sum/count:0,p10=percentile(.1),p50=percentile(.5),p95=percentile(.95),p99=percentile(.99),dynamicRange=clamp(p95-p10),lightX=brightW?brightX/brightW:.5,lightY=brightW?brightY/brightW:.08,confidence=clamp(dynamicRange*1.2)*clamp(Math.hypot(lightX-.5,lightY-.5)*3);
   const result={version:1,width:W,height:H,fingerprint:((hash^W^Math.imul(H,31))>>>0).toString(16).padStart(8,'0'),histogram,mean,median:p50,p10,p50,p95,p99,shadows:count?shadows/count:0,highlights:count?highlights/count:0,clippedHighlights:count?clippedHighlights/count:0,clippedShadows:count?clippedShadows/count:0,colorfulness:count?chroma/count:0,warmCast:count?clamp(warm/count,-1,1):0,tintCast:count?clamp(tint/count,-1,1):0,skinCoverage:count?skinWeight/count:0,skinLuma:skinWeight?skinL/skinWeight:mean,skinWarmth:skinWeight?clamp(skinWarm/skinWeight,-1,1):0,texture:textureN?clamp(texture/textureN):0,dynamicRange,subjectCoverage:count?subjectWeight/count:0,subjectBrightness:subjectWeight?subjectL/subjectWeight:mean,backgroundBrightness:bgWeight?bgL/bgWeight:mean,recognition:region.source,region,light:{x:lightX,y:lightY,angle:Math.atan2(.5-lightY,.5-lightX)*180/Math.PI,confidence},dominantHue:hue.indexOf(Math.max(...hue))/12,empty:!count};
-  const d=detail?.data&&Number.isInteger(detail.width)&&Number.isInteger(detail.height)&&detail.data.length===detail.width*detail.height*4?detail:{data,width:W,height:H};result.recovery=recoveryAnalysis(d.data,d.width,d.height,faces,skin,foreground,region,normalizedPlane(maps,'hair'));
+  const d=detail?.data&&Number.isInteger(detail.width)&&Number.isInteger(detail.height)&&detail.data.length===detail.width*detail.height*4?detail:{data,width:W,height:H};result.recovery=recoveryAnalysis(d.data,d.width,d.height,faces,skin,foreground,region,normalizedPlane(maps,'hair'));if(maps?.personGuided===true)result.recovery.personGuided=true;
   result.palette=Regions?.analyze(data,W,H,{foreground,skin,hair:normalizedPlane(maps,'hair'),faces:result.recovery.faces,region})||{version:1,sky:null,land:null};return result;
  }
  const INTENTS={
@@ -132,25 +132,36 @@
  function makeComponent(id,title,role,p,region,light,reason){const focus=copy(region?.focus||{cx:.5,cy:.5,rx:.32,ry:.4}),sun={x:clamp(light?.x??.5),y:clamp(light?.y??.08)},leak=copy(sun),component={id,title,role,enabled:true,p:clean(p),focus,sun,leak,reason,targetIntent:{role,adaptive:true,regionSource:region?.source||'all'}};if(component.p.nang>.001)component.p.nangManual=true;if(component.p.leak>.001)component.p.leakManual=true;component.targetIntent.baseline={p:copy(component.p),focus:copy(focus),sun:copy(sun),leak:copy(leak)};return component;}
  function relightPeople(plan,a,variant){
   if(a.recovery)plan.analysis.recovery={...copy(a.recovery),personLightVersion:1};
-  const records=a.recovery?.faces||[],active=records.map((r,index)=>({r,index})).filter(({r})=>r.mean<.46||r.p10<.15&&r.p90-r.p10>.25);if(!active.length){plan.components=plan.components.filter(c=>!c.id.startsWith('face-'));return plan;}
+  // Deep backlight is a separate measured condition, not a larger fixed fill.
+  // Leave the mixed sun/shadow curve intact when either face metric is brighter.
+  const severity=r=>{if(r.confidence<=.7)return 0;const t=Math.min(clamp((.22-r.mean)/.14),clamp((.40-r.p90)/.24));return t*t*(3-2*t);};
+  const records=a.recovery?.faces||[],active=records.map((r,index)=>({r,index,severe:severity(r)})).filter(({r})=>r.mean<.46||r.p10<.15&&r.p90-r.p10>.25);if(!active.length){plan.components=plan.components.filter(c=>!c.id.startsWith('face-'));return plan;}
   const rescue=rescueStyle(plan.style),excluded=active.map(({r})=>r.region?{...copy(r.region),adjustRegion:'out'}:{adjustRegion:'out',adjustRegionShape:'ellipse',adjustRegionX:r.focus.cx,adjustRegionY:r.focus.cy,adjustRegionRX:r.focus.rx*1.12,adjustRegionRY:r.focus.ry*1.12,adjustRegionAngle:0,adjustRegionFeather:.25}),zone=a.recovery?.zones?.subject;
-  const whiteAnchor=zone?Math.max(clamp((zone.highlightCoverage-.004)/.025),clamp((zone.p90-.67)/.16)):0;
+  const whiteAnchor=zone?Math.max(clamp((zone.highlightCoverage-.004)/.025),clamp((zone.p90-.67)/.16)):0,severe=Math.max(...active.map(r=>r.severe)),bodySeverity=rescue&&a.region.source==='ai'&&a.recovery?.personGuided===true&&zone&&whiteAnchor===0?severe*Math.min(clamp((.20-zone.mean)/.12),clamp((.40-zone.p90)/.24)):0,bodyNoise=zone?clamp(1-zone.noise/Math.max(.025,zone.mean)*3,.35,1):1,bodyEV=bodySeverity?clamp(Math.log2(linear(.20)/Math.max(.0008,linear(zone.mean)))*.75,0,1.4)*clamp(bodySeverity*2.5)*bodyNoise:0;
+  const background=a.recovery?.zones?.background,dusk=rescue&&background?severe*Math.min(clamp((.11-background.p10)/.08),clamp((background.shadowCoverage-.30)/.20)):0;
   for(const component of plan.components){
+   if(severe>0&&rescue&&component.id==='balance'&&finite(component.p.toneExposure))component.p.toneExposure*=1-severe;
    if(component.id==='subject'){
     component.p.adjustRegionStack=[...(component.p.adjustRegionStack||[]),...copy(excluded)];
     if(rescue)for(const key of ['filmExp','toneShadows','toneBrightness'])if(finite(component.p[key]))component.p[key]*=1-whiteAnchor;
+    if(bodyEV>0){component.p.toneExposure=clamp((component.p.toneExposure||0)+bodyEV,0,2);if(finite(component.p.filmExp))component.p.filmExp*=1-clamp(bodySeverity*3);for(const key of ['toneShadows','toneBrightness'])if(finite(component.p[key]))component.p[key]*=1-clamp(bodySeverity*3);}
    }
    if(rescue&&component.id==='light'&&finite(component.p.toneLocalEV))component.p.toneLocalEV*=1-whiteAnchor;
    if(component.id==='texture'||component.id==='clarity')component.p.adjustRegionStack=[...(component.p.adjustRegionStack||[]),...copy(excluded)];
+   if(bodyEV>0&&component.id==='texture')for(const key of ['sharp','printClear','detail'])if(finite(component.p[key]))component.p[key]*=clamp(1-bodyEV*.28,.3,1)*bodyNoise;
+   if(bodyEV>0&&component.id==='clarity')component.p.adjustRegionStack.push({...copy(a.region.p),adjustRegion:'out'});
+   if(severe>0&&rescue&&component.id==='depth'&&finite(component.p.dehaze)){component.p.dehaze=Math.min(component.p.dehaze,.35+.25*(1-severe))*(1-dusk)**2;if(dusk>0)for(const key of ['sat','contrast','toneShadows','toneBlacks'])if(finite(component.p[key]))component.p[key]*=1-dusk;}
+   if(severe>0&&rescue&&component.id==='clarity'&&finite(component.p.detail))component.p.detail*=(1-dusk*.65)/(1+severe*2);
   }
   const globalEV=plan.components.reduce((sum,c)=>sum+(!c.p.adjustRegion||c.p.adjustRegion==='all'?Number(c.p.toneExposure)||0:0),0),faces=[];
-  for(const {r,index}of active){
-   const reliable=r.confidence>.7,noise=clamp(1-r.noise*5,.6,1),target=reliable?clamp(r.p90+.08,.48,.58):.38,need=Math.max(0,Math.log2(linear(target)/Math.max(.0008,linear(r.mean)))),channel=r.channelP95??clamp(r.p90+Math.abs(r.warmCast)*.5),headroom=clamp(Math.log2(linear(.90)/Math.max(.0008,linear(channel)))-Math.max(0,globalEV),0,1),ev=clamp(need*.40,0,reliable?headroom*.45:.22),film=clamp((target-r.mean)*4.3,0,reliable?.92:.22)*noise;
+  for(const {r,index,severe}of active){
+   const reliable=r.confidence>.7,noise=clamp(1-r.noise*5,.6,1),target=reliable?clamp(r.p90+.08,.48,.58):.38,need=Math.max(0,Math.log2(linear(target)/Math.max(.0008,linear(r.mean)))),channel=r.channelP95??clamp(r.p90+Math.abs(r.warmCast)*.5),rawHeadroom=Math.max(0,Math.log2(linear(.90)/Math.max(.0008,linear(channel)))-Math.max(0,globalEV)),headroom=clamp(rawHeadroom,0,1),normalEV=clamp(need*.40,0,reliable?headroom*.45:.22),normalFilm=clamp((target-r.mean)*4.3,0,reliable?.92:.22)*noise,ev=severe?Math.min(2,rawHeadroom,normalEV+need*.85*severe):normalEV,film=severe?normalFilm*(1-clamp(severe*2))+.06*noise*clamp(severe*2):normalFilm;
    const f=copy(r.focus),region=copy(r.region||{adjustRegion:'in',adjustRegionShape:'ellipse',adjustRegionX:f.cx,adjustRegionY:f.cy,adjustRegionRX:f.rx,adjustRegionRY:f.ry,adjustRegionAngle:0,adjustRegionFeather:.55}),p={...region,adjustRegionStack:a.region.source==='ai'?[copy(a.region.p)]:[],toneExposure:ev,filmExp:film,toneShadows:0,toneBrightness:0,sat:-clamp((r.warmCast-.10)*.8,0,.10),toneHighlights:-clamp((channel-.55)*.35,0,.12),toneWhites:-clamp((channel-.75)*.12,0,.025)};
+   if(severe>0){p.temp=clamp((.08-r.warmCast)*severe*2,-.12,.16);p.tint=clamp(-r.tintCast*severe*3,-.16,.20);}
    // The native per-channel film curve opens skin without a large luma gain
    // that would clip warm channels and create gray/red plateaus.
    faces.push(makeComponent('face-'+index,'Ánh sáng khuôn mặt '+(index+1),'skin',p,{focus:f,source:reliable?'face':'ai'},a.light,'Bù sáng bằng phơi sáng có giới hạn màu và đường cong phim RAY trên vùng da đã nhận diện; giữ áo, tóc và cảnh bên ngoài.'));
-   const shadowEV=reliable?clamp((clamp(target*.60,.24,.34)-r.p10)*5.5,0,1.25)*noise:0;
+   const shadowRequest=reliable?(clamp((clamp(target*.60,.24,.34)-r.p10)*5.5,0,1.25)*(1-clamp(severe*2))+Math.min(.8,Math.max(0,rawHeadroom-ev)*.4)*severe)*noise:0,shadowEV=severe>0?Math.min(shadowRequest,Math.max(0,rawHeadroom-ev)*.5):shadowRequest;
    if(r.shadowRegion&&shadowEV>.015){const shadow={...copy(r.shadowRegion),adjustRegionStack:[copy(region),...(a.region.source==='ai'?[copy(a.region.p)]:[])],toneExposure:shadowEV,toneHighlights:-.06};faces.push(makeComponent('face-shadow-'+index,'Bóng trên mặt '+(index+1),'skin',shadow,{focus:f,source:'face'},a.light,'Mở thêm phần da trong bóng tay hoặc tóc bằng vùng bóng đo từ ảnh; không tăng sáng da và quần áo đã sáng.'));}
   }
   const finish=plan.components.filter(c=>c.id==='clarity'||c.id==='texture');plan.components=plan.components.filter(c=>!c.id.startsWith('face-')&&c.id!=='clarity'&&c.id!=='texture');plan.components.push(...faces,...finish);

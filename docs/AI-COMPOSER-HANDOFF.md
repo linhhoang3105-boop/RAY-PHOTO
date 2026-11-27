@@ -45,3 +45,13 @@ npm run build:web
 ```
 
 Website RAY hiện tại chạy trên Sites; push GitHub không tự triển khai website đó. Giữ bản mã nguồn và version phát hành khớp nhau, theo [GITHUB-HANDOFF.md](https://github.com/linhhoang3105-boop/RAY-PHOTO/blob/main/docs/GITHUB-HANDOFF.md) khi làm từ repo GitHub. Các bản ZIP nguồn phải đặt tên phiên bản mới, không ghi đè bản đã gửi trước đó.
+
+## Người tối sâu trước trời sáng — v118
+
+Nhận diện theo điểm dùng lại `RayRemoveAI.infer` riêng biệt, không gọi `segment()` dùng chung trạng thái hủy của công cụ Xóa vật. Runtime yêu cầu hook `refineRecognition` tối đa một lần mỗi ảnh; helper chỉ chạy khi có mặt đo được đủ tối, xác suất cao và lệch sáng với cảnh. Ảnh nhận diện dài tối đa 512 px. Khi có tối đa ba khuôn mặt, phải chọn thành công tất cả người rồi mới thay foreground; bất kỳ người nào thất bại thì giữ mask cũ. Không tự bỏ người đã sáng khỏi vùng bảo vệ.
+
+`recovery.personGuided` là boolean tùy chọn được đặt khi vùng đã qua kiểm tra theo điểm mặt. Thân người chỉ nhận bù sáng mạnh khi cờ này đúng và các percentile đo được còn tối, không có áo trắng cần bảo vệ. Không đưa mask raster vào JSON. Mở công thức không thích ứng vẫn giữ tham số đã lưu; muốn tạo công thức theo thuật toán mới dùng Tự phối.
+
+Thứ tự native được xác nhận trực tiếp: Tone áp trong `bodyWarp`, trước `buildLUT` (gồm Film Exposure). Với ảnh tối sâu, tăng EV có giới hạn rồi chỉ nâng đường cong phim rất ít; tránh nền xám làm mặt/thân trông như mảng tô. Phần bóng bổ sung giữ khoảng trống kênh màu còn lại. Khi nhận diện tóc gần như trống ở ảnh tối, không dùng oval dự phòng để tô sáng lên vùng tóc.
+
+Công thức cảnh có kiểm tra histogram hai cụm sáng/tối để phân biệt chạng vạng với sương núi. Không hứa khôi phục chi tiết đã đen hoặc cháy hoàn toàn; kiểm tra ảnh thật và để người dùng điều chỉnh lại vùng/cường độ. Nguồn ảnh tham chiếu và kết quả chỉ nằm trong scratch.

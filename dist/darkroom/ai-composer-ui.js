@@ -51,7 +51,31 @@
   try{c.getContext('2d').drawImage(image,0,0,c.width,c.height);engine=await RayBeautyRuntime.engine({...BEAUTY_ASSETS,kinds:['segment','face'],refineHeads:false});return await engine.detect(c,notify);}
   finally{await engine?.close?.();c.width=c.height=0;resume?.();}
  }
- controller=Runtime.create({getSource:()=>source,readImage:image=>({...imageData(image),detail:{...imageData(image,512),sourceWidth:image.width,sourceHeight:image.height}}),recognize,getExistingRecognition:image=>BEAUTY.source===image&&BEAUTY.maps?{maps:BEAUTY.maps,faces:BEAUTY.faces}:null,presets:()=>ROLLS,capture,restore,paint,record:label=>RaySession.record(label),busy:()=>BEAUTY.busy||BODY_AI.busy||window.RayCompose?.busy||window.RayRemove?.busy||document.body.classList.contains('ray-video-mode'),onChange:sync});
+ // Isolated calls reuse the object selector without touching its shared cancel/job state.
+ async function refineRecognition(image,recognition,a,notify){
+  const severe=(a?.recovery?.faces||[]).some(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10),selection=window.RayRemoveSelection,infer=window.RayRemoveAI?.infer,maps=recognition?.maps,faces=recognition?.faces;
+  if(!severe||typeof infer!=='function'||typeof selection?.component!=='function'||typeof selection?.at!=='function'||!maps||!Number.isInteger(maps.width)||!Number.isInteger(maps.height)||maps.width<1||maps.height<1||maps.width*maps.height>1048576||!Array.isArray(faces)||!faces.length||faces.length>3)return recognition;
+  const valid=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.y)&&p.x>=0&&p.x<=1&&p.y>=0&&p.y<=1,people=faces.map(face=>{const points=Array.isArray(face)?face.filter(valid):[],point=face?.[1];if(points.length<4||!valid(point))return null;const xs=points.map(p=>p.x),ys=points.map(p=>p.y),left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys);return{point:{x:point.x,y:point.y},points,area:(right-left)*(bottom-top),cx:(left+right)/2,cy:(top+bottom)/2};});
+  if(people.some(p=>!p||p.area<=0))return recognition;
+  // Recovery records are sorted by area; match locations instead of sharing indices.
+  const matched=(a.recovery?.faces||[]).filter(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10).some(f=>people.some(p=>Math.hypot((p.cx-f.focus.cx)/Math.max(.001,f.focus.rx),(p.cy-f.focus.cy)/Math.max(.001,f.focus.ry))<1.5));if(!matched)return recognition;
+  const c=make(),scale=Math.min(1,512/Math.max(image.width,image.height)),root=typeof BODY_AI_ASSETS!=='undefined'?BODY_AI_ASSETS.roots[0]:new URL('../vendor/mediapipe/',location.href).href.replace(/\/$/,''),foreground=new Uint8Array(maps.width*maps.height),resume=window.RayPreview?.pause?.();c.width=Math.max(2,Math.round(image.width*scale));c.height=Math.max(2,Math.round(image.height*scale));
+  try{
+   c.getContext('2d').drawImage(image,0,0,c.width,c.height);
+   for(const person of people){
+    if(source!==image)return recognition;
+    const raw=await infer(c,'object',person.point,{root,object:typeof BODY_AI_ASSETS!=='undefined'&&BODY_AI_ASSETS.object||root+'/magic_touch.tflite',refine:false},()=>notify?.('Đang khoanh rõ người để bù sáng riêng…'));
+    if(source!==image||!raw||!Number.isInteger(raw.width)||!Number.isInteger(raw.height)||raw.width<1||raw.height<1||raw.width*raw.height>1048576||raw.data?.length!==raw.width*raw.height)return recognition;
+    const seed=Math.min(raw.height-1,Math.floor(person.point.y*raw.height))*raw.width+Math.min(raw.width-1,Math.floor(person.point.x*raw.width));if(!Number.isFinite(raw.data[seed])||raw.data[seed]<.65)return recognition;
+    const connected=selection.component(raw.data,raw.width,raw.height,person.point,'composer-person',.72),count=connected.data.reduce((n,v)=>n+(v>=102),0),coverage=person.points.reduce((n,p)=>n+(selection.at(connected,p.x,p.y)>=.4),0)/person.points.length;
+    if(count<Math.max(24,person.area*raw.width*raw.height*1.1)||coverage<.65)return recognition;
+    for(let y=0;y<maps.height;y++)for(let x=0;x<maps.width;x++){const i=y*maps.width+x;foreground[i]=Math.max(foreground[i],Math.round(selection.at(connected,(x+.5)/maps.width,(y+.5)/maps.height)*255));}
+   }
+   const count=foreground.reduce((n,v)=>n+(v>=102),0);if(count<8||count>foreground.length*.90)return recognition;
+   return{...recognition,maps:{...maps,foreground,personGuided:true}};
+  }catch{return recognition;}finally{c.width=c.height=0;resume?.();}
+ }
+ controller=Runtime.create({getSource:()=>source,readImage:image=>({...imageData(image),detail:{...imageData(image,512),sourceWidth:image.width,sourceHeight:image.height}}),recognize,refineRecognition,getExistingRecognition:image=>BEAUTY.source===image&&BEAUTY.maps?{maps:BEAUTY.maps,faces:BEAUTY.faces}:null,presets:()=>ROLLS,capture,restore,paint,record:label=>RaySession.record(label),busy:()=>BEAUTY.busy||BODY_AI.busy||window.RayCompose?.busy||window.RayRemove?.busy||document.body.classList.contains('ray-video-mode'),onChange:sync});
  window.RayAIComposer={controller,open:()=>open(true),get busy(){return controller.state.busy;},save:()=>save.click(),get recipe(){return currentRecipe();}};
  function message(text,error=false){status.textContent=text||'';status.classList.toggle('error',error);}
  function open(on){opened=on;panel.hidden=!on;trigger.setAttribute('aria-expanded',String(on));document.body.classList.toggle('ray-composer-open',on);if(on){guideComponent=null;panel.scrollTop=0;dock.scrollTop=0;sync(controller.state);void refreshSaved();}else overlay.hidden=true;window.RayWorkspace?.fitPhoto?.();window.RayPreview?.layoutChanged?.();}

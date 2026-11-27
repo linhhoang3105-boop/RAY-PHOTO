@@ -25,13 +25,13 @@
   for(const key of ['getSource','readImage','capture','restore','paint'])if(typeof host?.[key]!=='function')throw Error('Thiếu kết nối AI Composer: '+key);
   const core=dependencies.core||getCore(),recipes=dependencies.recipes||getRecipes();
   if(!core||!recipes)throw Error('AI Composer chưa tải đủ mô-đun.');
-  let photo=null,base=null,lastPaint=null,checkpoint=null,checkpointState=null,ticket=0,analysisPromise=null,analysisCache=null,faceScanAttempted=false,writing=false,recorded=false;
+  let photo=null,base=null,lastPaint=null,checkpoint=null,checkpointState=null,ticket=0,analysisPromise=null,analysisCache=null,faceScanAttempted=false,personScanAttempted=false,writing=false,recorded=false;
   const state={style:core.STYLES?.[0]?.id||'auto-beauty',seed:(Number(host.seed)>>>0)||1234,variants:[],selected:0,intensity:100,busy:false,status:'Mở ảnh rồi chọn phong cách để AI phối.',active:false,applied:false,analysis:null,error:null,comparing:false};
   const snapshot=()=>clone(state),emit=()=>{try{host.onChange?.(snapshot());}catch(error){host.onError?.(error);}};
   const currentPlan=()=>state.variants[state.selected]||null;
   const canonicalState=()=>clone(Object.fromEntries(['style','seed','variants','selected','intensity','analysis','active','applied','comparing'].map(key=>[key,state[key]])));
   function resetForPhoto(next){
-   ticket++;photo=next;base=lastPaint=checkpoint=checkpointState=null;analysisPromise=analysisCache=null;faceScanAttempted=false;recorded=false;
+   ticket++;photo=next;base=lastPaint=checkpoint=checkpointState=null;analysisPromise=analysisCache=null;faceScanAttempted=false;personScanAttempted=false;recorded=false;
    Object.assign(state,{variants:[],selected:0,intensity:100,busy:false,active:false,applied:false,analysis:null,error:null,comparing:false,status:next?'Chọn phong cách để AI phân tích ảnh gốc.':'Mở ảnh rồi chọn phong cách để AI phối.'});
   }
   function observeSource(){const next=host.getSource();if(next!==photo){resetForPhoto(next);return false;}return true;}
@@ -73,6 +73,7 @@
   function readyStatus(prefix='Đã phối ảnh'){
    return prefix+(state.analysis?.recognition==='estimated'?' · vùng xử lý đang được ước lượng từ ảnh.':' · có thể chỉnh từng thành phần.');
   }
+  const severePerson=a=>(a.recovery?.faces||[]).some(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10);
   async function analyzePhoto(image,job,needFaces=false){
    const requestFaces=needFaces&&!faceScanAttempted;
    if(analysisCache&&!requestFaces)return analysisCache;
@@ -88,7 +89,16 @@
      try{const fresh=await host.recognize?.(image,message=>{if(still(job,image)){state.status=String(message||'Đang nhận diện vùng ảnh…');emit();}});if(fresh)recognition={...recognition,...fresh,maps:fresh.maps||recognition?.maps,faces:fresh.faces?.length?fresh.faces:recognition?.faces||[]};}catch{estimated=!recognition?.maps&&!recognition?.faces?.length;}
     }
     if(!recognition?.maps&&!recognition?.faces?.length)estimated=true;
-    const result=core.analyze(pixels.data,pixels.width,pixels.height,{...(recognition||{}),...(pixels.detail?{detail:pixels.detail}:{})});
+    let result=core.analyze(pixels.data,pixels.width,pixels.height,{...(recognition||{}),...(pixels.detail?{detail:pixels.detail}:{})});
+    // A deeply underlit person may share a fuzzy semantic mask with a railing.
+    // Refine once on the same original pixels; a failure keeps useful recognition.
+    if(typeof host.refineRecognition==='function'&&!personScanAttempted&&severePerson(result)&&image===photo&&image===host.getSource()&&state.busy){
+     personScanAttempted=true;
+     try{
+      const fresh=await host.refineRecognition(image,recognition,result,message=>{if(image===photo&&image===host.getSource()&&state.busy){state.status=String(message||'Đang khoanh rõ người trong bóng…');emit();}});
+      if(fresh&&fresh!==recognition&&(!fresh.source||fresh.source===image)&&image===photo&&image===host.getSource()&&state.busy){recognition=fresh;result=core.analyze(pixels.data,pixels.width,pixels.height,{...recognition,...(pixels.detail?{detail:pixels.detail}:{})});}
+     }catch{/* Optional person refinement must not discard the original skin/face result. */}
+    }
     if(estimated&&result.recognition!=='face'&&result.recognition!=='ai')result.recognition='estimated';
     if(image===photo&&image===host.getSource())analysisCache=result;
     return result;

@@ -1,10 +1,16 @@
 # RAY PHOTO — xưởng ảnh phim
 
-**Bản nguồn đầy đủ v117 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
+**Bản nguồn đầy đủ v118 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
 
 Website hiện tại: [RAY PHOTO](https://pho-cang-photobooth.linhhoang3105.chatgpt.site). Việc cập nhật website cần phát hành qua Sites như mô tả trong hướng dẫn GitHub.
 
 Bản tích hợp trình chỉnh ảnh RAY PHOTO và photobooth Linh Linh – Phố Cảng. Giao diện film tối/ấm, bốn khu Khám phá / Buồng ảnh / Photobooth / Album.
+
+## Một chạm với người ngược sáng nặng — v118
+
+**AI Composer → Cứu sáng & nét → Tự phối ảnh** nhận thêm trường hợp người tối sâu trước trời sáng. AI dùng khuôn mặt làm điểm tự động cho công cụ chọn vật hiện có để khoanh người, giữ riêng cảnh/lan can; bù sáng người bằng công cụ RAY, giảm nâng nền xám và giữ màu trời hoàng hôn. Cảnh núi mờ sương được khử mờ riêng; cảnh chạng vạng không nhận cùng mức khử mờ/làm nét như ban ngày.
+
+Từng lớp và vùng vẫn chỉnh, tắt/xóa và lưu công thức được. Nếu vùng người chưa đủ tin cậy, giữ nhận diện ban đầu và không tăng sáng thân người mạnh. Ảnh đen mất sắc độ hoặc nhiễu nặng chỉ phục hồi được phần thông tin còn lại. Không thay đổi các màu Bộ lọc, engine gốc hoặc kết quả cứu sáng hỗn hợp của v117. [Kiểm chứng v118](docs/qa/ai-composer-severe-v118.md).
 
 ## Công thức AI và bù sáng khuôn mặt — v117
 

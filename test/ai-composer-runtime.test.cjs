@@ -170,3 +170,25 @@ test('the real adaptive core and validated recipes work through every style and 
  r.setComponent('balance',{p:{toneExposure:.23}});r.setIntensity(61);const saved=r.recipe('Nắng riêng');r.apply();await r.reroll();assert.equal(f.color.layers.length,7);
  f.replace(210);assert.equal(await r.loadRecipe(saved,{adapt:true}),true);assert.equal(r.state.variants[0].title,'Nắng riêng');assert.equal(r.state.intensity,61);assert.equal(f.color.layers.length,7);assert.equal(f.reads,2);
 });
+
+function personRefinementFixture(refine){
+ const f=fixture(),analyze=f.deps.core.analyze;let calls=0;
+ f.deps.core.analyze=(...args)=>({...analyze(...args),backgroundBrightness:.55,recovery:{faces:[{confidence:.95,mean:.09,p90:.17}]}});
+ f.host.refineRecognition=async(...args)=>{calls++;return refine?refine(...args):{...args[1],maps:{...args[1]?.maps,foreground:new Uint8Array([220])}};};
+ Object.defineProperty(f,'calls',{get:()=>calls});return f;
+}
+test('severe person refinement reanalyzes original pixels once and caches the corrected masks across all AI styles',async()=>{
+ const f=personRefinementFixture();assert.equal(await f.controller.compose('restore-detail'),true);assert.equal(f.calls,1);assert.equal(f.deps.calls.analyze.length,2);assert.equal(f.deps.calls.analyze[1].recognition.maps.foreground[0],220);for(const call of f.deps.calls.analyze)assert.deepEqual(call.data,[...f.original]);await f.controller.compose('natural');await f.controller.reroll();assert.equal(f.calls,1);assert.equal(f.reads,1);assert.equal(f.deps.calls.analyze.length,2);f.replace();await f.controller.compose('cinematic');assert.equal(f.calls,2);
+});
+test('ordinary light, unreliable skin and low scene contrast do not request stronger person recognition',async()=>{
+ for(const change of [a=>{delete a.recovery;},a=>{a.recovery.faces[0].mean=.28;},a=>{a.recovery.faces[0].p90=.6;},a=>{a.recovery.faces[0].confidence=.45;},a=>{a.backgroundBrightness=.15;}]){const f=personRefinementFixture(),analyze=f.deps.core.analyze;f.deps.core.analyze=(...args)=>{const a=analyze(...args);change(a);return a;};assert.equal(await f.controller.compose('natural'),true);assert.equal(f.calls,0);assert.equal(f.deps.calls.analyze.length,1);}
+});
+test('optional person refinement failure or a foreign-photo result keeps original recognition without repeated retries',async()=>{
+ for(const refine of [()=>{throw Error('model offline');},()=>({source:{},maps:{width:1,height:1,foreground:new Uint8Array([255])}})]){const f=personRefinementFixture(refine);assert.equal(await f.controller.compose('restore-detail'),true);assert.equal(f.calls,1);assert.equal(f.deps.calls.analyze.length,1);assert.equal(f.controller.state.error,null);await f.controller.reroll();assert.equal(f.calls,1);assert.equal(f.reads,1);assert.equal(f.deps.calls.analyze.length,1);}
+});
+test('cancelled or replaced-photo person refinement cannot repaint or cache its late corrected mask',async()=>{
+ for(const replacement of [false,true]){const pending=deferred(),f=personRefinementFixture(()=>pending.promise),work=f.controller.compose('restore-detail');await waitFor(()=>f.calls===1);if(replacement)f.replace();else assert.equal(f.controller.cancel(),true);const before=f.color;pending.resolve({maps:{width:1,height:1,foreground:new Uint8Array([230])},faces:[]});assert.equal(await work,false);assert.equal(f.paints,0);assert.deepEqual(f.color,before);assert.equal(f.deps.calls.analyze.length,1);}
+});
+test('a later composition shares one pending person refinement and applies only the newest style',async()=>{
+ const pending=deferred(),f=personRefinementFixture(()=>pending.promise),first=f.controller.compose('natural');await waitFor(()=>f.calls===1);const second=f.controller.compose('moody');pending.resolve({maps:{width:1,height:1,foreground:new Uint8Array([210])},faces:[]});assert.equal(await first,false);assert.equal(await second,true);assert.equal(f.calls,1);assert.equal(f.reads,1);assert.equal(f.paints,1);assert.equal(f.controller.state.style,'moody');assert.equal(f.deps.calls.analyze.length,2);
+});
