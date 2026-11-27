@@ -9,6 +9,18 @@
   const sort=v=>Array.isArray(v)?v.map(sort):v&&typeof v==='object'?Object.fromEntries(Object.keys(v).sort().map(k=>[k,sort(v[k])])):v;
   return JSON.stringify(sort(value));
  }
+ function uniqueEffects(plans){
+  const seen=new Set();
+  return plans.filter(plan=>{
+   // Metadata does not affect rendering; retain every component's ordered values.
+   const key=stable(plan.components.map(component=>{
+    const p={...component.p},seeded=['grain','film','dust','spark','ptex','kinh','gloss','glow'].some(key=>Number(p[key])>.001)||Number(p.leak)>.001&&!p.leakManual||p.frame==='scan';
+    if(!seeded)delete p.seed;
+    return{enabled:component.enabled!==false,p,focus:component.focus,sun:component.sun,leak:component.leak};
+   }));
+   if(seen.has(key))return false;seen.add(key);return true;
+  });
+ }
  function create(host,dependencies={}){
   for(const key of ['getSource','readImage','capture','restore','paint'])if(typeof host?.[key]!=='function')throw Error('Thiếu kết nối AI Composer: '+key);
   const core=dependencies.core||getCore(),recipes=dependencies.recipes||getRecipes();
@@ -91,9 +103,11 @@
    if(!available({begin:true}))return false;
    const image=photo,job=++ticket,prior=canonicalState();Object.assign(state,{busy:true,error:null,status:'Đang phân tích ảnh gốc và phối phương án…'});emit();
    try{
-    const analysis=await analyzePhoto(image,job,['backlight','restore-detail','film-recovery'].includes(style));if(!guard(job,image))return false;
-    const seed=(state.seed+1)>>>0,count=Math.max(3,Math.min(5,Math.round(Number(host.variantCount)||4))),variants=core.generate(analysis,{style,seed,count,presets:host.presets?.()||[]});
-    if(!Array.isArray(variants)||variants.length<3||variants.length>5)throw Error('AI chưa tạo đủ phương án phối ảnh.');
+    // Every AI style can fill an underlit person; missing faces are scanned once per photo.
+    const analysis=await analyzePhoto(image,job,true);if(!guard(job,image))return false;
+    const seed=(state.seed+1)>>>0,count=Math.max(3,Math.min(5,Math.round(Number(host.variantCount)||4))),generated=core.generate(analysis,{style,seed,count,presets:host.presets?.()||[]});
+    if(!Array.isArray(generated)||generated.length<3||generated.length>5)throw Error('AI chưa tạo đủ phương án phối ảnh.');
+    const variants=uniqueEffects(generated);
     Object.assign(state,{style,seed,variants:clone(variants),selected:0,analysis:clone(analysis)});
     paint();state.busy=false;state.status=readyStatus();emit();return true;
    }catch(error){if(still(job,image))Object.assign(state,prior);return fail(error,job,image);}
@@ -174,7 +188,7 @@
    const saved=recipes.validate(input);if(!available({begin:true}))return false;
    const image=photo,job=++ticket,prior=canonicalState();Object.assign(state,{busy:true,error:null,status:adapt?'Đang thích ứng công thức với ảnh gốc…':'Đang mở công thức AI…'});emit();
    try{
-    const analysis=adapt?await analyzePhoto(image,job,['backlight','restore-detail','film-recovery'].includes(saved.style)):state.analysis;if(!guard(job,image))return false;
+    const analysis=adapt?await analyzePhoto(image,job,true):state.analysis;if(!guard(job,image))return false;
     const plan=adapt?{...core.adapt(saved,analysis,{presets:host.presets?.()||[],seed:saved.seed}),title:saved.name}:{version:1,id:'saved-'+saved.seed,style:saved.style,seed:saved.seed,title:saved.name,basePreset:clone(saved.basePreset),analysis:clone(saved.analysis||{}),components:clone(saved.components)};
     const amount=Number(saved.intensity);
     Object.assign(state,{style:saved.style,seed:saved.seed,variants:[clone(plan)],selected:0,intensity:Number.isFinite(amount)?Math.max(0,Math.min(100,amount)):100,analysis:clone(analysis||saved.analysis||{})});

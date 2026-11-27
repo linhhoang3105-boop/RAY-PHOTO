@@ -5,7 +5,7 @@
  const styles=[
   {id:'auto-beauty',name:'Auto Beauty',description:'Cân bằng tổng thể, ưu tiên da và chi tiết.'},
   {id:'backlight',name:'Cứu ngược sáng',description:'Bù sáng chủ thể tối, giữ vùng nền sáng và màu da tự nhiên.'},
-  {id:'restore-detail',name:'Phục hồi sáng & nét',description:'Cứu sáng riêng từng khuôn mặt và làm rõ chi tiết còn có trong ảnh.'},
+  {id:'restore-detail',name:'Cứu sáng & nét',description:'Cứu ngược sáng, mở bóng trên mặt và làm rõ chi tiết còn có trong ảnh.'},
   {id:'film-recovery',name:'Màu phim cứu sáng',description:'Cứu sáng chủ thể, phối màu phim cảm hứng Fuji riêng cho cảnh và giữ da tự nhiên.'},
   {id:'natural',name:'Natural',description:'Trong trẻo, giữ ánh sáng và màu tự nhiên.'},
   {id:'cinematic',name:'Cinematic',description:'Sắc độ điện ảnh và chiều sâu có kiểm soát.'},
@@ -16,6 +16,10 @@
   {id:'moody',name:'Moody',description:'Trầm có chiều sâu, giữ chủ thể rõ.'},
   {id:'creative',name:'Creative AI',description:'Khám phá tổ hợp màu, ánh sáng và chất phim từ ảnh.'}
  ];
+ // Keep every published style ID readable/callable. The picker has one rescue
+ // choice because backlight and restore-detail share the same native workflow.
+ const styleCuration={backlight:{visible:false,canonicalId:'restore-detail',reason:'Đã gộp vào Cứu sáng & nét.'},'restore-detail':{visible:true,canonicalId:'restore-detail',aliases:['backlight']}};
+ function getVisibleStyles(){return styles.filter(style=>styleCuration[style.id]?.visible!==false).map(style=>({...style,...(styleCuration[style.id]?.aliases?{aliases:styleCuration[style.id].aliases.slice()}:{})}));}
  const NUM={temp:[-1,1],tint:[-1,1],split:[-1,1],contrast:[-1,1],sat:[-1,1],lift:[0,1],halation:[0,1],grain:[0,1],vignette:[0,1],leak:[0,1],dust:[0,1],ca:[0,1],flash:[0,1],glow:[0,1],nang:[0,1],filmExp:[0,1],sharp:[0,1],kinh:[0,1],bgBlur:[0,1],motion:[0,1],spark:[0,1],paper:[0,1],gloss:[0,1],soft:[0,1],ptex:[0,1],film:[0,1],printClear:[0,1],dehaze:[0,1],detail:[0,1],rayNangPho:[0,1.5],rayThuNhat:[0,1.5],toneExposure:[-2,2],toneBrightness:[-1,1],toneHighlights:[-1,1],toneShadows:[-1,1],toneWhites:[-1,1],toneBlacks:[-1,1],toneLocalEV:[-2,2],toneLocalBrightness:[-1,1],toneLocalWarmth:[-1,1],toneLocalColorAmount:[0,1]};
  const OPTIONAL={haltint:[0,1],leakAngle:[-180,180],leakBandWidth:[.04,1],leakHue:[-45,75],leakSat:[0,2],nangSat:[0,2],nangSize:[.15,1.4],nangAspect:[.25,4],nangAngle:[-180,180],leakAspect:[.25,4],motionAngle:[-180,180],adjustRegionX:[-4,5],adjustRegionY:[-4,5],adjustRegionRX:[.001,16],adjustRegionRY:[.001,16],adjustRegionAngle:[-180,180],adjustRegionFeather:[0,1],adjustRegionThickness:[.000001,8],adjustRegionCurve:[-1,1],toneLocalOpacity:[0,1],toneLocalFeather:[0,1],toneLocalAngle:[-180,180],toneLocalCurve:[-1,1],toneLocalThickness:[.000001,4]};
  const EFFECTS=Object.keys(NUM),finite=n=>typeof n==='number'&&Number.isFinite(n);
@@ -52,6 +56,26 @@
   return {source:face?'face':'estimated',focus:fallback,coverage:clamp(Math.PI*fallback.rx*fallback.ry),p:{adjustRegion:'in',adjustRegionShape:'ellipse',adjustRegionX:fallback.cx,adjustRegionY:fallback.cy,adjustRegionRX:fallback.rx,adjustRegionRY:fallback.ry,adjustRegionAngle:0,adjustRegionFeather:.65}};
  }
 
+ // Portable skin/shadow coverage is derived from the current photo, never a fixed portrait oval.
+ function faceLightRegions(data,W,H,skin,hair,foreground,f,p10,p90){
+  if(!skin||!Paint?.contours)return{};
+  const left=clamp(f.cx-f.rx*1.5),right=clamp(f.cx+f.rx*1.5),top=clamp(f.cy-f.ry*1.6),bottom=clamp(f.cy+f.ry*1.65),fw=right-left,fh=bottom-top;
+  if(fw<=0||fh<=0)return{};
+  const scale=Math.min(1,128/Math.max(fw*W,fh*H)),width=Math.max(8,Math.round(fw*W*scale)),height=Math.max(8,Math.round(fh*H*scale)),full=new Float32Array(width*height),dark=new Float32Array(width*height),cut=clamp((p10+p90)*.55,.12,.30);
+  for(let y=0;y<height;y++)for(let x=0;x<width;x++){
+   const u=left+(x+.5)/width*fw,v=top+(y+.5)/height*fh,rad=((u-f.cx)/(f.rx*1.5))**2+((v-f.cy)/(f.ry*1.6))**2;if(rad>1)continue;
+   const k=(Math.min(H-1,Math.floor(v*H))*W+Math.min(W-1,Math.floor(u*W)))*4,h=hair?.at(u,v)||0,fg=foreground?.at(u,v)??1,sk=skin.at(u,v),weight=fg*Math.max(sk,rad<.55&&h<.15?.52:0)*(1-clamp((h-.18)/.42))*data[k+3]/255;
+   full[y*width+x]=weight;dark[y*width+x]=weight*clamp((cut+.045-lum(data[k],data[k+1],data[k+2]))/.07);
+  }
+  function vector(plane,feather){
+   const local=describeRegion({width,height,data:plane,at(u,v){return plane[Math.min(height-1,Math.floor(v*height))*width+Math.min(width-1,Math.floor(u*width))];}},[]);
+   if(local.source!=='ai'||local.p.adjustRegionShape!=='freehand')return null;
+   const q=copy(local.p);q.adjustRegionX=left+q.adjustRegionX*fw;q.adjustRegionY=top+q.adjustRegionY*fh;q.adjustRegionRX=Math.max(.001,q.adjustRegionRX*fw);q.adjustRegionRY=Math.max(.001,q.adjustRegionRY*fh);q.adjustRegionFeather=feather;
+   for(const stroke of q.adjustRegionStrokes)for(const point of stroke.points){point[0]=clamp(left+point[0]*fw);point[1]=clamp(top+point[1]*fh);}return q;
+  }
+  const region=vector(full,.85),shadowRegion=vector(dark,.95);return{...(region?{region}:{}),...(shadowRegion?{shadowRegion}:{})};
+ }
+
  function recoveryZone(data,W,H,foreground,region,faces,background=false){
   const hist=new Float64Array(256),residual=[];let n=0,sum=0,shadow=0,highlight=0,texture=0,neutral=0,warm=0,tint=0,darkSum=0,chromaSum=0;
   const step=Math.max(1,Math.ceil(Math.sqrt(W*H/160000)));
@@ -62,14 +86,14 @@
   const percentile=q=>{let total=0;for(let i=0;i<256;i++){total+=hist[i];if(total>=n*q)return i/255;}return 0;};residual.sort((a,b)=>a-b);
   return {mean:n?clamp(sum/n):0,p10:n?percentile(.1):0,p90:n?percentile(.9):0,shadowCoverage:n?clamp(shadow/n):0,highlightCoverage:n?clamp(highlight/n):0,texture:n?clamp(texture/n):0,noise:clamp((residual[Math.floor(residual.length*.5)]||0)*.8),neutralCoverage:n?clamp(neutral/n):0,neutralWarmCast:neutral?clamp(warm/neutral,-1,1):0,neutralTintCast:neutral?clamp(tint/neutral,-1,1):0,darkMean:n?clamp(darkSum/n):0,chroma:n?clamp(chromaSum/n):0};
  }
- function recoveryAnalysis(data,W,H,faces,skin,foreground,region){
+ function recoveryAnalysis(data,W,H,faces,skin,foreground,region,hair){
   const boxes=[];
   for(const face of (faces||[])){const pts=Array.isArray(face)?face.filter(p=>finite(p?.x)&&finite(p?.y)):[];if(pts.length<4)continue;const x0=clamp(Math.min(...pts.map(p=>p.x))),x1=clamp(Math.max(...pts.map(p=>p.x))),y0=clamp(Math.min(...pts.map(p=>p.y))),y1=clamp(Math.max(...pts.map(p=>p.y)));if(x1-x0<.008||y1-y0<.008)continue;boxes.push({focus:{cx:(x0+x1)/2,cy:(y0+y1)/2,rx:clamp((x1-x0)*.58,.008,.5),ry:clamp((y1-y0)*.58,.008,.5)},confidence:.95});}
-  if(!boxes.length&&skin&&foreground&&Paint?.contours){const width=Math.min(128,skin.width),height=Math.max(2,Math.round(width*skin.height/skin.width)),plane=new Float32Array(width*height);for(let y=0;y<height;y++)for(let x=0;x<width;x++){const u=(x+.5)/width,v=(y+.5)/height;plane[y*width+x]=skin.at(u,v)*foreground.at(u,v);}for(const path of Paint.contours({width,height,data:plane},.45)){if(path.length<4)continue;const x0=Math.min(...path.map(p=>p[0])),x1=Math.max(...path.map(p=>p[0])),y0=Math.min(...path.map(p=>p[1])),y1=Math.max(...path.map(p=>p[1])),w=x1-x0,h=y1-y0;if(w*h<.0003||w*h>.20||w/h<.3||w/h>2||(y0+y1)/2>region.focus.cy-region.focus.ry*.12)continue;boxes.push({focus:{cx:(x0+x1)/2,cy:(y0+y1)/2,rx:clamp(w*.57,.008,.5),ry:clamp(h*.57,.008,.5)},confidence:.45});}}
+  if(!boxes.length&&skin&&foreground&&Paint?.contours){const width=Math.min(128,skin.width),height=Math.max(2,Math.round(width*skin.height/skin.width)),plane=new Float32Array(width*height);for(let y=0;y<height;y++)for(let x=0;x<width;x++){const u=(x+.5)/width,v=(y+.5)/height;plane[y*width+x]=skin.at(u,v)*foreground.at(u,v);}for(const path of Paint.contours({width,height,data:plane},.45)){if(path.length<4)continue;const x0=Math.min(...path.map(p=>p[0])),x1=Math.max(...path.map(p=>p[0])),y0=Math.min(...path.map(p=>p[1])),y1=Math.max(...path.map(p=>p[1])),w=x1-x0,h=y1-y0;if(w*h<.0003||w*h>.20||w/h<.3||w/h>2||(y0+y1)/2>region.focus.cy-region.focus.ry*.12)continue;let hairWeight=0,nearby=0;if(hair)for(let y=Math.max(0,Math.floor((y0-h*.55)*height));y<Math.min(height,Math.ceil((y1+h*.35)*height));y++)for(let x=Math.max(0,Math.floor((x0-w*.45)*width));x<Math.min(width,Math.ceil((x1+w*.45)*width));x++){const u=(x+.5)/width,v=(y+.5)/height;if(u>x0&&u<x1&&v>y0&&v<y1)continue;nearby++;hairWeight+=hair.at(u,v)*foreground.at(u,v);}const headShape=w/h>.45&&w/h<1.55,corroborated=headShape&&nearby&&hairWeight/nearby>.16;boxes.push({focus:{cx:(x0+x1)/2,cy:(y0+y1)/2,rx:clamp(w*.57,.008,.5),ry:clamp(h*.57,.008,.5)},confidence:corroborated?.80:.45});}}
   boxes.sort((a,b)=>b.focus.rx*b.focus.ry-a.focus.rx*a.focus.ry);const measured=[];
-  for(const box of boxes){if(measured.some(v=>Math.hypot(v.focus.cx-box.focus.cx,v.focus.cy-box.focus.cy)<Math.min(v.focus.rx,box.focus.rx)))continue;const f=box.focus,hist=new Float64Array(256),residual=[],weights=[];let n=0,sum=0,warm=0,tint=0,texture=0,nt=0;
-   for(let y=Math.max(1,Math.floor((f.cy-f.ry)*H));y<Math.min(H-1,Math.ceil((f.cy+f.ry)*H));y++)for(let x=Math.max(1,Math.floor((f.cx-f.rx)*W));x<Math.min(W-1,Math.ceil((f.cx+f.rx)*W));x++){const u=(x+.5)/W,v=(y+.5)/H,radius=((u-f.cx)/f.rx)**2+((v-f.cy)/f.ry)**2;if(radius>.85)continue;const i=(y*W+x)*4,a=data[i+3]/255;if(a<.1)continue;const w=a*(skin?Math.max(.15,skin.at(u,v)):1)*(foreground?Math.max(.1,foreground.at(u,v)):1),r=data[i],g=data[i+1],b=data[i+2],l=lum(r,g,b),at=k=>lum(data[k],data[k+1],data[k+2]),left=at(i-4),right=at(i+4),up=at(i-W*4),down=at(i+W*4);sum+=l*w;n+=w;hist[Math.round(l*255)]+=w;warm+=(r-b)/255*w;tint+=((r+b)/2-g)/255*w;texture+=(Math.abs(right-left)+Math.abs(down-up))*.5*w;nt+=w;residual.push(Math.abs(l-(left+right+up+down)/4));}
-   if(n<3)continue;const percentile=q=>{let total=0;for(let j=0;j<256;j++){total+=hist[j];if(total>=n*q)return j/255;}return 1;};residual.sort((a,b)=>a-b);measured.push({focus:f,mean:sum/n,p10:percentile(.1),p90:percentile(.9),texture:clamp(texture/(nt||1)),noise:clamp((residual[Math.floor(residual.length*.5)]||0)*.8),warmCast:clamp(warm/n,-1,1),tintCast:clamp(tint/n,-1,1),confidence:box.confidence});if(measured.length===3)break;
+  for(const box of boxes){if(measured.some(v=>Math.hypot(v.focus.cx-box.focus.cx,v.focus.cy-box.focus.cy)<Math.min(v.focus.rx,box.focus.rx)))continue;const f=box.focus,hist=new Float64Array(256),channels=new Float64Array(256),residual=[],weights=[];let n=0,sum=0,warm=0,tint=0,texture=0,nt=0;
+   for(let y=Math.max(1,Math.floor((f.cy-f.ry)*H));y<Math.min(H-1,Math.ceil((f.cy+f.ry)*H));y++)for(let x=Math.max(1,Math.floor((f.cx-f.rx)*W));x<Math.min(W-1,Math.ceil((f.cx+f.ry)*W));x++){const u=(x+.5)/W,v=(y+.5)/H,radius=((u-f.cx)/f.rx)**2+((v-f.cy)/f.ry)**2;if(radius>.85)continue;const i=(y*W+x)*4,a=data[i+3]/255;if(a<.1)continue;const w=a*(skin?Math.max(.15,skin.at(u,v)):1)*(foreground?Math.max(.1,foreground.at(u,v)):1),r=data[i],g=data[i+1],b=data[i+2],l=lum(r,g,b),at=k=>lum(data[k],data[k+1],data[k+2]),left=at(i-4),right=at(i+4),up=at(i-W*4),down=at(i+W*4);sum+=l*w;n+=w;hist[Math.round(l*255)]+=w;channels[Math.max(r,g,b)]+=w;warm+=(r-b)/255*w;tint+=((r+b)/2-g)/255*w;texture+=(Math.abs(right-left)+Math.abs(down-up))*.5*w;nt+=w;residual.push(Math.abs(l-(left+right+up+down)/4));}
+   if(n<3)continue;const percentile=(q,h=hist)=>{let total=0;for(let j=0;j<256;j++){total+=h[j];if(total>=n*q)return j/255;}return 1;};residual.sort((a,b)=>a-b);const record={focus:f,mean:sum/n,p10:percentile(.1),p90:percentile(.9),channelP95:percentile(.95,channels),texture:clamp(texture/(nt||1)),noise:clamp((residual[Math.floor(residual.length*.5)]||0)*.8),warmCast:clamp(warm/n,-1,1),tintCast:clamp(tint/n,-1,1),confidence:box.confidence};Object.assign(record,faceLightRegions(data,W,H,skin,hair,foreground,f,record.p10,record.p90));measured.push(record);if(measured.length===3)break;
   }
   return {version:1,faces:measured,zones:{subject:recoveryZone(data,W,H,foreground,region,measured),background:recoveryZone(data,W,H,foreground,region,measured,true)}};
  }
@@ -91,7 +115,7 @@
   }
   const percentile=q=>{if(!count)return 0;let cumulative=0;for(let i=0;i<256;i++){cumulative+=histogram[i];if(cumulative>=count*q)return i/255;}return 1;},mean=count?sum/count:0,p10=percentile(.1),p50=percentile(.5),p95=percentile(.95),p99=percentile(.99),dynamicRange=clamp(p95-p10),lightX=brightW?brightX/brightW:.5,lightY=brightW?brightY/brightW:.08,confidence=clamp(dynamicRange*1.2)*clamp(Math.hypot(lightX-.5,lightY-.5)*3);
   const result={version:1,width:W,height:H,fingerprint:((hash^W^Math.imul(H,31))>>>0).toString(16).padStart(8,'0'),histogram,mean,median:p50,p10,p50,p95,p99,shadows:count?shadows/count:0,highlights:count?highlights/count:0,clippedHighlights:count?clippedHighlights/count:0,clippedShadows:count?clippedShadows/count:0,colorfulness:count?chroma/count:0,warmCast:count?clamp(warm/count,-1,1):0,tintCast:count?clamp(tint/count,-1,1):0,skinCoverage:count?skinWeight/count:0,skinLuma:skinWeight?skinL/skinWeight:mean,skinWarmth:skinWeight?clamp(skinWarm/skinWeight,-1,1):0,texture:textureN?clamp(texture/textureN):0,dynamicRange,subjectCoverage:count?subjectWeight/count:0,subjectBrightness:subjectWeight?subjectL/subjectWeight:mean,backgroundBrightness:bgWeight?bgL/bgWeight:mean,recognition:region.source,region,light:{x:lightX,y:lightY,angle:Math.atan2(.5-lightY,.5-lightX)*180/Math.PI,confidence},dominantHue:hue.indexOf(Math.max(...hue))/12,empty:!count};
-  const d=detail?.data&&Number.isInteger(detail.width)&&Number.isInteger(detail.height)&&detail.data.length===detail.width*detail.height*4?detail:{data,width:W,height:H};result.recovery=recoveryAnalysis(d.data,d.width,d.height,faces,skin,foreground,region);
+  const d=detail?.data&&Number.isInteger(detail.width)&&Number.isInteger(detail.height)&&detail.data.length===detail.width*detail.height*4?detail:{data,width:W,height:H};result.recovery=recoveryAnalysis(d.data,d.width,d.height,faces,skin,foreground,region,normalizedPlane(maps,'hair'));
   result.palette=Regions?.analyze(data,W,H,{foreground,skin,hair:normalizedPlane(maps,'hair'),faces:result.recovery.faces,region})||{version:1,sky:null,land:null};return result;
  }
  const INTENTS={
@@ -106,6 +130,32 @@
  function scaledParams(p,amount){const out=copy(p||{});for(const k of EFFECTS)if(finite(out[k]))out[k]=+(out[k]*amount).toFixed(6);return out;}
  function presetScore(r,t,a){const p=r.p||{},dist=Math.abs((p.temp||0)-t.temp)*1.6+Math.abs((p.tint||0)-t.tint)*1.25+Math.abs((p.contrast||0)-t.contrast)*1.3+Math.abs((p.sat||0)-t.sat)+Math.abs((p.lift||0)-t.lift)*.5;const optics=(p.grain||0)*.3+(p.ca||0)*.8+(p.flash||0)*.8+(p.leak||0)*.35;return dist+optics*(.5+a.skinCoverage)+(p.sat<=-.7&&a.skinCoverage>.04?.7:0)+(p.contrast||0)*a.dynamicRange*.18+(r.id==='goc'?.035:0);}
  function makeComponent(id,title,role,p,region,light,reason){const focus=copy(region?.focus||{cx:.5,cy:.5,rx:.32,ry:.4}),sun={x:clamp(light?.x??.5),y:clamp(light?.y??.08)},leak=copy(sun),component={id,title,role,enabled:true,p:clean(p),focus,sun,leak,reason,targetIntent:{role,adaptive:true,regionSource:region?.source||'all'}};if(component.p.nang>.001)component.p.nangManual=true;if(component.p.leak>.001)component.p.leakManual=true;component.targetIntent.baseline={p:copy(component.p),focus:copy(focus),sun:copy(sun),leak:copy(leak)};return component;}
+ function relightPeople(plan,a,variant){
+  if(a.recovery)plan.analysis.recovery={...copy(a.recovery),personLightVersion:1};
+  const records=a.recovery?.faces||[],active=records.map((r,index)=>({r,index})).filter(({r})=>r.mean<.46||r.p10<.15&&r.p90-r.p10>.25);if(!active.length){plan.components=plan.components.filter(c=>!c.id.startsWith('face-'));return plan;}
+  const rescue=rescueStyle(plan.style),excluded=active.map(({r})=>r.region?{...copy(r.region),adjustRegion:'out'}:{adjustRegion:'out',adjustRegionShape:'ellipse',adjustRegionX:r.focus.cx,adjustRegionY:r.focus.cy,adjustRegionRX:r.focus.rx*1.12,adjustRegionRY:r.focus.ry*1.12,adjustRegionAngle:0,adjustRegionFeather:.25}),zone=a.recovery?.zones?.subject;
+  const whiteAnchor=zone?Math.max(clamp((zone.highlightCoverage-.004)/.025),clamp((zone.p90-.67)/.16)):0;
+  for(const component of plan.components){
+   if(component.id==='subject'){
+    component.p.adjustRegionStack=[...(component.p.adjustRegionStack||[]),...copy(excluded)];
+    if(rescue)for(const key of ['filmExp','toneShadows','toneBrightness'])if(finite(component.p[key]))component.p[key]*=1-whiteAnchor;
+   }
+   if(rescue&&component.id==='light'&&finite(component.p.toneLocalEV))component.p.toneLocalEV*=1-whiteAnchor;
+   if(component.id==='texture'||component.id==='clarity')component.p.adjustRegionStack=[...(component.p.adjustRegionStack||[]),...copy(excluded)];
+  }
+  const globalEV=plan.components.reduce((sum,c)=>sum+(!c.p.adjustRegion||c.p.adjustRegion==='all'?Number(c.p.toneExposure)||0:0),0),faces=[];
+  for(const {r,index}of active){
+   const reliable=r.confidence>.7,noise=clamp(1-r.noise*5,.6,1),target=reliable?clamp(r.p90+.08,.48,.58):.38,need=Math.max(0,Math.log2(linear(target)/Math.max(.0008,linear(r.mean)))),channel=r.channelP95??clamp(r.p90+Math.abs(r.warmCast)*.5),headroom=clamp(Math.log2(linear(.90)/Math.max(.0008,linear(channel)))-Math.max(0,globalEV),0,1),ev=clamp(need*.40,0,reliable?headroom*.45:.22),film=clamp((target-r.mean)*4.3,0,reliable?.92:.22)*noise;
+   const f=copy(r.focus),region=copy(r.region||{adjustRegion:'in',adjustRegionShape:'ellipse',adjustRegionX:f.cx,adjustRegionY:f.cy,adjustRegionRX:f.rx,adjustRegionRY:f.ry,adjustRegionAngle:0,adjustRegionFeather:.55}),p={...region,adjustRegionStack:a.region.source==='ai'?[copy(a.region.p)]:[],toneExposure:ev,filmExp:film,toneShadows:0,toneBrightness:0,sat:-clamp((r.warmCast-.10)*.8,0,.10),toneHighlights:-clamp((channel-.55)*.35,0,.12),toneWhites:-clamp((channel-.75)*.12,0,.025)};
+   // The native per-channel film curve opens skin without a large luma gain
+   // that would clip warm channels and create gray/red plateaus.
+   faces.push(makeComponent('face-'+index,'Ánh sáng khuôn mặt '+(index+1),'skin',p,{focus:f,source:reliable?'face':'ai'},a.light,'Bù sáng bằng phơi sáng có giới hạn màu và đường cong phim RAY trên vùng da đã nhận diện; giữ áo, tóc và cảnh bên ngoài.'));
+   const shadowEV=reliable?clamp((clamp(target*.60,.24,.34)-r.p10)*5.5,0,1.25)*noise:0;
+   if(r.shadowRegion&&shadowEV>.015){const shadow={...copy(r.shadowRegion),adjustRegionStack:[copy(region),...(a.region.source==='ai'?[copy(a.region.p)]:[])],toneExposure:shadowEV,toneHighlights:-.06};faces.push(makeComponent('face-shadow-'+index,'Bóng trên mặt '+(index+1),'skin',shadow,{focus:f,source:'face'},a.light,'Mở thêm phần da trong bóng tay hoặc tóc bằng vùng bóng đo từ ảnh; không tăng sáng da và quần áo đã sáng.'));}
+  }
+  const finish=plan.components.filter(c=>c.id==='clarity'||c.id==='texture');plan.components=plan.components.filter(c=>!c.id.startsWith('face-')&&c.id!=='clarity'&&c.id!=='texture');plan.components.push(...faces,...finish);
+  for(const c of plan.components){c.p=clean(c.p);c.targetIntent.baseline={p:copy(c.p),focus:copy(c.focus),sun:copy(c.sun),leak:copy(c.leak)};}return plan;
+ }
  const MIX_KEYS=['temp','tint','split','contrast','sat','lift'];
  function mixParameters(mix){
   const result=Object.fromEntries(MIX_KEYS.map(k=>[k,0])),sources=Array.isArray(mix?.sources)?mix.sources.slice(0,3):[],total=sources.reduce((n,s)=>n+clamp(s.weight),0),strength=clamp(mix?.strength);
@@ -353,7 +403,7 @@
    }
    if(backlight){const index=components.findIndex(c=>c.id==='texture'),last=components.splice(index,1)[0];components.push(last);for(let i=components.length-1;i>=0;i--)if(!keepNeutralComponents&&!EFFECTS.some(k=>Math.abs(Number(components[i].p[k])||0)>.001))components.splice(i,1);}
    const name=styles.find(s=>s.id===style).name,title=name+' · '+(backlight?profile.name:['Cân bằng','Ánh sáng','Sắc độ','Chất phim','Khám phá'][variant]);
-   const plan={version:1,id:'ray-ai-'+a.fingerprint+'-'+style+'-'+localSeed,style,seed:localSeed,title,basePreset:backlight?{id:'goc',name:'Công cụ vùng RAY'}:{id:preset.id,name:preset.name||preset.names?.at(-1)||preset.id},analysis:{...summary(a),...(backlight&&a.recovery?{recovery:copy(a.recovery)}:{})},components};plans.push(backlight?plan:upgradeComposition(plan,a,catalog,style,variant));
+   const plan={version:1,id:'ray-ai-'+a.fingerprint+'-'+style+'-'+localSeed,style,seed:localSeed,title,basePreset:backlight?{id:'goc',name:'Công cụ vùng RAY'}:{id:preset.id,name:preset.name||preset.names?.at(-1)||preset.id},analysis:{...summary(a),...(backlight&&a.recovery?{recovery:copy(a.recovery)}:{})},components};plans.push(relightPeople(backlight?plan:upgradeComposition(plan,a,catalog,style,variant),a,variant));
   }
   return a.empty?plans.map(plan=>scale(plan,0)):plans;
  }
@@ -367,18 +417,20 @@
   const oldAnalysis={...newAnalysis,...previous,version:1,region:oldRegion,light:oldLight,empty:false};
   const oldGenerated=generate(oldAnalysis,{style:recipe.style,seed:recipe.seed,count:4,presets:list,keepNeutralComponents:true})[0],generated=generate(newAnalysis,{style:recipe.style,seed:seed??recipe.seed,count:4,presets:list,keepNeutralComponents:true})[0],oldById=new Map(oldGenerated.components.map(c=>[c.id,c])),fresh=new Map(generated.components.map(c=>[c.id,c]));
   const components=[];
-  for(const old of recipe.components){const base=old.targetIntent?.baseline,current=fresh.get(old.id),oldReference=oldById.get(old.id),paletteRegion=old.id.startsWith('palette-');if(!current||old.targetIntent?.adaptive===false){if(current||old.targetIntent?.adaptive===false||!paletteRegion&&(!rescueStyle(recipe.style)||!old.id.startsWith('face-')))components.push(copy(old));continue;}
-   const next=copy(current),newBase=base?copy(base):{p:copy(old.p),focus:copy(old.focus),sun:copy(old.sun),leak:copy(old.leak)};next.title=old.title;next.enabled=old.enabled!==false;if(old.mix)next.mix=copy(old.mix);else delete next.mix;
+  for(const old of recipe.components){const base=old.targetIntent?.baseline,current=fresh.get(old.id),oldReference=oldById.get(old.id),paletteRegion=old.id.startsWith('palette-');if(!current||old.targetIntent?.adaptive===false){if(current||old.targetIntent?.adaptive===false||!paletteRegion&&!old.id.startsWith('face-'))components.push(copy(old));continue;}
+   const legacyFace=recipe.analysis?.recovery?.personLightVersion!==1&&/^face-\d+$/.test(old.id)&&!!base?.p,next=copy(current),newBase=legacyFace?copy(current.targetIntent.baseline):base?copy(base):{p:copy(old.p),focus:copy(old.focus),sun:copy(old.sun),leak:copy(old.leak)};next.title=old.title;next.enabled=old.enabled!==false;if(old.mix)next.mix=copy(old.mix);else delete next.mix;
    // Transfer the image-dependent change, rather than regenerating a different
    // style variant. Applying to the same analysis is consequently an identity.
-   for(const key of EFFECTS){const range=NUM[key];if(finite(newBase.p[key])||finite(current.p[key]))newBase.p[key]=+clamp((newBase.p[key]||0)+(current.p[key]||0)-(oldReference?.p[key]||0),...range).toFixed(6);}
+   // Pre-person-light face formulas use the current safer native curve, then
+   // the saved manual delta below. Their old exposure is not a creative delta.
+   if(!legacyFace)for(const key of EFFECTS){const range=NUM[key];if(finite(newBase.p[key])||finite(current.p[key]))newBase.p[key]=+clamp((newBase.p[key]||0)+(current.p[key]||0)-(oldReference?.p[key]||0),...range).toFixed(6);}
    if(old.mix)for(const key of MIX_KEYS)newBase.p[key]=base?.p?.[key]??old.p[key]??0;
-   if(old.role==='subject'||old.role==='background'||old.role==='skin'||rescueStyle(recipe.style)&&['texture','subject-color','film-subject'].includes(old.id)){
+   if(old.role==='subject'||old.role==='background'||old.role==='skin'||['texture','clarity'].includes(old.id)||rescueStyle(recipe.style)&&['subject-color','film-subject'].includes(old.id)){
     for(const key of Object.keys(newBase.p))if(key.startsWith('adjustRegion'))delete newBase.p[key];
     for(const [key,value]of Object.entries(current.p))if(key.startsWith('adjustRegion'))newBase.p[key]=copy(value);
     newBase.focus=copy(current.focus);
    }else if(old.role==='light')for(const key of Object.keys(OPTIONAL))if(key.startsWith('adjustRegion')&&finite(current.p[key]))newBase.p[key]=+clamp((newBase.p[key]??0)+current.p[key]-(oldReference?.p[key]??0),...OPTIONAL[key]).toFixed(6);
-   for(const group of ['sun','leak',...(old.role==='light'?['focus']:[])])if(newBase[group]&&current[group]&&oldReference?.[group])for(const key of Object.keys(current[group]))newBase[group][key]=clamp(newBase[group][key]+current[group][key]-oldReference[group][key],key==='rx'||key==='ry'?.001:0,key==='rx'||key==='ry'?2:1);
+   if(!legacyFace)for(const group of ['sun','leak',...(old.role==='light'?['focus']:[])])if(newBase[group]&&current[group]&&oldReference?.[group])for(const key of Object.keys(current[group]))newBase[group][key]=clamp(newBase[group][key]+current[group][key]-oldReference[group][key],key==='rx'||key==='ry'?.001:0,key==='rx'||key==='ry'?2:1);
    if(rescueStyle(recipe.style)&&old.id==='light'){newBase.p.adjustRegionStack=copy(current.p.adjustRegionStack||[]);newBase.p.toneLocalColor=current.p.toneLocalColor;}
    next.p=copy(newBase.p);next.focus=copy(newBase.focus);next.sun=copy(newBase.sun);next.leak=copy(newBase.leak);
    if(base?.p){
@@ -390,9 +442,14 @@
    }
    next.targetIntent.baseline=copy(newBase);components.push(next);
   }
+  if(recipe.analysis?.recovery?.personLightVersion!==1){
+   const oldFaces=recipe.components.filter(c=>/^face-\d+$/.test(c.id)),hadFace=(recipe.analysis?.recovery?.faces||[]).length>0,canIntroduce=!oldFaces.length&&(!rescueStyle(recipe.style)?recipe.components.some(c=>c.role==='subject'):!hadFace),ids=new Set(components.map(c=>c.id)),added=[];
+   for(const c of generated.components.filter(c=>c.id.startsWith('face-')&&!ids.has(c.id))){const main=oldFaces.find(old=>c.id==='face-shadow-'+old.id.slice(5));if(canIntroduce)added.push(copy(c));else if(main){const next=copy(c);next.enabled=main.enabled!==false&&['toneExposure','toneBrightness','toneShadows','filmExp'].some(k=>Math.abs(Number(main.p[k])||0)>.001);added.push(next);}}
+   if(added.length){const index=components.findIndex(c=>c.id==='clarity'||c.id==='texture');components.splice(index<0?components.length:index,0,...added);}
+  }
   const chosenSeed=(seed??recipe.seed)>>>0;
   return {...generated,id:'ray-ai-'+newAnalysis.fingerprint+'-'+recipe.style+'-'+chosenSeed,seed:chosenSeed,title:recipe.title||generated.title,basePreset:copy(recipe.basePreset||generated.basePreset),components};
  }
 
- return {VERSION:1,styles,STYLES:styles,analyze,generate,scale,adapt,mixParameters,effectKeys:EFFECTS.slice(),parameterRanges:copy({...NUM,...OPTIONAL})};
+ return {VERSION:1,styles,STYLES:styles,styleCuration:copy(styleCuration),getVisibleStyles,analyze,generate,scale,adapt,mixParameters,effectKeys:EFFECTS.slice(),parameterRanges:copy({...NUM,...OPTIONAL})};
 });

@@ -1,6 +1,6 @@
-# Bàn giao mã nguồn RAY PHOTO — v116
+# Bàn giao mã nguồn RAY PHOTO — v117
 
-Gói `RAY-PHOTO-source-v116.zip` là dự án đầy đủ để tiếp tục phát triển: mã JavaScript/TypeScript, HTML/CSS, backend chia sẻ công thức, cấu hình cơ sở dữ liệu, Android/iOS, kiểm thử, tài nguyên AI, font và giấy phép. Các module nguồn là file văn bản có thể sửa trực tiếp. Bản HTML một file chỉ là bản đóng gói trình chỉnh ảnh; ZIP nguồn mới là dự án để bàn giao.
+Gói `RAY-PHOTO-source-v117.zip` là dự án đầy đủ để tiếp tục phát triển: mã JavaScript/TypeScript, HTML/CSS, backend chia sẻ công thức, cấu hình cơ sở dữ liệu, Android/iOS, kiểm thử, tài nguyên AI, font và giấy phép. Các module nguồn là file văn bản có thể sửa trực tiếp. Bản HTML một file chỉ là bản đóng gói trình chỉnh ảnh; ZIP nguồn mới là dự án để bàn giao.
 
 ## Chạy trên máy riêng
 
@@ -19,6 +19,8 @@ Mã chia sẻ 8 số dùng backend và cơ sở dữ liệu. Server local trả 
 ## Tìm đúng module để sửa
 
 Danh sách máy đọc được nằm trong `source/module-map.json`. Nguồn lõi được tách vật lý trong `source/editor/`; các engine và adapter đã độc lập tiếp tục nằm tại những file chuyên biệt trong `dist/darkroom/`. `dist/` ở dự án này còn chứa các file nguồn tĩnh, tài nguyên AI và media, không chỉ có output đã biên dịch.
+
+Riêng công thức AI, danh sách lựa chọn, bù sáng người và tương thích công thức cũ được mô tả trong [AI-COMPOSER-HANDOFF.md](AI-COMPOSER-HANDOFF.md).
 
 | Phần | File/thư mục nguồn cần mở |
 | --- | --- |
@@ -107,8 +109,8 @@ Cần Android Studio/SDK cho Android; cần macOS/Xcode cho iOS. Gói nguồn kh
 Có Python3 để tạo/kiểm tra ZIP bằng thư viện chuẩn:
 
 ```sh
-npm run source:zip -- --version v117 --output exports/RAY-PHOTO-source-v117.zip
-node scripts/package-source.mjs --verify exports/RAY-PHOTO-source-v117.zip
+npm run source:zip -- --version v118 --output exports/RAY-PHOTO-source-v118.zip
+node scripts/package-source.mjs --verify exports/RAY-PHOTO-source-v118.zip
 ```
 
 Khi còn dùng Git, đưa file mới vào index bằng `git add` trước khi xuất; script lấy danh sách file được quản lý trong Git. Sau khi giải nén ở nơi khác không có Git, script dùng manifest và duyệt các thư mục nguồn để đóng gói tiếp.

@@ -1,10 +1,16 @@
 # RAY PHOTO — xưởng ảnh phim
 
-**Bản nguồn đầy đủ v116 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
+**Bản nguồn đầy đủ v117 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
 
 Website hiện tại: [RAY PHOTO](https://pho-cang-photobooth.linhhoang3105.chatgpt.site). Việc cập nhật website cần phát hành qua Sites như mô tả trong hướng dẫn GitHub.
 
 Bản tích hợp trình chỉnh ảnh RAY PHOTO và photobooth Linh Linh – Phố Cảng. Giao diện film tối/ấm, bốn khu Khám phá / Buồng ảnh / Photobooth / Album.
+
+## Công thức AI và bù sáng khuôn mặt — v117
+
+AI Composer gộp hai lựa chọn cứu sáng gần nhau thành **Cứu sáng & nét**. Danh sách hiển thị dùng `getVisibleStyles()`; các ID phong cách cũ vẫn được giữ để mở, sửa và dùng lại công thức đã lưu. Các phương án có cùng tác động được gộp lại; khác biệt tên hoặc metadata không tạo thêm một lựa chọn giống ảnh.
+
+Công thức AI ưu tiên bù sáng riêng vùng mặt bị bóng tay hoặc ngược sáng, đo cả vùng tối và khoảng trống vùng sáng. Màu cảnh và các engine gốc tiếp tục được dùng; áo đen và vùng trắng trên người được bảo vệ khỏi mở sáng toàn thân không cần thiết. Các màu trong **Bộ lọc** giữ nguyên. [Bàn giao phần AI cho lần sửa tiếp](docs/AI-COMPOSER-HANDOFF.md) · [Kiểm chứng v117](docs/qa/ai-composer-person-v117.md).
 
 ## Màu phim Nắng Phố, Khử mờ và Chi tiết — v116
 

@@ -2,7 +2,7 @@
 
 Repo đích: https://github.com/linhhoang3105-boop/RAY-PHOTO
 
-**Bản hiện hành: v116.** Bổ sung Nắng Phố, Khử mờ và Chi tiết từ bản sửa của Claude; bảo vệ vùng sáng và tương thích các lớp/nháp cũ khi tích hợp. Hướng dẫn chạy và xuất lại mã nguồn được cập nhật trong [SOURCE-HANDOFF.md](SOURCE-HANDOFF.md).
+**Bản hiện hành: v117.** Nâng cấp công thức AI và bù sáng riêng khuôn mặt; gộp hai lựa chọn cứu sáng gần nhau. Toàn bộ 90 màu Bộ lọc và engine gốc giữ nguyên. [Hướng dẫn sửa tiếp AI](AI-COMPOSER-HANDOFF.md). Hướng dẫn chạy và xuất lại mã nguồn được cập nhật trong [SOURCE-HANDOFF.md](SOURCE-HANDOFF.md).
 
 Lần nhập nguồn v115 ban đầu bổ sung dự án đầy đủ từ nguồn RAY v115 đã phát hành, gồm 598 file nguồn/tài nguyên: editor, các engine chức năng, backend, mô hình AI, font, kiểm thử, cấu hình build và wrapper Android/iOS. Nguồn được đối chiếu với ZIP đã kiểm chứng SHA-256 `a49f66acd5a105088be27fdd99c3acb1416d28b6f04495a471432b8100113a3b`; commit nguồn RAY là `9c186b9f9d93356b10fbf7f3e3ec48f633766fbe`.
 
@@ -29,6 +29,12 @@ Hai file `index.html` và `RAY-PHOTO-v48.html` từng được tải lên gốc 
 
 Repo GitHub không tự triển khai lên website RAY đang chạy. Các quy trình GitHub Pages hoặc hosting khác cần được cấu hình riêng. API chia sẻ cần database riêng; ảnh/nháp trên thiết bị và dữ liệu database của website hiện hành không nằm trong mã nguồn.
 
-## Kiểm chứng bản nhập
+## Kiểm chứng bản hiện hành
 
-Bản v116 đã qua 796 kiểm thử: 794 đạt, 0 lỗi, 2 kiểm thử mô hình tùy chọn bỏ qua. 29 phần JS lõi và native bridge giữ nguyên nội dung; các engine Nắng Phố/Khử mờ/Chi tiết ở file độc lập. Bảo vệ vùng sáng, lớp cũ và nháp cũ được hậu kiểm khi đưa lên Sites. Báo cáo hiện hành: [film-clarity-v116.md](qa/film-clarity-v116.md). Commit nguồn Sites cùng phiên bản: `0366c30b9a5b07dd2ec30b0474bbe667c4551b38`.
+Bản v117: `npm test` có **810 bài, 808 đạt, 0 lỗi, 2 bỏ qua** (mô hình tùy chọn). Build hosting, standalone và portable đã kiểm tra; 200 tài nguyên public khớp nguồn. Có kiểm tra qua engine thật trên ảnh bóng tay che mặt; ảnh/mask thử không đưa vào repo. [Báo cáo v117](qa/ai-composer-person-v117.md). Commit nguồn Sites: `d5113c75e56770e794f856b800f8cfeef6616a76`.
+
+Các module AI nằm trong `dist/darkroom/ai-composer-*.js`; Claude có thể tiếp tục sửa trực tiếp cùng repo. Nguồn v117 được gắn tag riêng, không ghi đè gói ZIP cũ.
+
+## Kiểm chứng bản nhập trước
+
+Bản v116 đã qua 796 kiểm thử: 794 đạt, 0 lỗi, 2 kiểm thử mô hình tùy chọn bỏ qua. 29 phần JS lõi và native bridge giữ nguyên nội dung; các engine Nắng Phố/Khử mờ/Chi tiết ở file độc lập. Bảo vệ vùng sáng, lớp cũ và nháp cũ được hậu kiểm khi đưa lên Sites. Báo cáo v116: [film-clarity-v116.md](qa/film-clarity-v116.md). Commit nguồn Sites cùng phiên bản: `0366c30b9a5b07dd2ec30b0474bbe667c4551b38`.

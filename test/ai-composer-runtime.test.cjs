@@ -20,6 +20,41 @@ function fixture(options={}){
  return{controller,host,deps,image,original,baseline,records,changes,paintPlans,get reads(){return reads;},get recognitions(){return recognitions;},get paints(){return paints;},get restores(){return restores;},get color(){return copy(color);},setColor(value){color=copy(value);},setBusy(value){busy=value;},replace(value=192){source={id:2,data:new Uint8ClampedArray([value,20,10,255])};color={...copy(baseline),p:{...baseline.p,temp:.32}};return source;}};
 }
 async function waitFor(condition){for(let i=0;i<30&&!condition();i++)await Promise.resolve();assert.ok(condition(),'asynchronous step started');}
+function duplicateGenerator(f,change=()=>{}){
+ const generate=f.deps.core.generate;
+ f.deps.core.generate=(analysis,options)=>{
+  const plans=generate.call(f.deps.core,analysis,options),first=plans[0];
+  return plans.map((plan,index)=>{
+   const variant={...plan,seed:options.seed+index,title:'Tên riêng '+index,basePreset:{id:'alias-'+index,name:'Màu '+index},components:copy(first.components)};
+   for(const component of variant.components){component.id+='-'+index;component.title+=' '+index;component.reason='Mô tả '+index;component.p.seed=100+index;}
+   change(variant,index);return variant;
+  });
+ };
+}
+
+test('exact effect clones collapse to one editable option without changing save, reroll or cancel behavior',async()=>{
+ const f=fixture();duplicateGenerator(f);assert.equal(await f.controller.compose('restore-detail'),true);assert.equal(f.deps.calls.generate[0].count,4);assert.equal(f.controller.state.variants.length,1);assert.equal(f.controller.select(1),false);assert.equal(f.controller.select(0),true);
+ const saved=f.controller.recipe('Một phương án khác biệt');assert.equal(saved.components.length,2);assert.equal(saved.components[0].p.seed,100);f.controller.apply();const applied=f.color;assert.equal(await f.controller.reroll(),true);assert.equal(f.controller.state.variants.length,1);assert.equal(f.color.layers.length,3);assert.equal(f.controller.cancel(),true);assert.deepEqual(f.color,applied);
+ assert.equal(await f.controller.loadRecipe(saved,{adapt:false}),true);assert.equal(f.controller.state.variants.length,1);assert.deepEqual(f.controller.recipe(saved.name),saved);f.controller.setIntensity(0);assert.deepEqual(f.color,f.baseline);f.controller.setIntensity(100);assert.deepEqual(f.color,applied);
+});
+test('duplicate pruning preserves every effect parameter, component order, enabled state and native placement',async()=>{
+ const changes=[
+  ['parameter',plan=>{plan.components[0].p.toneExposure+=.001;}],
+  ['order',plan=>{plan.components.reverse();}],
+  ['enabled',plan=>{plan.components[0].enabled=false;}],
+  ['focus',plan=>{plan.components[0].focus.cx+=.01;}],
+  ['sun',plan=>{plan.components[0].sun.x+=.01;}],
+  ['leak',plan=>{plan.components[0].leak.y+=.01;}]
+ ];
+ for(const [name,change]of changes){const f=fixture();duplicateGenerator(f,(plan,index)=>{if(index===3)change(plan);});assert.equal(await f.controller.compose('natural'),true,name);assert.equal(f.controller.state.variants.length,2,name);assert.equal(f.controller.select(1),true,name);assert.equal(f.controller.state.selected,1,name);}
+});
+test('seeds keep distinct native texture and light effects, including glow and gloss dithering',async()=>{
+ for(const field of ['grain','film','dust','spark','ptex','kinh','gloss','glow','leak']){const f=fixture();duplicateGenerator(f,plan=>{plan.components[0].p[field]=.1;});assert.equal(await f.controller.compose('natural'),true,field);assert.equal(f.controller.state.variants.length,4,field);}
+ const manual=fixture();duplicateGenerator(manual,plan=>{Object.assign(plan.components[0].p,{leak:.1,leakManual:true});});assert.equal(await manual.controller.compose('natural'),true);assert.equal(manual.controller.state.variants.length,1,'manually placed flare does not consume the seed');
+});
+test('the generator must still supply three to five options before exact duplicate pruning',async()=>{
+ for(const length of [1,2,6]){const f=fixture(),generate=f.deps.core.generate;f.deps.core.generate=(analysis,options)=>generate.call(f.deps.core,analysis,{...options,count:length});assert.equal(await f.controller.compose('natural'),false,String(length));assert.match(f.controller.state.error,/chưa tạo đủ/);assert.deepEqual(f.color,f.baseline);assert.equal(f.paints,0);}
+});
 
 test('analysis always uses the original photo and repeated variations use the same base without stacking',async()=>{
  const f=fixture(),before=[...f.original];assert.equal(await f.controller.compose('natural'),true);const first=f.color;
@@ -70,19 +105,19 @@ test('mix weight edits preserve manual color deltas, independent tools and canon
 test('failed AI recognition still provides statistical plans and explicitly labels estimated regions',async()=>{
  const f=fixture({recognize:async()=>{throw Error('offline model unavailable');}});assert.equal(await f.controller.compose('natural'),true);assert.equal(f.controller.state.analysis.recognition,'estimated');assert.match(f.controller.state.status,/ước lượng/);assert.equal(f.controller.state.variants.length,4);assert.equal(f.controller.state.error,null);
 });
-test('same-photo recognition is reused and a different-photo recognition cannot be borrowed',async()=>{
- const f=fixture({existing:photo=>({source:photo,maps:{width:1,height:1},faces:[]})});await f.controller.compose('natural');assert.equal(f.recognitions,0);await f.controller.reroll();assert.equal(f.recognitions,0);
+test('same-photo face recognition is reused and a different-photo recognition cannot be borrowed',async()=>{
+ const f=fixture({existing:photo=>({source:photo,maps:{width:1,height:1},faces:[[{x:.3,y:.2},{x:.4,y:.3}]]})});await f.controller.compose('natural');assert.equal(f.recognitions,0);await f.controller.reroll();await f.controller.compose('auto-beauty');assert.equal(f.recognitions,0);assert.equal(f.deps.calls.analyze.length,1);
  const g=fixture({existing:()=>({source:{},maps:{width:1,height:1}})});await g.controller.compose('natural');assert.equal(g.recognitions,1);
 });
-test('recovery requests missing face recognition once after an ordinary cached-mask analysis',async()=>{
- const maps={width:1,height:1},f=fixture({existing:photo=>({source:photo,maps,faces:[]}),recognize:async()=>({faces:[[{x:.3,y:.2},{x:.4,y:.3}]]})});await f.controller.compose('natural');assert.equal(f.recognitions,0);await f.controller.compose('restore-detail');assert.equal(f.recognitions,1);assert.equal(f.deps.calls.analyze.length,2);assert.equal(f.deps.calls.analyze[1].recognition.maps,maps);assert.ok(f.deps.calls.analyze[1].recognition.faces.length);await f.controller.reroll();assert.equal(f.recognitions,1);assert.equal(f.deps.calls.analyze.length,2);
+test('Natural and Auto Beauty request missing faces once per photo and reuse existing masks across style changes',async()=>{
+ for(const style of ['natural','auto-beauty']){const maps={width:1,height:1},f=fixture({existing:photo=>({source:photo,maps,faces:[]}),recognize:async()=>({faces:[[{x:.3,y:.2},{x:.4,y:.3}]]})});await f.controller.compose(style);assert.equal(f.recognitions,1,style);assert.equal(f.deps.calls.analyze[0].recognition.maps,maps);assert.ok(f.deps.calls.analyze[0].recognition.faces.length);await f.controller.compose(style==='natural'?'auto-beauty':'natural');await f.controller.compose('restore-detail');await f.controller.reroll();assert.equal(f.recognitions,1);assert.equal(f.reads,1);assert.equal(f.deps.calls.analyze.length,1);}
 });
-test('film recovery refreshes missing face recognition for composition and adaptive recipe loading without repeated scans',async()=>{
- const make=()=>fixture({existing:photo=>({source:photo,maps:{width:1,height:1},faces:[]}),recognize:async()=>({faces:[[{x:.3,y:.2},{x:.4,y:.3}]]})}),f=make();await f.controller.compose('natural');assert.equal(f.recognitions,0);assert.equal(await f.controller.compose('film-recovery'),true);assert.equal(f.recognitions,1);assert.equal(f.deps.calls.analyze.length,2);assert.ok(f.deps.calls.analyze[1].recognition.faces.length);await f.controller.reroll();assert.equal(f.recognitions,1);
- const saved=f.controller.recipe('Fuji của tôi'),next=make();await next.controller.compose('natural');assert.equal(next.recognitions,0);assert.equal(await next.controller.loadRecipe(saved,{adapt:true}),true);assert.equal(next.recognitions,1);assert.equal(next.deps.calls.analyze.length,2);assert.ok(next.deps.calls.adapt[0].analysis);await next.controller.reroll();assert.equal(next.recognitions,1);
+test('film recovery and adaptive ordinary recipes receive face analysis without repeated scans',async()=>{
+ const make=()=>fixture({existing:photo=>({source:photo,maps:{width:1,height:1},faces:[]}),recognize:async()=>({faces:[[{x:.3,y:.2},{x:.4,y:.3}]]})}),f=make();await f.controller.compose('natural');const ordinary=f.controller.recipe('Natural đã lưu');assert.equal(f.recognitions,1);assert.equal(await f.controller.compose('film-recovery'),true);assert.equal(f.recognitions,1);assert.equal(f.deps.calls.analyze.length,1);assert.ok(f.deps.calls.analyze[0].recognition.faces.length);await f.controller.reroll();assert.equal(f.recognitions,1);
+ const next=make();assert.equal(await next.controller.loadRecipe(ordinary,{adapt:true}),true);assert.equal(next.recognitions,1);assert.equal(next.deps.calls.analyze.length,1);assert.ok(next.deps.calls.adapt[0].analysis);assert.ok(next.deps.calls.analyze[0].recognition.faces.length);await next.controller.reroll();assert.equal(next.recognitions,1);
 });
 test('a failed missing-face refresh retains useful cached masks and does not retry every reroll',async()=>{
- const maps={width:1,height:1},f=fixture({existing:photo=>({source:photo,maps,faces:[]}),recognize:async()=>{throw Error('offline face model');}});await f.controller.compose('backlight');assert.equal(f.recognitions,1);assert.equal(f.deps.calls.analyze[0].recognition.maps,maps);assert.equal(f.controller.state.analysis.recognition,'ai');assert.equal(f.controller.state.error,null);await f.controller.reroll();assert.equal(f.recognitions,1);f.replace();await f.controller.compose('restore-detail');assert.equal(f.recognitions,2);
+ const maps={width:1,height:1},f=fixture({existing:photo=>({source:photo,maps,faces:[]}),recognize:async()=>{throw Error('offline face model');}});await f.controller.compose('natural');assert.equal(f.recognitions,1);assert.equal(f.deps.calls.analyze[0].recognition.maps,maps);assert.equal(f.controller.state.analysis.recognition,'ai');assert.equal(f.controller.state.error,null);await f.controller.reroll();await f.controller.compose('auto-beauty');assert.equal(f.recognitions,1);f.replace();await f.controller.compose('restore-detail');assert.equal(f.recognitions,2);
 });
 test('photo replacement invalidates cached analysis and recognition and cannot restore an old baseline',async()=>{
  const f=fixture();await f.controller.compose('natural');const second=f.replace(192),before=f.color;assert.equal(f.controller.cancel(),false);assert.deepEqual(f.color,before);
