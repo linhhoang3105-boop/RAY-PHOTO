@@ -1,0 +1,25 @@
+node_modules/
+.sites-runtime/
+.DS_Store
+*.keystore
+*.jks
+android/local.properties
+android/.gradle/
+android/**/build/
+android/app/src/main/assets/public/
+ios/App/App/public/
+ios/App/Pods/
+ios/App/build/
+
+api-server/public/
+api-server/dist/
+api-server/.vinext/
+api-server/.wrangler/
+api-server/.sites-runtime/
+dist/client/
+dist/server/
+dist/.openai/
+
+# Portable web output and versioned source archives.
+build/
+exports/

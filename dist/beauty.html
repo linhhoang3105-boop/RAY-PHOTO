@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f3ec">
+  <meta name="description" content="Một buồng chụp nhỏ mang thương nhớ Hải Phòng. Tải ảnh lên để thử màu son, lông mày, tóc và màu phim ngay trên thiết bị.">
+  <title>Linh Linh - Phố Cảng — Chỉnh ảnh & makeup</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="makeup.css?v=12">
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 6h4l2-3h4l2 3h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7a9 9 0 0 0-15-2L2 8m0-6v6h6m-4 9a9 9 0 0 0 15 2l3-3m0 6v-6h-6"/></symbol>
+    <symbol id="i-flip" viewBox="0 0 24 24"><path d="M12 2v20M3 6l5 3v6l-5 3V6Zm18 0-5 3v6l5 3V6Z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L20 5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 16V2m-5 5 5-5 5 5M5 10H3v12h18V10h-2"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+  </defs></svg>
+  <header class="site-header"><a class="brand" href="index.html"><svg class="brand-flower" viewBox="0 0 64 64" aria-hidden="true"><g fill="currentColor"><ellipse cx="32" cy="18" rx="10" ry="16"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(72 32 32)"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(144 32 32)"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(216 32 32)"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(288 32 32)"/></g><circle cx="32" cy="32" r="5" fill="#efc58a"/></svg><span class="brand-name">Linh Linh - Phố Cảng<small>BEAUTY STUDIO</small></span></a><span class="header-note">MỘT CHÚT MÀU. VẪN LÀ BẠN.</span><a href="#makeupGuide" class="text-button">Cách chỉnh ↗</a></header>
+  <main class="makeup-main">
+    <nav class="mode-switch" aria-label="Chọn khu chỉnh ảnh"><a href="index.html">Photobooth</a><a href="beauty.html" class="active" aria-current="page">Chỉnh ảnh &amp; makeup</a></nav>
+    <section class="intro makeup-intro"><div><p class="eyebrow"><span></span> CHƠI VỚI MÀU MỘT CHÚT</p><h1>Một tấm ảnh.<br><em>Rất là bạn.</em></h1><p class="intro-copy">Thử một màu son, đổi màu tóc, thêm chút nắng.<br>Chọn ảnh rồi chỉnh theo ý mình nhé.</p></div><button id="openPhoto" class="button primary"><svg class="icon"><use href="#i-upload"/></svg> Tải ảnh lên</button></section>
+    <div class="makeup-workspace">
+      <section class="makeup-image-panel" aria-label="Ảnh đang chỉnh">
+        <div class="makeup-view-top"><span id="imageDimensions">ẢNH CỦA BẠN</span><button id="compareOriginal" class="text-button" disabled aria-pressed="false">Xem ảnh gốc</button></div>
+        <div class="makeup-stage" id="makeupStage"><div class="makeup-stage-inner"><div id="canvasStack" class="makeup-canvas-stack" hidden><canvas id="makeupView" aria-label="Ảnh sau khi chỉnh màu và makeup"></canvas><canvas id="maskOverlay" aria-label="Tô hoặc xóa vùng makeup bằng ngón tay" tabindex="0"></canvas></div><div id="makeupEmpty" class="makeup-empty"><span aria-hidden="true">✳</span><h2>Bắt đầu bằng một tấm ảnh.</h2><p>Ảnh chân dung rõ mặt sẽ dễ chỉnh nhất.</p><button id="pickEmpty" class="button primary">Chọn ảnh từ máy</button></div></div></div>
+        <p id="detectionStatus" class="makeup-status" role="status" aria-live="polite">Ảnh được xử lý ngay trên thiết bị của bạn.</p>
+        <div class="makeup-view-actions"><label for="viewZoom">Phóng xem <select id="viewZoom" disabled><option value="1">100%</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option></select></label><button id="recognizeAgain" class="text-button" disabled>Nhận diện lại</button><button id="useManual" class="text-button" hidden>Tôi muốn tô thủ công</button></div>
+        <div class="makeup-save-actions"><button id="saveMakeup" class="button primary" disabled><svg class="icon"><use href="#i-download"/></svg> Lưu ảnh đã chỉnh</button><button id="resetMakeup" class="button secondary" disabled>Bỏ chỉnh sửa</button></div>
+      </section>
+      <aside class="makeup-controls" id="makeupControls" aria-label="Công cụ chỉnh ảnh">
+        <section class="makeup-card"><p class="lbl">MỘT CHÚT MAKEUP</p><div class="feature-tabs" id="featureTabs" role="group" aria-label="Vùng chỉnh"><button id="tabLips" data-part="lips" class="active" aria-pressed="true">Son môi</button><button id="tabBrows" data-part="brows" aria-pressed="false">Lông mày</button><button id="tabHair" data-part="hair" aria-pressed="false">Màu tóc</button></div><p id="featureHint" class="makeup-help">Chọn ảnh để nhận diện vùng môi.</p><div id="makeupPalette" class="makeup-palette" aria-label="Bảng màu"></div><label class="custom-tone" for="makeupColor"><span>Màu tự chọn</span><input type="color" id="makeupColor" value="#a33d42" disabled></label><label class="makeup-slider" for="makeupStrength"><span>Độ đậm<output id="strengthValue">0%</output></span><input id="makeupStrength" type="range" min="0" max="100" step="1" value="0" disabled></label><label id="faceChoiceLabel" class="makeup-select" for="faceChoice" hidden>Khuôn mặt<select id="faceChoice"><option value="-1">Tất cả khuôn mặt</option></select></label></section>
+        <section class="makeup-card"><div class="makeup-card-head"><p class="lbl">SỬA VÙNG TÔ</p><label class="show-mask"><input id="showMask" type="checkbox" disabled> Hiện vùng</label></div><div id="brushTools" class="brush-tools" role="group" aria-label="Chọn công cụ"><button id="toolView" data-tool="view" class="active" aria-pressed="true">Xem ảnh</button><button id="toolPaint" data-tool="paint" aria-pressed="false">Cọ tô</button><button id="toolErase" data-tool="erase" aria-pressed="false">Tẩy</button></div><label class="makeup-slider" for="brushSize"><span>Cỡ cọ<output id="brushSizeValue">3%</output></span><input id="brushSize" type="range" min="0.5" max="15" step="0.5" value="3" disabled></label><div class="mask-actions"><button id="undoMask" class="text-button" disabled>↶ Hoàn tác nét tô</button><button id="clearMask" class="text-button danger" disabled>Xóa vùng này</button></div><p class="makeup-help">Phóng ảnh rồi dùng cọ tô / tẩy khi viền nhận diện chưa khớp. Chọn Xem ảnh để cuộn ảnh.</p></section>
+        <section class="makeup-card"><p class="lbl">DA &amp; MÀU ẢNH</p><label class="makeup-slider" for="skinSmooth"><span>Mịn da<output id="skinSmoothValue">0%</output></span><input id="skinSmooth" type="range" min="0" max="100" value="0" disabled></label><label class="makeup-slider" for="skinBright"><span>Sáng da<output id="skinBrightValue">0%</output></span><input id="skinBright" type="range" min="0" max="100" value="0" disabled></label><label class="makeup-select" for="beautyRoll">Màu phim<select id="beautyRoll" disabled></select></label><p class="makeup-help">Có màu Nắng hoa theo ảnh mẫu của bà.</p></section>
+      </aside>
+    </div>
+    <section id="makeupGuide" class="makeup-guide"><h2>Thử màu, giữ lại những gì bạn thích.</h2><p>1. Chọn ảnh rõ mặt. 2. Chọn son, lông mày hoặc tóc và kéo Độ đậm. 3. Dùng cọ / tẩy để sửa vùng lệch, rồi lưu ảnh.</p><p>Nhận diện có thể lệch với góc nghiêng, tóc bay hoặc nhiều người. Cọ tô thủ công luôn dùng được. Ảnh được xử lý trên thiết bị và không gửi lên máy chủ của ứng dụng.</p></section>
+  </main>
+  <input id="makeupFile" type="file" accept="image/*" hidden>
+  <div id="makeupToast" class="toast" role="status" hidden></div>
+  <dialog id="beautySaveDialog" class="save-fallback" aria-labelledby="beautySaveTitle" hidden><div class="save-top"><h2 id="beautySaveTitle">Ảnh đã sẵn sàng</h2><button id="beautyCloseSave" class="text-button">Quay lại chỉnh ×</button></div><div class="saved-photo"><img id="beautySavedImage" alt="Ảnh đã chỉnh makeup, nhấn giữ để lưu"></div><p id="beautySaveStatus" role="status">Bấm Lưu vào Ảnh / Chia sẻ hoặc nhấn giữ ảnh để lưu.</p><div class="save-buttons"><button id="beautyShare" class="button primary" hidden>Lưu vào Ảnh / Chia sẻ</button><a id="beautyDownload" class="button secondary" download>Tải PNG</a></div></dialog>
+  <script src="buongtoi-lab.js?v=12"></script><script src="photo-beauty.js?v=12"></script><script src="darkroom/hair-core.js?v=104"></script><script src="makeup-core.js?v=102"></script><script src="darkroom/beauty-runtime.js?v=104"></script><script src="makeup-detection.js?v=103"></script><script src="makeup-editor.js?v=103"></script>
+</body></html>

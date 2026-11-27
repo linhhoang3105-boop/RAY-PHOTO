@@ -1,0 +1,18 @@
+{
+  "model": "lama-512-int8-v1",
+  "modelSha256": "cab19978adc306622fe37ef60d4a52103b99c98141d499c2a2366a7ed1255dbe",
+  "runtime": "1.23.2",
+  "backend": "WASM",
+  "threads": 1,
+  "image": [
+    512,
+    512
+  ],
+  "modelMs": 19587,
+  "meanAbsoluteChannelError": {
+    "ai": 3.8849801410391507,
+    "fast": 12.505782064791548
+  },
+  "outsideChanges": 0,
+  "maxResidentKiB": 776468
+}

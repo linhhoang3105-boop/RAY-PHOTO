@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RAY PHOTO — chỉnh màu ảnh phim</title>
+<style>{{RAY_EDITOR_STYLE}}</style>
+<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="ai-composer.css">
+<link rel="stylesheet" href="refinements.css">
+<link rel="stylesheet" href="../fonts/fonts.css"><link rel="stylesheet" href="body-ai/body-ai.css">
+</head>
+<body>
+
+<div class="app">
+  <section class="stage empty" id="stage">
+    <div class="canvasWrap" id="canvasWrap">
+      <canvas id="view"></canvas>
+      <div class="focus-oval" id="focusOval">
+        <div class="focus-handle" id="focusHandle"></div>
+      </div>
+      <div class="body-oval" id="bodyOval">
+        <span class="bo-tag" id="bodyTag"></span>
+        <span class="bo-arrow" id="bodyArrow"><i></i></span>
+        <div class="bo-h bo-rot" id="bodyRot" title="Kéo để xoay vòng"></div>
+        <div class="bo-h bo-size" id="bodySize" title="Kéo để đổi cỡ vòng"></div>
+      </div>
+      <div class="leak-handle" id="leakHandle" title="Kéo để đổi vị trí vệt nắng"></div>
+      <div class="leak-handle" id="nangHandle" title="Kéo để đổi vị trí nắng"></div>
+    </div>
+    <div class="drop" id="drop">
+      <h1>RAY PHOTO</h1>
+      <p>Kéo một tấm ảnh vào đây, hoặc dán từ bộ nhớ tạm. Ảnh không rời khỏi máy — mọi thứ xử lý ngay trong trình duyệt.</p>
+      <label class="btn btn-amber pick" id="pick1">Chọn ảnh<input type="file" class="pickin" accept="image/*" aria-label="Chọn ảnh"></label>
+    </div>
+    <div class="busy" id="busy">Đang dựng bản đầy đủ…</div>
+  </section>
+
+  <aside class="panel">
+    <div class="head">
+      <button class="stamp-btn on" id="stampBtn" title="Bật/tắt dấu ngày trên ảnh" aria-pressed="true">
+        <canvas id="readout" width="150" height="30"></canvas>
+      </button>
+      <div class="who">
+        <b>RAY PHOTO</b>
+        <span>chỉnh màu kiểu phim · bản 7f</span>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <div class="grp" id="grpBeauty">
+        <button type="button" class="lbl lblbtn" id="beautyHead" aria-expanded="false"><span>Làm đẹp</span><em id="beautyHeadTxt">mở ▾</em></button>
+        <div id="beautyBox" hidden>
+          <button type="button" class="bbtn" id="beautyScan" disabled>AI · Nhận diện da, tóc và mặt</button>
+          <p class="hint" id="beautyStatus" role="status" aria-live="polite">Bấm nhận diện rồi chọn mức làm đẹp. Lần đầu cần mạng và tải vài chục MB (nên dùng Wi-Fi); ảnh vẫn xử lý ngay trên máy, không gửi đi.</p>
+          <div class="beauty-people" id="beautyPeople" hidden>
+            <div class="beauty-people-title">Chọn người cần làm đẹp</div>
+            <div class="beauty-people-list" id="beautyPeopleList" role="group" aria-label="Các người đã nhận diện"></div>
+            <div class="bodybtns"><button type="button" class="bbtn" id="beautyResetPerson" disabled>Xóa người này</button><button type="button" class="bbtn" id="beautyCopyAll" disabled>Áp dụng cho mọi người</button></div>
+          </div>
+          <p class="hint" id="beautyPersonStatus" role="status" aria-live="polite"></p>
+          <div class="beauty-section" id="beautySkin"></div>
+          <div class="beauty-section" id="beautySmooth"></div>
+          <div class="beauty-section" id="beautyHair"></div>
+          <div class="beauty-section" id="beautyLip"></div>
+          <div class="beauty-section" id="beautyBlush"></div>
+          <div class="beauty-section" id="beautyBrow"></div>
+          <p class="hint">AI tìm tối đa 10 người. Chọn ảnh nhỏ để chỉnh riêng da, độ mịn, màu tóc và makeup; đổi người vẫn giữ các mức đã chỉnh. “Áp dụng cho mọi người” sao chép thiết lập của người đang chọn. Làm mịn thử mức 20–40 để giữ nét tự nhiên. Bấm đúp thanh để về 0. Tóc sáng màu là mô phỏng, nên thử mức vừa phải để giữ chi tiết tóc.</p>
+          <div class="bodybtns"><button type="button" class="bbtn" id="beautyPeek">Giữ để xem trước làm đẹp</button><button type="button" class="bbtn" id="beautyReset">Xóa làm đẹp</button></div>
+        </div>
+      </div>
+      <div class="grp" id="grpBody">
+        <button type="button" class="lbl lblbtn" id="bodyHead" aria-expanded="false"><span>Chỉnh dáng</span><em id="bodyHeadTxt">mở ▾</em></button>
+        <div id="bodyBox" hidden>
+          <div class="body-ai" aria-label="AI hỗ trợ chỉnh dáng">
+            <button type="button" class="bbtn" id="bodyAiScan" disabled>AI · Nhận diện bộ phận</button>
+            <label class="body-ai-person" hidden>Chọn người cần chỉnh<select id="bodyAiPerson" aria-label="Chọn người cần chỉnh"></select></label>
+            <p class="hint" id="bodyAiStatus" role="status" aria-live="polite">Bấm nhận diện để AI gợi ý vị trí các bộ phận.</p>
+            <p class="hint">AI đặt vòng vào vùng nhận diện; chọn bộ phận rồi kéo thanh để chỉnh. Eo, bụng, hông và cằm/nọng là vùng ước lượng; lưng, mông và vùng tự do đặt tay. Vẫn kéo vòng để sửa vị trí được. Lần đầu cần mạng và tải vài chục MB (nên dùng Wi-Fi); ảnh vẫn xử lý ngay trên máy, không gửi đi.</p>
+          </div>
+          <p class="hint" style="margin:0 0 12px">Chọn bộ phận, kéo vòng xanh trên ảnh vào đúng chỗ (chấm dưới-phải đổi cỡ, chấm phía trên xoay vòng), rồi chỉnh các thanh. Mỗi bộ phận có vòng và thanh riêng, chỉ đổi phần ảnh trong vòng của nó. Trái/phải tính theo màn hình. Chỉnh chưa ưng thì bấm Quay lại (hoặc Ctrl/⌘ + Z).</p>
+          <div class="bodyhist"><button type="button" class="bbtn bundo" disabled>↶ Quay lại</button><button type="button" class="bbtn bredo" disabled>↷ Làm lại</button></div>
+          <div class="parts" id="bodyParts"></div>
+          <div id="bodyCtl" hidden>
+            <div class="bname"><button type="button" class="bp" id="bodyPrev" aria-label="Bộ phận trước">‹</button><p class="lbl" id="bodyName"></p><button type="button" class="bp" id="bodyNext" aria-label="Bộ phận sau">›</button></div>
+            <div class="bodyhist"><button type="button" class="bbtn bundo" disabled>↶ Quay lại</button><button type="button" class="bbtn bredo" disabled>↷ Làm lại</button></div>
+            <button type="button" class="bbtn" id="bodyAiAlign" disabled style="width:100%;margin-bottom:10px">Đặt vòng này theo AI</button>
+            <div id="bodySliders"></div>
+            <p class="hint">"Ngang" co giãn theo chiều ngang của vòng, "Dọc" theo chiều dọc — xoay vòng để đổi hướng co giãn. "Đẩy" dời phần ảnh trong vòng theo hướng đã chọn (mũi tên trên vòng): 0° sang phải, 90° xuống, 180° sang trái, 270° lên. Viền cứng quá mà thu nhỏ mạnh thì được tự giới hạn để ảnh không bị gập. Bấm đúp vào thanh để về mặc định.</p>
+          </div>
+          <div class="bodybtns">
+            <button type="button" class="bbtn" id="bodyPeek">Giữ để xem ảnh gốc</button>
+            <button type="button" class="bbtn" id="bodyHide">Ẩn vòng</button>
+            <button type="button" class="bbtn" id="bodyReset1">Về 0 bộ phận này</button>
+            <button type="button" class="bbtn" id="bodyResetAll">Xoá hết chỉnh dáng</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Cuộn phim</p>
+        <div class="rolls" id="rolls"></div>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Màu</p>
+        <div id="grpColor"></div>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Chất phim</p>
+        <div id="grpFilm"></div>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Ảnh in</p>
+        <div id="grpPrint"></div>
+        <p class="hint">"Nước ảnh trong veo": trắng sáng sạch, đen sâu và màu tách rõ hơn; giữ độ dịu của da và chi tiết. Thử mức 35–50 rồi tăng dần theo ảnh. Đưa về 0 để giữ nước ảnh ban đầu.</p>
+        <p class="hint">Mô phỏng ảnh in / rửa tiệm. "Giấy ảnh": trắng ngả kem, màu ngấm dịu. "Bề mặt bóng": màu đậm sâu hơn, vùng tối giữ đen mà nổi chi tiết, kèm một mảng phản chiếu cửa sổ mềm, hơi gợn (khác Bóng kính là vệt hẹp). "Mềm chi tiết": bớt nét gắt kiểu điện thoại. "Vân giấy": vân bề mặt cực mịn. "Phim tráng in": một lớp thống nhất mô phỏng phim sau khi tráng, scan và in — đường cong mềm, màu phản ứng theo dải màu và độ sáng, nét quang học dịu, hạt mịn; bật sẵn ở "Ảnh rửa tiệm 2". Màu "Ảnh rửa tiệm" bật sẵn cả bộ.</p>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Lấp lánh</p>
+        <div class="row">
+          <div class="t"><span>Lấp lánh</span><em data-v="spark">0</em></div>
+          <input type="range" min="0" max="1" step="0.01" data-k="spark" aria-label="Lấp lánh">
+        </div>
+        <div class="seg" id="sparkModeSeg" style="margin-top:6px;">
+          <button data-v="fine" class="on">Mịn</button>
+          <button data-v="coarse">Thô</button>
+        </div>
+        <p class="hint">Rắc đốm sáng như hạt nhũ trên giấy ảnh in: nhiều đốm nhỏ, vài đốm lớn có tia sao; tụ thành đám, bắt sáng cả vùng tối và nhiều hơn dọc các cạnh sáng. "Mịn": hạt nhỏ dày. "Thô": hạt to, nhiều sao 4 cánh. Bấm ↻ để rắc lại chỗ khác.</p>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Vùng nét</p>
+        <div class="row">
+          <div class="t"><span>Độ mờ nền</span><em data-v="bgBlur">0</em></div>
+          <input type="range" min="0" max="1" step="0.01" data-k="bgBlur" aria-label="Độ mờ nền">
+        </div>
+        <div class="row">
+          <div class="t"><span>Mờ chuyển động</span><em data-v="motion">0</em></div>
+          <input type="range" min="0" max="1" step="0.01" data-k="motion" aria-label="Mờ chuyển động">
+        </div>
+        <div class="row">
+          <div class="t"><span>Góc chéo</span><em data-v="motionAngle">-25°</em></div>
+          <input type="range" min="-180" max="180" step="1" data-k="motionAngle" aria-label="Góc chéo">
+        </div>
+        <div class="seg" id="rgAtmosSeg" style="margin-top:4px; grid-template-columns:repeat(3,1fr);">
+          <button data-v="off" class="on">Tắt</button>
+          <button data-v="out">Ngoài vòng</button>
+          <button data-v="in">Trong vòng</button>
+        </div>
+        <p class="hint" id="focusHint">Kéo lên để hiện vòng nét trên ảnh — kéo giữa vòng để di chuyển, kéo góc để đổi kích cỡ. Mờ chuyển động kéo vệt theo hướng chéo, như nền đang lướt qua — chỉnh Góc chéo để đổi hướng vệt. "Ngoài vòng": Nắng/Quầng sáng/Độ bóng/Vệt sáng lọt chỉ hiện ở nền, chủ thể sạch. "Trong vòng": ngược lại, chỉ hiện lên đúng chủ thể trong vòng nét.</p>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Nắng</p>
+        <div class="seg" id="nangModeSeg">
+          <button data-v="auto" class="on">Cố định trên</button>
+          <button data-v="manual">Tự kéo vị trí</button>
+        </div>
+        <div class="row">
+          <div class="t"><span>Kích cỡ nắng</span><em data-v="nangSize">75</em></div>
+          <input type="range" min="0.15" max="1.4" step="0.01" data-k="nangSize" aria-label="Kích cỡ nắng">
+        </div>
+        <p class="hint">Cần bật thanh "Nắng" ở mục Chất phim trước. Mặc định nắng toả từ giữa phía trên xuống. "Tự kéo vị trí": hiện chấm sáng vàng trên ảnh, kéo tới đâu tâm nắng ở đó — giống hệt cách kéo Vệt nắng.</p>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Vệt nắng</p>
+        <div class="seg" id="leakModeSeg">
+          <button data-v="auto" class="on">Ngẫu nhiên</button>
+          <button data-v="manual">Tự kéo vị trí</button>
+        </div>
+        <div class="seg" id="leakShapeSeg" style="margin-top:6px;">
+          <button data-v="circle" class="on">Tròn</button>
+          <button data-v="patch">Mảng</button>
+        </div>
+        <div class="row">
+          <div class="t"><span>Kích cỡ vệt nắng</span><em data-v="leakBandWidth">30</em></div>
+          <input type="range" min="0.04" max="1" step="0.01" data-k="leakBandWidth" aria-label="Kích cỡ vệt nắng">
+        </div>
+        <div class="row" id="leakAngleRow" style="display:none">
+          <div class="t"><span>Góc vệt nắng</span><em data-v="leakAngle">0°</em></div>
+          <input type="range" min="-180" max="180" step="1" data-k="leakAngle" aria-label="Góc vệt nắng">
+        </div>
+        <div class="row">
+          <div class="t"><span>Màu vệt nắng</span><em data-v="leakHue">0°</em></div>
+          <input type="range" min="-45" max="75" step="1" data-k="leakHue" aria-label="Màu vệt nắng">
+        </div>
+        <div class="row">
+          <div class="t"><span>Sắc độ vệt nắng</span><em data-v="leakSat">100</em></div>
+          <input type="range" min="0" max="2" step="0.01" data-k="leakSat" aria-label="Sắc độ vệt nắng">
+        </div>
+        <div class="row">
+          <div class="t"><span>Độ rực nắng</span><em data-v="nangSat">100</em></div>
+          <input type="range" min="0" max="2" step="0.01" data-k="nangSat" aria-label="Độ rực nắng">
+        </div>
+        <p class="hint">Cần bật thanh "Vệt sáng lọt" ở mục Chất phim trước. "Ngẫu nhiên": mỗi lần bấm ↻ vệt nắng nhảy sang góc khác. "Tự kéo vị trí": hiện chấm sáng trên ảnh, kéo tới đâu vệt nắng ở đó. Hình dạng: "Tròn" toả đều mọi hướng; "Mảng" là một dải hình chữ nhật mềm viền, chỉnh "Góc vệt nắng" để xoay dải theo bất kỳ hướng nào (dọc, ngang, chéo). "Kích cỡ" chỉnh to/nhỏ cho cả hai hình dạng. "Màu vệt nắng" (0° = vàng ấm) chỉ lượn trong dải vàng-cam-đỏ. "Sắc độ vệt nắng"/"Độ rực nắng" chỉnh độ rực nhạt/đậm riêng cho hai hiệu ứng này — kéo về 0 gần như trắng, 100 là mặc định, kéo cao hơn thì vàng cam đậm hơn — hoàn toàn không ảnh hưởng màu chung của ảnh.</p>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Khung</p>
+        <div class="seg" id="frameSeg">
+          <button data-v="none" class="on">Không</button>
+          <button data-v="scan">Viền quét</button>
+          <button data-v="film">Viền phim</button>
+          <button data-v="polaroid">Ảnh lấy liền</button>
+        </div>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Kích thước</p>
+        <div class="seg" id="sizeSeg">
+          <button data-v="full" class="on">Gốc</button>
+          <button data-v="2048">Cạnh dài 2048</button>
+          <button data-v="1600">Cạnh dài 1600</button>
+          <button data-v="1080">Cạnh dài 1080</button>
+        </div>
+      </div>
+
+      <div class="grp">
+        <p class="lbl">Dấu ngày</p>
+        <input class="datein" id="dateTxt" inputmode="numeric" spellcheck="false" aria-label="Nội dung dấu ngày">
+      </div>
+    </div>
+
+    <div class="foot">
+      <label class="btn icon pick" id="pick2" title="Mở ảnh khác">Mở<input type="file" class="pickin" accept="image/*" aria-label="Mở ảnh khác"></label>
+      <button class="btn icon" id="dice" title="Đổi ngẫu nhiên hạt, vệt sáng và bụi">↻</button>
+      <button class="btn btn-amber" id="save" disabled>Lưu về máy</button>
+    </div>
+  </aside>
+</div>
+
+<div class="sheet" id="sheet">
+  <div class="pic"><img id="sheetImg" alt="Ảnh đã chỉnh"></div>
+  <p id="sheetTip">Nhấn giữ vào ảnh rồi chọn <b>Thêm vào Ảnh</b> để lưu vào máy.</p>
+  <span class="diag" id="sheetDiag"></span>
+  <div class="acts">
+    <button class="btn" id="sheetClose">Đóng</button>
+    <button class="btn btn-amber" id="sheetShare">Chia sẻ · Lưu</button>
+  </div>
+</div>
+
+<input type="file" id="file" accept="image/*" hidden>
+
+<script>{{RAY_EDITOR_SCRIPT}}</script>
+<script src="quality-core.js"></script>
+<script src="hair-core.js"></script>
+<script src="runtime-profile.js"></script>
+<script src="body-ai/people.js"></script>
+<script src="light-core.js"></script>
+<script src="brush-core.js"></script>
+<script src="remove-core.js"></script>
+<script src="background-core.js"></script>
+<script src="compose-core.js"></script>
+<script src="photo-edit-core.js"></script>
+<script src="tone-core.js"></script>
+<script src="preview-texture.js"></script>
+<script src="tone-controls.js"></script>
+<script src="brush-controls.js"></script>
+<script src="ray-preset-thu-nhat.js"></script>
+<script src="thu-nhat-adapter.js"></script>
+<script src="preset-catalog.js"></script>
+<script src="app-bridge.js"></script>
+<script src="photo-controls.js"></script>
+<script src="brow-core.js"></script>
+<script src="beauty-runtime.js"></script>
+<script src="brows.js"></script>
+<script src="hair-editor.js"></script>
+<script src="region-paint-core.js"></script>
+<script src="region-shape-core.js"></script>
+<script src="adjust-scope-core.js"></script>
+<script src="effect-layers.js"></script>
+<script src="layer-inspector.js"></script>
+<script src="compose-editor.js"></script>
+<script src="background-editor.js"></script>
+<script src="people-editor.js"></script>
+<script src="photo-edit.js"></script>
+<script src="remove-selection-core.js"></script>
+<script src="remove-ai.js"></script>
+<script src="inpaint.js"></script>
+<script src="remove-editor.js"></script>
+<script src="cutout-core.js"></script>
+<script src="sticker-store.js"></script>
+<script src="cutout-editor.js"></script>
+<script src="edit-history.js"></script>
+<script src="../album-store.js"></script>
+<script src="session.js"></script>
+<script src="quality-editor.js"></script>
+<script src="preview-quality.js"></script>
+<script src="workspace-layout.js"></script>
+<script src="editor-visibility.js"></script>
+<script type="module" src="my-presets.mjs"></script>
+<script src="../module-native.js"></script>
+
+<!-- Body AI from v67; the v48 editor above is unchanged. -->
+<script src="body-ai/pose-core.js"></script>
+<script src="body-ai/recognition-core.js"></script>
+<script src="body-ai/region-core.js"></script>
+<script src="body-ai/contour-core.js"></script>
+<script src="body-ai/line-core.js"></script>
+<script src="body-ai/pose-adapter.js"></script>
+<script src="body-ai/compat.js"></script>
+<script src="body-ai/geometry.js"></script>
+<script src="body-ai/face.js"></script>
+<script src="body-ai/overall.js"></script>
+<script src="body-ai/one-tap.js"></script>
+<script src="body-ai/workspace.js"></script>
+<script src="body-ai/region-editor.js"></script>
+<script src="body-ai/contour-editor.js"></script>
+<script src="body-ai/line-editor.js"></script>
+<script src="adjust-scope-ui.js"></script>
+<script src="region-paint-ui.js"></script>
+<script src="region-shape-ui.js"></script>
+<script src="doodle-core.js"></script>
+<script src="doodle-ui.js"></script>
+<script src="../booth-media.js"></script>
+<script src="video-editor.js"></script>
+<script src="../editor-mobile.js"></script>
+<script src="filter-strength-core.js"></script>
+<script src="filter-strength.js"></script>
+<script src="ai-composer-regions.js"></script>
+<script src="ai-composer-core.js"></script>
+<script src="ai-composer-recipes.js"></script>
+<script src="ai-composer-runtime.js"></script>
+<script src="ai-composer-ui.js"></script>
+</body>
+</html>

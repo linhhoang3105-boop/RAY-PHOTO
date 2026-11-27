@@ -1,0 +1,30 @@
+{
+  "id": "lama-512-int8-v1",
+  "bytes": 62074990,
+  "sha256": "cab19978adc306622fe37ef60d4a52103b99c98141d499c2a2366a7ed1255dbe",
+  "source": "https://huggingface.co/g-ronimo/lama/blob/386a67cedf9b8bb4fe76798c10c8d77abc0a5cc8/lama_512_int8.onnx",
+  "license": "Apache-2.0",
+  "runtime": "1.23.2",
+  "chunks": [
+    {
+      "file": "lama-512-int8-01.bin",
+      "bytes": 16777216,
+      "sha256": "3bb0bc779f9e86a386f66d43afdad75729db40cbab4e40e61e776f439073b229"
+    },
+    {
+      "file": "lama-512-int8-02.bin",
+      "bytes": 16777216,
+      "sha256": "969a779fb55e3c7f04e51615e480365d00ed47368dec04e868489b98e4475bc7"
+    },
+    {
+      "file": "lama-512-int8-03.bin",
+      "bytes": 16777216,
+      "sha256": "1e1d4f23c1ae29f8c1808d50ae5fd5b93a456eed0dc8be6509351d4b4839e80c"
+    },
+    {
+      "file": "lama-512-int8-04.bin",
+      "bytes": 11743342,
+      "sha256": "81a8f2671d8d8799f626ffbdd90bfd9b0f2288b083c11a4a57c9c42ea665f538"
+    }
+  ]
+}

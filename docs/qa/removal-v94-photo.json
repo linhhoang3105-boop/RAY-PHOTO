@@ -1,0 +1,15 @@
+{
+  "fixture": "existing golden-hour.webp; not user photo",
+  "mask": "saved real MagicTouch CPU inference plus visible cleanup rim",
+  "cleanupRim": 19,
+  "model": "lama-512-int8-v1",
+  "backend": "WASM",
+  "modelMs": 18839,
+  "image": [
+    960,
+    640
+  ],
+  "outsideChanges": 0,
+  "changedInside": 53073,
+  "maxResidentKiB": 835624
+}

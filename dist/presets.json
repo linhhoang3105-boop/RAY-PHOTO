@@ -1,0 +1,539 @@
+[
+  {
+    "id": "goc",
+    "name": "Gốc",
+    "group": "Gốc",
+    "dot": "#8B8271"
+  },
+  {
+    "id": "trongveo",
+    "name": "Trong veo",
+    "group": "Trong & dịu",
+    "dot": "#7FBE7A"
+  },
+  {
+    "id": "dongco",
+    "name": "Đồng cỏ",
+    "group": "Trong & dịu",
+    "dot": "#5CA83E"
+  },
+  {
+    "id": "ngocdiep",
+    "name": "Ngọc Diệp",
+    "group": "Trong & dịu",
+    "dot": "#e8becb",
+    "description": "Trong veo · Hồng đào · Ánh sáng mềm. Da hồng nhẹ, xanh dịu, hợp áo trắng và hoa."
+  },
+  {
+    "id": "troixanh",
+    "name": "Trời xanh",
+    "group": "Trong & dịu",
+    "dot": "#1E8FD9"
+  },
+  {
+    "id": "trongxanh",
+    "name": "Trong xanh",
+    "group": "Trong & dịu",
+    "dot": "#2EA8B8"
+  },
+  {
+    "id": "blue2",
+    "name": "Blue 2",
+    "group": "Trong & dịu",
+    "dot": "#1050A0"
+  },
+  {
+    "id": "anhrua2",
+    "name": "Ảnh rửa tiệm 2",
+    "group": "Trong & dịu",
+    "dot": "#E6D9C3"
+  },
+  {
+    "id": "nhatban3",
+    "name": "Nhật Bản 3",
+    "group": "Trong & dịu",
+    "dot": "#8FA098"
+  },
+  {
+    "id": "chauau",
+    "name": "Châu Âu",
+    "group": "Trong & dịu",
+    "dot": "#C4623C"
+  },
+  {
+    "id": "cw503",
+    "name": "Sương lam",
+    "group": "Trong & dịu",
+    "dot": "#7FA8B0"
+  },
+  {
+    "id": "okinh",
+    "name": "Ống kính chuẩn",
+    "group": "Trong & dịu",
+    "dot": "#8B8271"
+  },
+  {
+    "id": "cinestill",
+    "name": "Phố lên đèn",
+    "group": "Trong & dịu",
+    "dot": "#C43030"
+  },
+  {
+    "id": "trungquoc",
+    "name": "Trung Quốc",
+    "group": "Trong & dịu",
+    "dot": "#E0708C"
+  },
+  {
+    "id": "nangxuyenla",
+    "name": "Nắng xuyên lá",
+    "group": "Trong & dịu",
+    "dot": "#E8C468"
+  },
+  {
+    "id": "fujicam",
+    "name": "Vườn sau mưa",
+    "group": "Trong & dịu",
+    "dot": "#2E8068"
+  },
+  {
+    "id": "phim36",
+    "name": "Phim 36",
+    "group": "Trong & dịu",
+    "dot": "#3E7FC4"
+  },
+  {
+    "id": "anhrua",
+    "name": "Ảnh rửa tiệm",
+    "group": "Trong & dịu",
+    "dot": "#EFE3CF"
+  },
+  {
+    "id": "nangcuaso",
+    "name": "Nắng cửa sổ",
+    "group": "Trong & dịu",
+    "dot": "#D9A855"
+  },
+  {
+    "id": "fujicam2",
+    "name": "Chiều nghiêng",
+    "group": "Trong & dịu",
+    "dot": "#8C6034"
+  },
+  {
+    "id": "gold200",
+    "name": "Nắng mật",
+    "group": "Trong & dịu",
+    "dot": "#E0A83C"
+  },
+  {
+    "id": "ngonang",
+    "name": "Ngõ nắng",
+    "group": "Trong & dịu",
+    "dot": "#D9B888"
+  },
+  {
+    "id": "studioam",
+    "name": "Studio ấm",
+    "group": "Trong & dịu",
+    "dot": "#E0B878"
+  },
+  {
+    "id": "portra400",
+    "name": "Hồng mơ",
+    "group": "Trong & dịu",
+    "dot": "#E0B090"
+  },
+  {
+    "id": "tanhoc",
+    "name": "Tan Học",
+    "group": "Trong & dịu",
+    "dot": "#d9af72",
+    "description": "Nắng mật ong · Bóng mềm · Hạt phim mịn. Sắc xanh trầm nhẹ, hợp sân trường, phố nhỏ và bạn bè."
+  },
+  {
+    "id": "am",
+    "name": "Ấm",
+    "group": "Trong & dịu",
+    "dot": "#E0A878"
+  },
+  {
+    "id": "phim80s",
+    "name": "Phim 80s",
+    "group": "Trong & dịu",
+    "dot": "#D9924C"
+  },
+  {
+    "id": "mamiya7",
+    "name": "Khoảng trời",
+    "group": "Trong & dịu",
+    "dot": "#A08F7A"
+  },
+  {
+    "id": "colorplus200",
+    "name": "Ngày vàng",
+    "group": "Trong & dịu",
+    "dot": "#D9A876"
+  },
+  {
+    "id": "phimvang",
+    "name": "Phim vàng",
+    "group": "Trong & dịu",
+    "dot": "#D9A23C"
+  },
+  {
+    "id": "ae1",
+    "name": "Hiên nhà",
+    "group": "Trong & dịu",
+    "dot": "#D9A97F"
+  },
+  {
+    "id": "spotmatic",
+    "name": "Nắng cũ",
+    "group": "Trong & dịu",
+    "dot": "#C9974A"
+  },
+  {
+    "id": "vuonnang",
+    "name": "Vườn nắng",
+    "group": "Nóng – lạnh",
+    "dot": "#2E6B3A"
+  },
+  {
+    "id": "fujicam3",
+    "name": "Bóng lá",
+    "group": "Nóng – lạnh",
+    "dot": "#1E7A72"
+  },
+  {
+    "id": "tealcam",
+    "name": "Teal & Orange",
+    "group": "Nóng – lạnh",
+    "dot": "#D9722E"
+  },
+  {
+    "id": "amlam",
+    "name": "Ám lam",
+    "group": "Nóng – lạnh",
+    "dot": "#7FA0B8"
+  },
+  {
+    "id": "hkdienanh",
+    "name": "HK điện ảnh",
+    "group": "Nóng – lạnh",
+    "dot": "#B8642A"
+  },
+  {
+    "id": "dienanh",
+    "name": "Điện ảnh",
+    "group": "Nóng – lạnh",
+    "dot": "#3E8C8C"
+  },
+  {
+    "id": "thunhat",
+    "name": "Thu Nhật",
+    "group": "Nóng – lạnh",
+    "dot": "#c6a65e",
+    "description": "Nắng vàng dịu · Lá vàng-lục · Đen olive · Trắng kem. Màu phim thu Nhật từ công thức riêng."
+  },
+  {
+    "id": "haitruong",
+    "name": "Hậu trường",
+    "group": "Xanh & đất",
+    "dot": "#8C7860"
+  },
+  {
+    "id": "xanhbaha",
+    "name": "Xanh bạc hà",
+    "group": "Xanh & đất",
+    "dot": "#8CB89A"
+  },
+  {
+    "id": "toyd",
+    "name": "Kẹo nắng",
+    "group": "Xanh & đất",
+    "dot": "#E0956B"
+  },
+  {
+    "id": "fx400",
+    "name": "Lá non",
+    "group": "Xanh & đất",
+    "dot": "#5E9E6E"
+  },
+  {
+    "id": "ocua",
+    "name": "Ô cửa",
+    "group": "Xanh & đất",
+    "dot": "#7A7250"
+  },
+  {
+    "id": "industar50",
+    "name": "Rêu nắng",
+    "group": "Xanh & đất",
+    "dot": "#8C9060"
+  },
+  {
+    "id": "nhatban",
+    "name": "Nhật Bản",
+    "group": "Xanh & đất",
+    "dot": "#B7B894"
+  },
+  {
+    "id": "nanghanh",
+    "name": "Nắng hanh",
+    "group": "Xanh & đất",
+    "dot": "#D8B872"
+  },
+  {
+    "id": "ngotngao",
+    "name": "Ngọt ngào",
+    "group": "Pastel & sương",
+    "dot": "#F0B8C4"
+  },
+  {
+    "id": "sococu",
+    "name": "Máy số cũ",
+    "group": "Pastel & sương",
+    "dot": "#9FADAF"
+  },
+  {
+    "id": "moao2",
+    "name": "Mờ ảo 2",
+    "group": "Pastel & sương",
+    "dot": "#E8B888"
+  },
+  {
+    "id": "phomua",
+    "name": "Phố mưa",
+    "group": "Pastel & sương",
+    "dot": "#8FA8A0"
+  },
+  {
+    "id": "tiectung",
+    "name": "Tiệc tùng",
+    "group": "Pastel & sương",
+    "dot": "#E8B8AC"
+  },
+  {
+    "id": "amu",
+    "name": "Ngày âm u",
+    "group": "Pastel & sương",
+    "dot": "#98A092"
+  },
+  {
+    "id": "hongphan",
+    "name": "Hồng phấn",
+    "group": "Pastel & sương",
+    "dot": "#E0B8A8"
+  },
+  {
+    "id": "hanquoc",
+    "name": "Hàn Quốc",
+    "group": "Pastel & sương",
+    "dot": "#EBC8CE"
+  },
+  {
+    "id": "moao",
+    "name": "Mờ ảo",
+    "group": "Pastel & sương",
+    "dot": "#E8C4B0"
+  },
+  {
+    "id": "bienxam",
+    "name": "Biển xám",
+    "group": "Pastel & sương",
+    "dot": "#8FA3AE"
+  },
+  {
+    "id": "p400",
+    "name": "Lụa hồng",
+    "group": "Pastel & sương",
+    "dot": "#E0B49C"
+  },
+  {
+    "id": "suong",
+    "name": "Sương sớm",
+    "group": "Pastel & sương",
+    "dot": "#93A6A0"
+  },
+  {
+    "id": "srt101",
+    "name": "Mơ chiều",
+    "group": "Pastel & sương",
+    "dot": "#C98470"
+  },
+  {
+    "id": "h400",
+    "name": "Mây ngọc",
+    "group": "Pastel & sương",
+    "dot": "#9CC4B4"
+  },
+  {
+    "id": "biennang",
+    "name": "Biển nắng",
+    "group": "Pastel & sương",
+    "dot": "#DCC49A"
+  },
+  {
+    "id": "nhatban2",
+    "name": "Nhật Bản 2",
+    "group": "Pastel & sương",
+    "dot": "#9CA878"
+  },
+  {
+    "id": "jelly",
+    "name": "Jelly",
+    "group": "Pastel & sương",
+    "dot": "#E8A8C4"
+  },
+  {
+    "id": "hkcu",
+    "name": "HK phim cũ",
+    "group": "Pastel & sương",
+    "dot": "#D98F86"
+  },
+  {
+    "id": "kyuc",
+    "name": "Miền ký ức",
+    "group": "Pastel & sương",
+    "dot": "#D9A8C0"
+  },
+  {
+    "id": "polaroid",
+    "name": "Mảnh nhớ",
+    "group": "Pastel & sương",
+    "dot": "#D9C7B0"
+  },
+  {
+    "id": "ae",
+    "name": "Nắng lụa",
+    "group": "Trầm & sâu",
+    "dot": "#D8B23C"
+  },
+  {
+    "id": "grx",
+    "name": "Phố lặng",
+    "group": "Trầm & sâu",
+    "dot": "#7A8288"
+  },
+  {
+    "id": "phodem",
+    "name": "Phố đêm mưa",
+    "group": "Trầm & sâu",
+    "dot": "#B84A38"
+  },
+  {
+    "id": "e100",
+    "name": "Ráng hạ",
+    "group": "Trầm & sâu",
+    "dot": "#C4453C"
+  },
+  {
+    "id": "fxs",
+    "name": "Hồng sương",
+    "group": "Trầm & sâu",
+    "dot": "#C4574A"
+  },
+  {
+    "id": "fm2",
+    "name": "Gió sớm",
+    "group": "Trầm & sâu",
+    "dot": "#8C94A0"
+  },
+  {
+    "id": "thap90",
+    "name": "Thập niên 90",
+    "group": "Trầm & sâu",
+    "dot": "#8C4A3C"
+  },
+  {
+    "id": "ccd",
+    "name": "Ngày trong",
+    "group": "Trầm & sâu",
+    "dot": "#6FA8B8"
+  },
+  {
+    "id": "cafe",
+    "name": "Cà phê",
+    "group": "Trầm & sâu",
+    "dot": "#6B4324"
+  },
+  {
+    "id": "cacao",
+    "name": "Cacao",
+    "group": "Trầm & sâu",
+    "dot": "#5A3820"
+  },
+  {
+    "id": "nang98",
+    "name": "Nắng 98",
+    "group": "Trầm & sâu",
+    "dot": "#E8A33C"
+  },
+  {
+    "id": "demflash2",
+    "name": "Đêm flash 2",
+    "group": "Ánh sáng",
+    "dot": "#FFE8B0"
+  },
+  {
+    "id": "flashtrang",
+    "name": "Flash trắng",
+    "group": "Ánh sáng",
+    "dot": "#DADCE0"
+  },
+  {
+    "id": "tiecdem",
+    "name": "Tiệc đêm",
+    "group": "Ánh sáng",
+    "dot": "#D9A548"
+  },
+  {
+    "id": "demflash",
+    "name": "Đêm flash",
+    "group": "Ánh sáng",
+    "dot": "#EFE0C4"
+  },
+  {
+    "id": "hkdem",
+    "name": "HK đêm",
+    "group": "Ánh sáng",
+    "dot": "#E0479B"
+  },
+  {
+    "id": "rosang",
+    "name": "Rò sáng",
+    "group": "Ánh sáng",
+    "dot": "#D9432E"
+  },
+  {
+    "id": "chieu",
+    "name": "Chiều muộn",
+    "group": "Ánh sáng",
+    "dot": "#C4604A"
+  },
+  {
+    "id": "hethan",
+    "name": "Phim hết hạn",
+    "group": "Ánh sáng",
+    "dot": "#8FA24E"
+  },
+  {
+    "id": "nguocnang",
+    "name": "Ngược nắng",
+    "group": "Ánh sáng",
+    "dot": "#F0C982"
+  },
+  {
+    "id": "denrang",
+    "name": "Đen trắng",
+    "group": "Đơn sắc",
+    "dot": "#C8C2B4"
+  },
+  {
+    "id": "sepia",
+    "name": "Sepia",
+    "group": "Đơn sắc",
+    "dot": "#C9B896"
+  }
+]

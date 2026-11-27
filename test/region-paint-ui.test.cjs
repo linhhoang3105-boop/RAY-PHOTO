@@ -1,0 +1,40 @@
+const{test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),path=require('node:path');
+const Paint=require('../dist/darkroom/region-paint-core.js'),Scope=require('../dist/darkroom/adjust-scope-core.js'),Controls=require('../dist/darkroom/photo-controls.js');
+function setup(builder=false){
+ const nodes=[];let h;class Element{
+  constructor(tag='div'){this.tagName=tag;this.children=[];this.events={};this.attrs={};this.style={};this.dataset={};this.hidden=false;this.className='';nodes.push(this);}
+  get classList(){return{add:n=>{if(!this.className.split(' ').includes(n))this.className+=' '+n;},contains:n=>this.className.split(' ').includes(n),toggle:(n,on)=>{this.className=this.className.split(' ').filter(v=>v!==n).join(' ')+(on?' '+n:'');}};}
+  get parentElement(){return this.parent;}
+  append(...items){for(const n of items){if(n.parent)n.parent.children=n.parent.children.filter(x=>x!==n);n.parent=this;this.children.push(n);}}
+  after(n){this.parent?.insertBefore(n,this.parent.children[this.parent.children.indexOf(this)+1]);}
+  insertBefore(n,b){n.parent=this;const i=this.children.indexOf(b);this.children.splice(i<0?this.children.length:i,0,n);}
+  set innerHTML(value){this.children=[];for(const m of value.matchAll(/<(input|output|span|p)\b/g))this.append(new Element(m[1]));}
+  querySelectorAll(q){const out=[];for(const n of this.children){if(q.startsWith('.')?n.classList.contains(q.slice(1)):n.tagName===q)out.push(n);out.push(...n.querySelectorAll(q));}return out;}
+  querySelector(q){return this.querySelectorAll(q)[0];}
+  replaceChildren(...items){this.children=[];this.append(...items);}
+  setAttribute(k,v){this.attrs[k]=v;}addEventListener(k,v){(this.events[k]??=[]).push(v);}setPointerCapture(){}getBoundingClientRect(){return{left:0,top:0,width:600,height:500};}
+  emit(type,point={}){const e={target:this,currentTarget:this,button:0,pointerId:1,pointerType:'touch',preventDefault(){},stopImmediatePropagation(){},...point};for(const fn of this.events[type]||[])fn(e);}
+ }
+ const document={createElement:t=>new Element(t),createElementNS:(_,t)=>{const e=new Element(t);e.namespaceURI='http://www.w3.org/2000/svg';return e;},getElementById:id=>nodes.find(n=>n.id===id),querySelector:q=>nodes.find(n=>q.startsWith('.')&&n.classList.contains(q.slice(1))),querySelectorAll:q=>nodes.filter(n=>q.startsWith('.')&&n.classList.contains(q.slice(1)))};
+ const wrap=new Element();wrap.id='canvasWrap';const app=new Element();app.className='film-workspace';const details=new Element();details.className='adjust-scope-settings';const label=new Element();label.className='adjust-scope-shape';details.append(label);for(let i=0;i<2;i++){const bar=new Element();bar.className='adjust-scope-bar';const b=new Element('button');b.className='adjust-scope-edit';bar.append(b);}
+ const P={...Scope.defaults},history=[];h={P,source:{width:200,height:160},BEAUTY:{},BODY_AI:{},RayRegionPaint:Paint,RayLayers:{updateScope(){}},RayControls:Controls,RaySession:{record(){history.push(JSON.parse(JSON.stringify(P)));},contextChanged(){}},document,clamp:(v,a,b)=>Math.max(a,Math.min(b,v)),bodyGeo:()=>({W:200,H:160,k:2,ox:10,oy:20}),queue(){},setTimeout,clearTimeout,ResizeObserver:class{observe(){}}};
+ h.window=h;h.RayAdjustScopeUI={visible:()=>!!h.source&&P.adjustRegion!=='all'&&P.adjustRegionShow&&!app.classList.contains('is-result-preview'),act(label,fn){h.RaySession.record();fn();h.RayRegionPaintUI.sync();h.RaySession.record();}};
+ vm.createContext(h);vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist/darkroom/region-paint-ui.js'),'utf8'),h);
+ if(builder){h.RayAdjustScopeUI.sync=()=>h.RayRegionPaintUI.sync();h.RayRegionShape=require('../dist/darkroom/region-shape-core.js');h.RayAdjustScope={...Scope,invalidate(){}};vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist/darkroom/region-shape-ui.js'),'utf8'),h);}
+ return{h,P,nodes,history,layer:document.getElementById('regionPaintLayer'),button:text=>nodes.find(n=>n.tagName==='button'&&n.textContent===text),draw(points){const layer=document.getElementById('regionPaintLayer');layer.emit('pointerdown',{clientX:points[0][0],clientY:points[0][1]});for(const [clientX,clientY]of points.slice(1))layer.emit('pointermove',{clientX,clientY});layer.emit('pointerup',{clientX:points.at(-1)[0],clientY:points.at(-1)[1]});}};
+}
+test('actual pointer controller paints, closes a lasso, erases and emits a dashed contour independently of tool scrolling',()=>{
+ const s=setup();s.h.RayRegionPaintUI.start();s.P.adjustRegionFeather=0;s.P.adjustRegionBrushSize=.16;s.draw([[90,100],[250,100],[250,240]]);assert.equal(s.P.adjustRegionStrokes.length,1);assert.equal(s.P.adjustRegionStrokes[0].points.length,3);const first=JSON.stringify(s.P.adjustRegionStrokes),path=s.nodes.find(n=>n.classList.contains('region-paint-front'));assert.ok(path.attrs.d.startsWith('M'));assert.ok(path.attrs.d.endsWith('Z'));assert.equal(s.layer.classList.contains('is-drawing'),true);
+ s.button('Khoanh vùng').onclick();s.draw([[50,50],[150,50],[150,150]]);assert.equal(s.P.adjustRegionStrokes[1].mode,'lasso');assert.ok(Scope.weight(s.P,200,160)(60,24)>.9);
+ s.button('Tẩy vùng').onclick();s.draw([[170,100]]);assert.equal(s.P.adjustRegionStrokes[2].mode,'erase');assert.equal(Scope.weight(s.P,200,160)(80,40),0);assert.equal(JSON.stringify([s.P.adjustRegionStrokes[0]]),first);
+ s.button('Bỏ nét vùng cuối').onclick();assert.equal(s.P.adjustRegionStrokes.length,2);s.button('✓ Xong vẽ').onclick();assert.equal(s.P.adjustRegionDrawing,false);s.draw([[300,280],[350,280]]);assert.equal(s.P.adjustRegionStrokes.length,2);assert.equal(Paint.interactive,false);
+ s.P.adjustRegionShow=false;s.h.RayRegionPaintUI.sync();assert.equal(s.layer.hidden,true);assert.equal(s.nodes.filter(n=>n.events.pointerdown).length,1,'only the photo surface captures drawing; the panel remains scrollable');s.h.source=null;s.h.RayRegionPaintUI.sync();assert.equal(s.button('✎ Vẽ vùng').disabled,true);
+});
+test('the real shape controller joins straight strokes, applies Inside/Outside, bends a shape and preserves previous components',()=>{
+ const s=setup(true);s.h.RayRegionShapeUI.start();s.P.adjustRegionFeather=0;s.button('Thẳng').onclick();s.draw([[90,60],[290,60]]);assert.equal(s.P.adjustRegionStrokes[0].open,true);assert.equal(Paint.hasPaint(s.P.adjustRegionStrokes),false);s.draw([[290,60],[290,220]]);s.draw([[290,220],[90,60]]);assert.equal(s.P.adjustRegionStrokes.length,1);assert.equal(s.P.adjustRegionStrokes[0].open,false);assert.equal(Scope.weight(s.P,200,160)(100,50),1);
+ const first=JSON.stringify(s.P.adjustRegionStrokes);s.button('Ngoài hình').onclick();assert.equal(Scope.weight(s.P,200,160)(100,50),0);assert.equal(Scope.weight(s.P,200,160)(10,140),1);s.button('Trong hình').onclick();s.button('＋ Hình mới').onclick();s.button('Cong').onclick();s.draw([[80,260],[250,260]]);assert.equal(s.P.adjustRegionStrokes.length,2);assert.equal(s.P.adjustRegionStrokes[1].points.length,33);s.button('Khép hình').onclick();assert.equal(s.P.adjustRegionStrokes[1].open,false);assert.equal(JSON.stringify(s.P.adjustRegionStrokes.slice(0,1)),first);
+ s.button('Uốn nét').onclick();s.draw([[170,298],[174,285]]);assert.equal(s.P.adjustRegionStrokes.length,2);s.button('✓ Xong vẽ').onclick();assert.equal(s.P.adjustRegionDrawing,false);assert.ok(s.P.adjustRegionStrokes.every(p=>p.open!==true));
+});
+test('body strokes can become a closed selection without changing body edits, and use existing shapes as extra components',()=>{
+ const s=setup(true),paths=[[[.2,.2],[.6,.2]],[[.6,.6],[.6,.2]],[[.6,.6],[.2,.2]]],before=JSON.stringify(paths);s.h.RayBodyLines={paths:()=>paths};s.h.RayRegionShapeUI.start();assert.equal(s.h.RayRegionShapeUI.importBody(),true);assert.equal(JSON.stringify(paths),before);assert.equal(s.P.adjustRegionStrokes.length,1);assert.equal(s.P.adjustRegionStrokes[0].open,false);s.h.RayRegionShapeUI.addPrimitive('ellipse');assert.equal(s.P.adjustRegionStrokes.length,2);assert.equal(s.P.adjustRegionStrokes[1].open,false);assert.equal(s.P.adjustRegionShape,'freehand');
+});

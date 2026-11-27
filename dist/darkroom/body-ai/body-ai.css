@@ -1,0 +1,149 @@
+
+#rayRatio54{margin:12px 0;padding:14px;border:1px solid #79623e;border-radius:10px;background:linear-gradient(150deg,#27272c,#18181c);color:#eee4d1}
+#rayRatio54 .r54-title{font-size:15px;color:#edcf87;font-weight:650;margin:0 0 8px}
+#rayRatio54 .r54-line{display:flex;align-items:center;gap:9px;margin:10px 0;flex-wrap:wrap}
+#rayRatio54 .r54-line>*{min-width:0}
+#rayRatio54 label{font-size:12px;color:#e6d5b2}
+#rayRatio54 select,#rayRatio54 input[type=number],#rayRatio54 button{border:1px solid #766447;border-radius:6px;background:#24232a;color:#f3e9d6;padding:9px 10px;min-height:39px;font-size:13px}
+#rayRatio54 select{flex:1 1 150px;max-width:100%}
+#rayRatio54 input[type=number]{width:89px;flex:none}
+#rayRatio54 button{cursor:pointer}
+#rayRatio54 button:disabled{opacity:.37;cursor:not-allowed}
+#rayRatio54 .r54-primary{background:#e7c778;color:#201b12;border-color:#e7c778;font-weight:650}
+#rayRatio54 .r54-note{color:#c7bda6;font-size:11px;line-height:1.6;margin:8px 0}
+#rayRatio54 #r54Status{font-size:12px;line-height:1.55;color:#f0d296;margin:10px 0;white-space:pre-line}
+#rayRatio54 .r54-value{font-variant-numeric:tabular-nums;min-width:45px;color:#f3d78f;text-align:right;font-size:13px}
+#rayRatio54 input[type=range]{flex:1 1 160px;accent-color:#e7c778;min-width:0}
+#rayRatio54 .r54-chip{border:1px solid #887144;color:#e7c778;font-size:10px;border-radius:20px;padding:3px 7px}
+#r54Overlay{position:absolute;pointer-events:none;z-index:9;max-width:none!important;max-height:none!important;border:none!important;box-shadow:none!important}
+@media(max-width:520px){#rayRatio54 select{flex-basis:190px}#rayRatio54 .r54-line{gap:6px}}
+
+
+#rayFace55{background:linear-gradient(145deg,#292720,#1d1d21);border:1px solid #c29d5f;border-radius:11px;padding:14px;margin:8px 0 16px;color:#ede5d4;font-size:13px}
+#rayFace55 *{box-sizing:border-box}#rayFace55 header{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:10px}
+#rayFace55 h3{font-size:16px;color:#f1d18d;line-height:1.5;margin:0;font-weight:650}
+#rayFace55 .r55-tag{font-size:11px;color:#e8c984;border:1px solid #856c43;border-radius:15px;padding:3px 8px}
+#rayFace55 .r55-desc{font-size:12px;line-height:1.55;color:#d4c7b1;margin:8px 0 14px}
+#rayFace55 .r55-actions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}
+#rayFace55 button,#rayFace55 select{min-height:44px;font-size:13px;padding:9px 10px;border-radius:7px;border:1px solid #816e50;background:#302c2a;color:#f5e8cc;cursor:pointer;max-width:100%}
+#rayFace55 button:disabled{opacity:.42;cursor:not-allowed}
+#rayFace55 .r55-primary{background:#e7c778;color:#282219;border-color:#e7c778;font-weight:750}
+#rayFace55 .r55-field{display:grid;grid-template-columns:minmax(90px, 125px) 1fr;align-items:center;gap:8px;margin:9px 0}
+#rayFace55 .r55-field label{font-size:12px;color:#ddcda7}
+#rayFace55 .r55-field select{width:100%;min-width:0}
+#rayFace55 .r55-field input{width:100%;accent-color:#e7c778}
+#rayFace55 .r55-rows{display:grid;grid-template-columns:1.3fr .55fr .55fr;gap:1px;background:#5e5347;border:1px solid #5e5347;border-radius:6px;overflow:hidden;margin:10px 0}
+#rayFace55 .r55-rows>div{background:#242327;padding:8px 6px;font-size:11.5px;line-height:1.4;min-width:0}
+#rayFace55 .r55-rows>.r55-head{color:#f1d18d;font-weight:650;background:#39342d}
+#rayFace55 .r55-num{font-variant-numeric:tabular-nums;text-align:right}
+#rayFace55 .r55-result{padding:10px;border:1px solid #675438;background:#1f2022;border-radius:7px;line-height:1.6;margin:9px 0;white-space:pre-line}
+#rayFace55 .r55-small{font-size:12px;line-height:1.55;color:#cbbfae;margin:10px 0}
+#rayFace55 .r60-fine-controls{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;margin:10px 0;padding:11px;border:1px solid #615237;border-radius:8px;background:#1b1b1d}
+#rayFace55 .r60-fine-controls label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:13px;color:#e8d9b5;margin-top:8px}
+#rayFace55 .r60-fine-controls label:first-child{margin-top:0}
+#rayFace55 .r60-fine-controls output{font-weight:750;font-variant-numeric:tabular-nums;color:#f1d18d;font-size:14px}
+#rayFace55 .r60-fine-controls input{width:100%;height:29px;accent-color:#e7c778;touch-action:pan-x}
+#rayFace55 #r60Feedback{color:#e7c778}
+#rayFace55 #r55Apply,#rayFace55 #r60CommitFine{font-size:14px;min-height:48px}
+#r55Mask{position:absolute;z-index:12;pointer-events:none;max-width:none!important;max-height:none!important;border:none!important;box-shadow:none!important}
+@media(max-width:400px){#rayFace55{padding:10px}#rayFace55 .r55-field{grid-template-columns:100px 1fr}}
+/* Guides are UI-only. They must never be present during a save/after applying a face template. */
+body.ray54-guide-clean #r55Mask,
+.film-workspace.is-result-preview #r55Mask,
+.film-workspace.is-result-preview #r54Overlay,
+.film-workspace.is-result-preview #bodyOval {display:none!important;}
+
+
+#rayOverall62{border:1px solid #c3a15d;border-radius:11px;padding:14px;margin:10px 0 16px;background:linear-gradient(145deg,#28271f,#1a1c21);color:#f2e6ce}
+#rayOverall62 h3{font:650 16px/1.5 var(--sans);color:#efd18a;margin:0 0 6px}
+#rayOverall62 p{font:12px/1.65 var(--sans);color:#d0c4af;margin:7px 0 12px}
+#rayOverall62 .ray62-line{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:10px 0}
+#rayOverall62 label{font-size:13px;color:#f0ddb5}
+#rayOverall62 select{flex:1 1 160px;min-width:0;max-width:100%;padding:10px;border-radius:6px;background:#292830;color:#f9efd7;border:1px solid #85714c;font-size:13px}
+#rayOverall62 .ray62-actions{display:flex;gap:8px;flex-wrap:wrap;margin:11px 0}
+#rayOverall62 button{min-height:43px;padding:9px 12px;flex:1 1 125px;border:1px solid #776444;border-radius:7px;background:#29272b;color:#f0dbad;cursor:pointer;font:600 13px var(--sans)}
+#rayOverall62 button.ray62-primary{background:#e7c778;border-color:#e7c778;color:#221c13;flex-basis:100%}
+#rayOverall62 button:disabled{opacity:.4;cursor:not-allowed}
+#ray62OverallStatus{font-size:12px;line-height:1.6;white-space:pre-line;background:#1c1c1f;border-radius:7px;padding:10px;color:#ead09c}
+#rayOverall62 .ray62-diagnostic{font-size:11px;color:#c8bda8;margin-bottom:4px}
+#ray62UndoTop{display:none}
+.ray-body-outline{display:flex;align-items:center;gap:8px;margin:9px 0 4px;font-size:13px;color:#f0d38f}.ray-body-outline input{width:18px;height:18px;accent-color:#e7c778}
+.ray-body-outline-note{font-size:11px!important;line-height:1.5;color:#d1c5ae;margin:4px 0 10px!important}
+#rayBodyDetectionList{padding-left:18px;margin:8px 0;font-size:12px;line-height:1.7;color:#ded1b8}#rayBodyDetectionList li{margin:5px 0}
+.film-workspace.is-result-preview #ray62UndoTop{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:5px 12px;background:#302a20;color:#f2d38e;border:1px solid #806b44;border-radius:6px;cursor:pointer}
+@media(max-width:520px){#rayOverall62{padding:11px}#rayOverall62 button{font-size:12px}}
+
+#rayFace55,#rayRatio54,#rayOverall62{font-size:14px;line-height:1.6}
+#rayFace55 button,#rayFace55 select,#rayRatio54 button,#rayRatio54 select,#rayRatio54 input[type=number],#rayOverall62 button,#rayOverall62 select{font-size:15px;min-height:44px}
+#rayFace55 .r55-desc,#rayFace55 .r55-small,#rayFace55 .r55-field label,#rayRatio54 .r54-note,#rayRatio54 label,#rayRatio54 #r54Status{font-size:13px}
+#rayFace55 .r55-rows>div{font-size:12px}
+#rayFace55 .r55-actions>button,#rayOverall62 .ray62-actions>button{flex:1 1 170px}
+
+/* One compact workflow for body edits; these rules only apply to Chỉnh dáng. */
+body[data-editor-tool=body] .film-workspace .scroll{display:block}
+body[data-editor-tool=body] #grpBody{width:100%;max-width:880px;margin:auto;padding:10px 14px}
+body[data-editor-tool=body] #bodyHead{display:none}
+.ray-body-tabs{display:flex;gap:6px;position:sticky;top:0;z-index:4;padding:0 0 9px;background:#17181c}
+.ray-body-tabs button{flex:1;min-width:0;min-height:40px;border:1px solid #65583e;border-radius:7px;background:#24242a;color:#d9cdb7;font:13px var(--sans);cursor:pointer}
+.ray-body-tabs button[aria-selected=true]{background:#e7c778;border-color:#e7c778;color:#211b12}
+.ray-body-picker{display:flex;gap:10px;align-items:center;font:13px var(--sans);color:#e6d4a9;margin:3px 0 8px}
+.ray-body-picker select{flex:1;min-width:0;min-height:42px;padding:8px 10px;background:#27262c;color:#f5ecd9;border:1px solid #746140;border-radius:6px;font:15px var(--sans)}
+.ray-body-help{font:12px/1.6 var(--sans);color:#cfc2a8;margin:6px 0 12px}
+#rayBodyManual #bodyCtl>.bname,#rayBodyManual #bodyCtl>.hint{display:none}
+#rayBodyManual #bodySliders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 20px}
+#rayBodyManual #bodySliders .row{margin:0 0 10px}
+#rayBodyManual #bodySliders .row .t{font-size:12px}
+.ray-body-details{border-top:1px solid #4d4434;padding:9px 0;margin:7px 0;font:12px/1.6 var(--sans);color:#d9caae}
+.ray-body-details>summary{cursor:pointer;color:#e5ce9a;min-height:32px;display:list-item}
+.ray-body-details .row{margin:12px 0}
+#bodyBox[data-body-mode] #rayFace55,#bodyBox[data-body-mode] #rayOverall62,#bodyBox[data-body-mode] #rayRatio54{border:0;padding:0;margin:0;background:none}
+#bodyBox[data-body-mode] #rayFace55 h3,#bodyBox[data-body-mode] #rayOverall62 h3,#bodyBox[data-body-mode] .r54-title{display:none}
+#bodyBox[data-body-mode] .r55-desc,#bodyBox[data-body-mode] .ray62-diagnostic{font-size:12px;margin:4px 0 10px;line-height:1.6}
+#bodyBox[data-body-mode] .r55-field{grid-template-columns:100px minmax(0,1fr);margin:7px 0}
+#bodyBox[data-body-mode] .r55-actions,#bodyBox[data-body-mode] .ray62-actions{margin:8px 0;gap:7px}
+#bodyBox[data-body-mode] button{font-family:var(--sans)}
+#bodyBox[data-body-mode] .r60-fine-controls{grid-template-columns:minmax(0,1fr);margin:8px 0;padding:10px}
+.ray-body-reset{padding-top:8px;margin-top:10px;border-top:1px solid #443d31}
+.ray-body-reset button,#rayBodyManual>#bodyReset1{min-height:36px;padding:7px 10px;font-size:12px;border-radius:5px}
+#r54ScopeNote{font-size:12px}
+@media(max-width:600px){#rayBodyManual #bodySliders{display:block}.ray-body-tabs button{font-size:12px}#bodyBox[data-body-mode] #rayFace55 button,#bodyBox[data-body-mode] #rayOverall62 button{min-height:40px;font-size:13px}#bodyBox[data-body-mode] #rayFace55 select,#bodyBox[data-body-mode] #rayOverall62 select{font-size:15px}}
+
+/* Open strokes stay thin on the photograph; the range controls the affected pixels around them. */
+.ray-body-tabs{gap:5px}.ray-body-tabs button{white-space:nowrap;padding-inline:6px}
+#rayBodyLinesPane{min-width:0;padding:0 0 10px}
+.ray-body-line-modes,.ray-body-line-actions,.ray-body-line-nudges{display:flex;gap:6px;flex-wrap:wrap;margin:9px 0}
+#rayBodyLinesPane button{min-height:40px;padding:8px 11px;border:1px solid #796743;border-radius:6px;background:#25242a;color:#ead7ad;font:13px var(--sans);touch-action:manipulation}
+#rayBodyLinesPane button[aria-pressed=true]{background:#e7c778;border-color:#e7c778;color:#211b11}
+#rayBodyLinesPane button:disabled{opacity:.35}
+#rayBodyLinesPane .row{margin:13px 0;display:block}#rayBodyLinesPane input[type=range]{width:100%;accent-color:#e7c778;touch-action:pan-x}#rayBodyLinesPane output{float:right;color:#f1d18d}
+.ray-body-line-nudges button{flex:1;font-size:20px!important}.ray-body-line-actions button{flex:1;white-space:nowrap}
+#rayBodyLineSurface{position:absolute;z-index:10;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;overflow:hidden}
+#rayBodyLineSurface.is-armed{pointer-events:auto;touch-action:none;cursor:crosshair}#rayBodyLineSurface[data-mode=edit].is-armed{cursor:grab}
+#rayBodyLineSurface svg{display:block;width:100%;height:100%;overflow:hidden;pointer-events:none;max-width:none;border:0;background:none}
+#rayBodyPhotoTools{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:flex;gap:7px;z-index:14;max-width:calc(100% - 16px)}
+#rayBodyPhotoTools button{position:static;transform:none;min-height:36px;border-radius:20px;border:1px solid #c6a35a;background:#211e17ed;color:#f6d88b;padding:7px 13px;white-space:nowrap;font:13px var(--sans);touch-action:manipulation}
+#rayBodyPhotoTools button[aria-pressed=true]{background:#e7c778;color:#211b11}
+.session-peeking #rayBodyLineSurface,.session-peeking #rayBodyPhotoTools,.film-workspace.is-result-preview #rayBodyLineSurface,.film-workspace.is-result-preview #rayBodyPhotoTools{visibility:hidden;pointer-events:none}
+#rayBodyLineSurface[hidden],#rayBodyPhotoTools[hidden],#rayBodyPhotoTools button[hidden]{display:none!important}
+@media(max-width:380px){.ray-body-tabs button{font-size:11px;padding-inline:4px}.ray-body-line-actions button{font-size:11px!important;padding-inline:7px!important}}
+
+#rayContourTools .ray-contour-modes{display:flex;flex-wrap:wrap;gap:5px}#rayContourTools .ray-contour-modes button{flex:1 1 30%;min-height:36px}#rayContourTools .ray-contour-modes button[data-contour-mode=drag]{flex-basis:45%}
+
+/* Keep the original size/width/length sliders first; region brushes are optional. */
+#rayBodyTab-manual{white-space:normal;line-height:1.25;padding:4px 6px}
+#rayBodyManual .ray-body-picker{margin:0 0 5px}
+#rayBodyManual #bodySliders .row{margin:0 0 7px}
+#rayBodyManual #bodySliders .row .t{font-size:13px;color:#f3dfad}
+#rayBodyManual .ray-body-region-details .body-region-tools{margin:0;border:0;padding:0}
+#rayBodyManual .ray-body-region-details .body-region-tools>h3{display:none}
+@media(max-width:600px){
+ body[data-editor-tool=body] #grpBody:has(#bodyBox[data-body-mode=manual]){padding-top:0}
+ #bodyBox[data-body-mode=manual]{margin-top:0}
+ #bodyBox[data-body-mode=manual]>.bodybtns{display:none}
+ #bodyBox[data-body-mode=manual]>.ray-body-tabs{padding-bottom:0}
+ #rayBodyManual .ray-body-picker{margin-bottom:3px}
+ #rayBodyManual .ray-body-picker select{height:36px;min-height:36px;padding:4px 8px}
+ #rayBodyManual #bodySliders .row{display:grid;grid-template-columns:120px minmax(0,1fr);align-items:center;gap:10px;min-height:32px;margin:0}
+ #rayBodyManual #bodySliders .row .t{display:flex;align-items:center;justify-content:space-between;gap:4px;font-size:11px;white-space:nowrap}
+ #rayBodyManual #bodySliders .row input[type=range]{width:100%;min-width:0;margin:0;min-height:32px}
+}

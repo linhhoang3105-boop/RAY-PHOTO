@@ -1,0 +1,15 @@
+/* One local album connection; list metadata without retaining every source and history in memory. */
+(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.RayAlbumStore=api;})(typeof globalThis!=='undefined'?globalThis:this,()=>{
+ 'use strict';
+ const fields=['id','name','mime','origin','draftId','created','updated','poster','steps','advancedDraft','premiumDraft','variant','width','height','editKey'];
+ function metadata(row){return Object.fromEntries(fields.filter(k=>row[k]!==undefined).map(k=>[k,row[k]]));}
+ function storageError(error){if(error?.name==='QuotaExceededError')return new Error('Kho trên thiết bị đã đầy. Bạn vẫn có thể tải kết quả về máy; quản lý các tệp cũ trong Kho ảnh để dành chỗ cho nháp.');return error||new Error('Chưa lưu được kho ảnh. Kết quả đang chỉnh vẫn còn.');}
+ function create(factory){let pending;
+  const open=()=>pending||=(new Promise((resolve,reject)=>{const r=factory.open('buong-toi-album',3);r.onupgradeneeded=()=>{for(const name of ['exports','drafts'])if(!r.result.objectStoreNames.contains(name))r.result.createObjectStore(name,{keyPath:'id'});const store=r.transaction.objectStore('exports');if(!store.indexNames.contains('editKey'))store.createIndex('editKey','editKey');};r.onsuccess=()=>{r.result.onversionchange=()=>{r.result.close();pending=null;};resolve(r.result);};r.onerror=()=>{pending=null;reject(storageError(r.error));};r.onblocked=()=>{pending=null;reject(new Error('Đóng các tab RAY PHOTO cũ rồi thử mở Kho ảnh lại.'));};}));
+  async function run(mode,action,name='exports'){const db=await open();return new Promise((resolve,reject)=>{const tx=db.transaction(name,mode);let result;tx.oncomplete=()=>resolve(result);tx.onabort=tx.onerror=event=>reject(storageError(tx.error||event?.target?.error));try{action(tx.objectStore(name),value=>{result=value;});}catch(error){try{tx.abort();}catch{}reject(storageError(error));}});}
+  const request=(mode,fn,name)=>run(mode,(store,done)=>{const r=fn(store);r.onsuccess=()=>done(r.result);},name);
+  return{open,request,get:(name,id)=>request('readonly',s=>s.get(id),name),put:(name,row)=>request('readwrite',s=>s.put(row),name),list:name=>run('readonly',(store,done)=>{const rows=[],r=store.openCursor();r.onsuccess=()=>{const cursor=r.result;if(!cursor){done(rows);return;}rows.push(metadata(cursor.value));cursor.continue();};},name),saveExport:row=>run('readwrite',(store,done)=>{const put=prior=>{const next={...row,id:prior?.id||row.id,created:prior?.created||row.created};const r=store.put(next);r.onsuccess=()=>done(next);};if(!row.editKey){put(null);return;}const r=store.index('editKey').getAll(row.editKey);r.onsuccess=()=>put(r.result.find(prior=>prior.mime===row.mime));})};
+ }
+ async function fingerprint(value,crypto=globalThis.crypto){if(!crypto?.subtle)return value;const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));return Array.from(new Uint8Array(bytes),v=>v.toString(16).padStart(2,'0')).join('');}
+ return{metadata,storageError,create,fingerprint};
+});

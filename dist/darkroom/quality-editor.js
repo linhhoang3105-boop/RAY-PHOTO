@@ -1,0 +1,17 @@
+/* A single full-quality export path for the app, portable HTML, JPEG and PNG. */
+(()=>{
+ 'use strict';
+ const core=RayQuality,qualityNote=document.createElement('p');qualityNote.className='hint export-quality-note';qualityNote.setAttribute('role','status');document.getElementById('sizeSeg').after(qualityNote);let saving=false;
+ function sync(){if(!source){qualityNote.textContent='Ảnh lưu được dựng từ ảnh gốc, độc lập với chế độ xem trước Nhẹ.';return;}const p=core.plan(source.width,source.height,exportLong);qualityNote.textContent='Ảnh gốc '+source.width+' × '+source.height+' · Lưu phần ảnh '+p.width+' × '+p.height+' px.'+(p.limited?' Đã giới hạn 16 MP để phù hợp bộ nhớ; khung viền được cộng thêm.':' Khung viền được cộng thêm.');}
+ const oldSync=syncControls;syncControls=function(){oldSync();sync();};const oldDraw=draw;draw=function(){oldDraw();sync();};document.getElementById('sizeSeg').addEventListener('click',sync);
+ async function exportFile(){
+  if(!source)throw new Error('Mở một ảnh trước nhé.');if(saving||BEAUTY.busy||BODY_AI.busy||window.RayCompose?.busy||window.RayRemove?.busy)throw new Error('Đợi xử lý xong hoặc bấm Dừng trước khi lưu.');
+  const expectedSource=source;saving=true;saveBtn.disabled=true;let access,editKey;
+  try{access=await window.RayAccess?.prepareExport()||{kind:'full',draftId:window.RaySession?.documentKey};if(source!==expectedSource)throw new Error('Bạn đã đổi ảnh. Nháp ảnh trước vẫn được giữ; hãy lưu lại ảnh đang mở.');}catch(error){saving=false;saveBtn.disabled=!source;throw error;}
+  const resumePreview=window.RayPreview?.pause?.({refineOnResume:false});window.RayLayers?.invalidate?.();busy.classList.add('on');
+  try{await window.RayCompose?.ensureAssets();await window.RaySession?.apply();editKey=window.RaySession?.documentKey+'|'+window.RaySession?.snapshot?.()?.key;await nextFrame();const type=window.RayCompose?.outputType()||'image/jpeg';const result=await core.output({source,longEdge:exportLong,type,render:(target,input)=>{const out=render(target,input);try{window.RayPreview?.showExport(target,input.width,input.height);}catch{}return out;},make:()=>document.createElement('canvas'),notify:p=>{busy.textContent=p.attempt?'Máy thiếu bộ nhớ — đang thử bản gọn hơn…':'Đang dựng ảnh '+p.width+' × '+p.height+'…';}});return{...result,editKey,name:stamp().replace(/\.jpg$/i,type==='image/png'?'.png':'.jpg'),origin:'darkroom',draftId:access.draftId||window.RaySession?.documentKey,basicCopy:false};}
+  finally{saving=false;busy.classList.remove('on');busy.textContent='Đang dựng bản đầy đủ…';saveBtn.disabled=!source;resumePreview?.();}
+ }
+ saveBtn.onclick=async()=>{try{const file=await exportFile();if(window.parent!==window)window.parent.BuongToiHost?.onExport(file);if(IOS){const dataUrl=await new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(new Error('Chưa mở được ảnh để lưu vào Ảnh.'));reader.readAsDataURL(file.blob);});openSheet({blob:file.blob,dataUrl},file.name,file.width,file.height);}else{const a=document.createElement('a'),url=URL.createObjectURL(file.blob);a.download=file.name;a.href=url;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),8000);}if(file.fallback||file.limited)note('Đã lưu '+file.width+' × '+file.height+' px để phù hợp bộ nhớ.');}catch(error){note(error.message||'Chưa lưu được ảnh.');}};
+ window.RayQualityExport={exportFile};sync();
+})();

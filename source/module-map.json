@@ -1,0 +1,978 @@
+{
+  "version": 1,
+  "name": "RAY PHOTO",
+  "nativeEditorManifest": "source/editor/manifest.json",
+  "entryPoints": {
+    "web": "dist/index.html",
+    "editor": "dist/darkroom/index.html",
+    "photobooth": "dist/photobooth/index.html",
+    "sharingAPI": "server/preset-api.mjs",
+    "hostedWorker": "api-server/worker/index.ts",
+    "portableWorker": "server/portable-worker.mjs",
+    "localServer": "scripts/serve-local.mjs"
+  },
+  "notes": [
+    "sourceFiles are the authoritative editable paths. Trailing slash means the directory and its children. Existing independent UMD/ESM modules stay in their current dist paths to avoid duplicate authorities.",
+    "The native editor source parts share classic-script lexical state and are assembled in exact manifest order without wrappers or added separators. They are logical source modules, not individually bootable ES-module applications.",
+    "browserDeclarationOrder records HTML declaration order. type=module scripts defer their evaluation according to browser rules. Adapter initialization order remains unchanged.",
+    "generatedOutputs are build products; edit their source module and rebuild. The historical-baseline module contains preserved references, not current editor authority.",
+    "Folder coverage can intentionally overlap for backend/database and build tooling. Existing backend framework includes its own helpers and components. Hosted sharing requires DB configuration; local photo processing does not upload photos."
+  ],
+  "browserDeclarationOrder": [
+    {
+      "path": "dist/darkroom/index.html",
+      "type": "assembled-classic-native-script"
+    },
+    {
+      "path": "dist/darkroom/quality-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/hair-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/runtime-profile.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/people.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/light-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/brush-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/remove-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/background-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/compose-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/photo-edit-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/tone-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/preview-texture.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/tone-controls.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/brush-controls.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/ray-preset-thu-nhat.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/thu-nhat-adapter.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/preset-catalog.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/app-bridge.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/photo-controls.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/brow-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/beauty-runtime.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/brows.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/hair-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/region-paint-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/region-shape-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/adjust-scope-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/effect-layers.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/layer-inspector.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/compose-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/background-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/people-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/photo-edit.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/remove-selection-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/remove-ai.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/inpaint.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/remove-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/cutout-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/sticker-store.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/cutout-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/edit-history.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/album-store.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/session.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/quality-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/preview-quality.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/workspace-layout.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/editor-visibility.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/my-presets.mjs",
+      "type": "module-deferred"
+    },
+    {
+      "path": "dist/module-native.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/pose-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/recognition-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/region-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/contour-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/line-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/pose-adapter.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/compat.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/geometry.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/face.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/overall.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/one-tap.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/workspace.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/region-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/contour-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/body-ai/line-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/adjust-scope-ui.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/region-paint-ui.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/region-shape-ui.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/doodle-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/doodle-ui.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/booth-media.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/video-editor.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/editor-mobile.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/filter-strength-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/filter-strength.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/ai-composer-regions.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/ai-composer-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/ai-composer-recipes.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/ai-composer-runtime.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/ai-composer-ui.js",
+      "type": "classic"
+    }
+  ],
+  "modules": [
+    {
+      "id": "shell",
+      "name": "Trang chính và điều hướng",
+      "description": "Khám phá, mở ảnh, chuyển trình chỉnh ảnh/Photobooth và album.",
+      "sourceFiles": [
+        "dist/index.html",
+        "dist/studio.js",
+        "dist/studio.css"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "workspace",
+        "photobooth",
+        "album"
+      ]
+    },
+    {
+      "id": "editor-state",
+      "name": "Trạng thái và tiện ích ảnh",
+      "description": "Trạng thái P/F/NK/LK và toán màu dùng chung trong native bundle.",
+      "sourceFiles": [
+        "source/editor/core/00-state.js",
+        "source/editor/core/03-math-color.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": []
+    },
+    {
+      "id": "editor-ui",
+      "name": "Giao diện native",
+      "description": "Template HTML và CSS native; HTML runtime được sinh từ manifest.",
+      "sourceFiles": [
+        "source/editor/index.template.html",
+        "source/editor/ui/base.css",
+        "dist/darkroom/app.css",
+        "dist/darkroom/refinements.css"
+      ],
+      "generatedOutputs": [
+        "dist/darkroom/index.html"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "filters",
+      "name": "Bộ lọc và Cường độ tổng",
+      "description": "Preset gốc, LUT/phim, tham số màu, Thu Nhật và cường độ preset.",
+      "sourceFiles": [
+        "source/editor/filters/01-native-presets.js",
+        "source/editor/filters/02-slider-definitions.js",
+        "source/editor/filters/04-color-lut.js",
+        "source/editor/filters/06-film-emulsion.js",
+        "source/editor/filters/08-print-gloss.js",
+        "source/editor/filters/09-print-clear.js",
+        "source/editor/filters/13-filter-controls.js",
+        "source/editor/filters/26-seed-controls.js",
+        "dist/darkroom/preset-catalog.js",
+        "dist/darkroom/ray-preset-thu-nhat.js",
+        "dist/darkroom/thu-nhat-adapter.js",
+        "dist/darkroom/filter-strength-core.js",
+        "dist/darkroom/filter-strength.js",
+        "dist/presets.json"
+      ],
+      "generatedOutputs": [
+        "dist/darkroom/preset-bases.mjs"
+      ],
+      "dependencies": [
+        "editor-state",
+        "renderer",
+        "regions"
+      ]
+    },
+    {
+      "id": "lighting",
+      "name": "Nắng và hiệu ứng sáng",
+      "description": "Glow, nắng, flare và các tay điều khiển vùng nét/ánh sáng.",
+      "sourceFiles": [
+        "source/editor/lighting/07-glow.js",
+        "source/editor/lighting/14-focus-sun-controls.js",
+        "dist/darkroom/light-core.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "editor-state",
+        "renderer"
+      ]
+    },
+    {
+      "id": "renderer",
+      "name": "Dựng ảnh native",
+      "description": "Chuỗi dựng ảnh hiện có; không thay thuật toán khi ghép module.",
+      "sourceFiles": [
+        "source/editor/render/11-render-image.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "filters",
+        "lighting",
+        "body",
+        "makeup"
+      ]
+    },
+    {
+      "id": "workspace",
+      "name": "Khung chỉnh ảnh và nhập ảnh",
+      "description": "Preview, nhập ảnh, UI adapter, vùng công cụ và bootstrap.",
+      "sourceFiles": [
+        "source/editor/workspace/12-preview-import.js",
+        "source/editor/workspace/25-file-input.js",
+        "source/editor/workspace/28-bootstrap.js",
+        "dist/darkroom/app-bridge.js",
+        "dist/darkroom/photo-controls.js",
+        "dist/darkroom/workspace-layout.js",
+        "dist/darkroom/editor-visibility.js",
+        "dist/editor-mobile.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "editor-state",
+        "renderer",
+        "layers"
+      ]
+    },
+    {
+      "id": "image-export",
+      "name": "Xuất ảnh và dấu ngày",
+      "description": "Chữ số, dấu ngày, dựng ảnh nguồn và chia sẻ/lưu ảnh.",
+      "sourceFiles": [
+        "source/editor/export/05-date-glyphs.js",
+        "source/editor/export/24-date-controls.js",
+        "source/editor/export/27-image-export.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "renderer",
+        "native-bridge"
+      ]
+    },
+    {
+      "id": "body",
+      "name": "Chỉnh dáng và Body AI",
+      "description": "Biến dạng hình học, nhận diện và chỉnh từng vùng/người.",
+      "sourceFiles": [
+        "source/editor/body/10-warp.js",
+        "source/editor/body/15-body-controls.js",
+        "source/editor/body/16-recognition.js",
+        "dist/darkroom/body-ai/body-ai.css",
+        "dist/darkroom/body-ai/compat.js",
+        "dist/darkroom/body-ai/contour-core.js",
+        "dist/darkroom/body-ai/contour-editor.js",
+        "dist/darkroom/body-ai/face.js",
+        "dist/darkroom/body-ai/geometry.js",
+        "dist/darkroom/body-ai/line-core.js",
+        "dist/darkroom/body-ai/line-editor.js",
+        "dist/darkroom/body-ai/one-tap.js",
+        "dist/darkroom/body-ai/overall.js",
+        "dist/darkroom/body-ai/people.js",
+        "dist/darkroom/body-ai/pose-adapter.js",
+        "dist/darkroom/body-ai/pose-core.js",
+        "dist/darkroom/body-ai/recognition-core.js",
+        "dist/darkroom/body-ai/region-core.js",
+        "dist/darkroom/body-ai/region-editor.js",
+        "dist/darkroom/body-ai/workspace.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "editor-state",
+        "workspace"
+      ]
+    },
+    {
+      "id": "makeup",
+      "name": "Makeup và nhận diện người",
+      "description": "Da, son, má, mi, phân người và nhận diện; hair/brow adapter bổ sung riêng.",
+      "sourceFiles": [
+        "source/editor/makeup/17-state-ai.js",
+        "source/editor/makeup/18-face-person-regions.js",
+        "source/editor/makeup/19-skin-hair-blend.js",
+        "source/editor/makeup/20-face-masks.js",
+        "source/editor/makeup/21-skin-smoothing.js",
+        "source/editor/makeup/22-makeup-render.js",
+        "source/editor/makeup/23-controls-recognition.js",
+        "dist/darkroom/beauty-runtime.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "editor-state",
+        "workspace"
+      ]
+    },
+    {
+      "id": "hair",
+      "name": "Tóc",
+      "description": "Màu tóc và adapter áp lên matte đã nhận diện.",
+      "sourceFiles": [
+        "dist/darkroom/hair-core.js",
+        "dist/darkroom/hair-editor.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "makeup"
+      ]
+    },
+    {
+      "id": "brows",
+      "name": "Lông mày",
+      "description": "Hình dáng, sợi mày và lớp chỉnh riêng.",
+      "sourceFiles": [
+        "dist/darkroom/brow-core.js",
+        "dist/darkroom/brows.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "makeup"
+      ]
+    },
+    {
+      "id": "composer",
+      "name": "AI Composer",
+      "description": "Phân tích ảnh, phối công cụ, vùng màu, công thức và UI.",
+      "sourceFiles": [
+        "dist/darkroom/ai-composer-core.js",
+        "dist/darkroom/ai-composer-recipes.js",
+        "dist/darkroom/ai-composer-regions.js",
+        "dist/darkroom/ai-composer-runtime.js",
+        "dist/darkroom/ai-composer-ui.js",
+        "dist/darkroom/ai-composer.css"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "filters",
+        "lighting",
+        "regions",
+        "local-presets",
+        "layers"
+      ]
+    },
+    {
+      "id": "tone",
+      "name": "Sáng tối và đường cong vùng",
+      "description": "Công cụ chỉnh sáng/tối và ánh sáng màu native.",
+      "sourceFiles": [
+        "dist/darkroom/tone-controls.js",
+        "dist/darkroom/tone-core.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "regions",
+        "renderer"
+      ]
+    },
+    {
+      "id": "brush",
+      "name": "Bút ánh sáng",
+      "description": "Nét bút và điều khiển bút sáng/tối.",
+      "sourceFiles": [
+        "dist/darkroom/brush-controls.js",
+        "dist/darkroom/brush-core.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "renderer"
+      ]
+    },
+    {
+      "id": "regions",
+      "name": "Vùng điều chỉnh",
+      "description": "Trong/ngoài vùng, nét vẽ, hình vùng và giao vùng.",
+      "sourceFiles": [
+        "dist/darkroom/adjust-scope-core.js",
+        "dist/darkroom/adjust-scope-ui.js",
+        "dist/darkroom/region-paint-core.js",
+        "dist/darkroom/region-paint-ui.js",
+        "dist/darkroom/region-shape-core.js",
+        "dist/darkroom/region-shape-ui.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "editor-state"
+      ]
+    },
+    {
+      "id": "background",
+      "name": "Thay nền",
+      "description": "Tách nền, thay ảnh/màu nền và sửa vùng.",
+      "sourceFiles": [
+        "dist/darkroom/background-core.js",
+        "dist/darkroom/background-editor.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "compose",
+        "makeup"
+      ]
+    },
+    {
+      "id": "compose",
+      "name": "Ghép người và phối cảnh",
+      "description": "Dựng lớp người/vật, vị trí, xoay/nghiêng và thứ tự che.",
+      "sourceFiles": [
+        "dist/darkroom/compose-core.js",
+        "dist/darkroom/compose-editor.js",
+        "dist/darkroom/people-editor.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "photo-edit",
+        "layers"
+      ]
+    },
+    {
+      "id": "removal",
+      "name": "Xóa người/vật và vá nền",
+      "description": "Chọn vật, giữ chủ thể, inpaint và worker LaMa.",
+      "sourceFiles": [
+        "dist/darkroom/inpaint-core.js",
+        "dist/darkroom/inpaint-runtime.js",
+        "dist/darkroom/inpaint-worker.js",
+        "dist/darkroom/inpaint.js",
+        "dist/darkroom/remove-ai.js",
+        "dist/darkroom/remove-core.js",
+        "dist/darkroom/remove-editor.js",
+        "dist/darkroom/remove-selection-core.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "regions",
+        "assets"
+      ]
+    },
+    {
+      "id": "stickers",
+      "name": "Tách vật và sticker",
+      "description": "Tách vật/tranh, PNG trong suốt và kho sticker.",
+      "sourceFiles": [
+        "dist/darkroom/cutout-core.js",
+        "dist/darkroom/cutout-editor.js",
+        "dist/darkroom/sticker-store.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "regions",
+        "compose",
+        "assets"
+      ]
+    },
+    {
+      "id": "photo-edit",
+      "name": "Cắt xoay ảnh",
+      "description": "Hình học chỉnh ảnh và thao tác cắt/xoay.",
+      "sourceFiles": [
+        "dist/darkroom/photo-edit-core.js",
+        "dist/darkroom/photo-edit.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "layers"
+      ]
+    },
+    {
+      "id": "text",
+      "name": "Chữ trên ảnh",
+      "description": "Nội dung, font và vị trí chữ.",
+      "sourceFiles": [
+        "dist/darkroom/doodle-core.js",
+        "dist/darkroom/doodle-ui.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "assets"
+      ]
+    },
+    {
+      "id": "video",
+      "name": "Video trong chỉnh ảnh",
+      "description": "Thời gian, preset theo video và xuất video.",
+      "sourceFiles": [
+        "dist/darkroom/video-editor.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "renderer",
+        "photobooth-media"
+      ]
+    },
+    {
+      "id": "layers",
+      "name": "Các bước, lớp, hoàn tác và nháp",
+      "description": "Hiệu ứng độc lập, lịch sử, xem/sửa tham số và session.",
+      "sourceFiles": [
+        "dist/darkroom/effect-layers.js",
+        "dist/darkroom/edit-history.js",
+        "dist/darkroom/session.js",
+        "dist/darkroom/layer-parameters.mjs",
+        "dist/darkroom/layer-inspector.mjs",
+        "dist/darkroom/layer-inspector-boot.mjs"
+      ],
+      "generatedOutputs": [
+        "dist/darkroom/layer-inspector.js"
+      ],
+      "dependencies": [
+        "album"
+      ]
+    },
+    {
+      "id": "local-presets",
+      "name": "Màu của tôi và công thức",
+      "description": "Lưu/nhập/chia sẻ công thức, store riêng và whitelist tham số.",
+      "sourceFiles": [
+        "dist/darkroom/my-presets.mjs",
+        "dist/darkroom/my-presets-store.mjs",
+        "dist/darkroom/preset-rules.mjs",
+        "dist/darkroom/recipe-description.mjs",
+        "dist/darkroom/creative-save.mjs"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "layers",
+        "api"
+      ]
+    },
+    {
+      "id": "preview-quality",
+      "name": "Chất lượng và hiệu năng",
+      "description": "Preview retina, giới hạn bộ nhớ, kết cấu và chế độ Nhẹ.",
+      "sourceFiles": [
+        "dist/darkroom/quality-core.js",
+        "dist/darkroom/quality-editor.js",
+        "dist/darkroom/preview-quality.js",
+        "dist/darkroom/preview-texture.js",
+        "dist/darkroom/runtime-profile.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "renderer"
+      ]
+    },
+    {
+      "id": "photobooth",
+      "name": "Photobooth",
+      "description": "Camera, khung ảnh, cắt ghép ô ảnh, cử chỉ và giao diện booth.",
+      "sourceFiles": [
+        "dist/photobooth/index.html",
+        "dist/app.js",
+        "dist/booth-app.css",
+        "dist/booth-core.js",
+        "dist/booth-designs.js",
+        "dist/booth-gestures.js",
+        "dist/booth-workspace.js",
+        "dist/buongtoi-lab.js",
+        "dist/photo-beauty.js",
+        "dist/styles.css",
+        "dist/media.css"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "photobooth-media",
+        "album"
+      ]
+    },
+    {
+      "id": "photobooth-media",
+      "name": "GIF và video Photobooth",
+      "description": "Nguồn media và mã GIF dùng chung.",
+      "sourceFiles": [
+        "dist/booth-media.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "assets"
+      ]
+    },
+    {
+      "id": "legacy-makeup",
+      "name": "Trang Makeup tương thích",
+      "description": "Trang beauty.html và module Makeup độc lập cũ; không phải darkroom hiện tại.",
+      "sourceFiles": [
+        "dist/beauty.html",
+        "dist/makeup-core.js",
+        "dist/makeup-detection.js",
+        "dist/makeup-editor.js",
+        "dist/makeup.css"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "assets"
+      ]
+    },
+    {
+      "id": "album",
+      "name": "Kho ảnh trên thiết bị",
+      "description": "IndexedDB cho ảnh, nháp và lịch sử nguồn.",
+      "sourceFiles": [
+        "dist/album-store.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": []
+    },
+    {
+      "id": "intro",
+      "name": "Phim mở đầu",
+      "description": "Giao diện và media intro.",
+      "sourceFiles": [
+        "dist/intro.js",
+        "dist/intro.css"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "assets"
+      ]
+    },
+    {
+      "id": "pwa",
+      "name": "PWA và cache",
+      "description": "Service worker, manifest và range video.",
+      "sourceFiles": [
+        "dist/sw.js",
+        "dist/manifest.webmanifest",
+        "dist/video-range.js"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "assets"
+      ]
+    },
+    {
+      "id": "native-bridge",
+      "name": "Cầu nối ứng dụng điện thoại",
+      "description": "Nguồn Capacitor, bridge trình duyệt và wrapper iOS/Android.",
+      "sourceFiles": [
+        "dist/module-native.js",
+        "native/",
+        "android/",
+        "ios/",
+        "capacitor.config.json"
+      ],
+      "generatedOutputs": [
+        "dist/native-bridge.js"
+      ],
+      "dependencies": []
+    },
+    {
+      "id": "api",
+      "name": "API chia sẻ mã màu",
+      "description": "API công thức; triển khai đầy đủ cần database.",
+      "sourceFiles": [
+        "server/preset-api.mjs"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "database"
+      ]
+    },
+    {
+      "id": "database",
+      "name": "Schema và migration",
+      "description": "Schema và SQL cho kho mã màu; không gồm dữ liệu người dùng.",
+      "sourceFiles": [
+        "api-server/db/",
+        "api-server/drizzle/"
+      ],
+      "generatedOutputs": [],
+      "dependencies": []
+    },
+    {
+      "id": "hosting",
+      "name": "Web server và framework",
+      "description": "Worker/Vinext, cấu hình và công cụ phát triển/triển khai.",
+      "sourceFiles": [
+        "api-server/",
+        ".openai/hosting.json"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "api"
+      ]
+    },
+    {
+      "id": "assets",
+      "name": "Mô hình, font và tài nguyên",
+      "description": "Mô hình chạy trên thiết bị, font, media và giấy phép đi kèm.",
+      "sourceFiles": [
+        "dist/icon.svg",
+        "dist/privacy.html",
+        "dist/support.html",
+        "dist/vendor/",
+        "dist/fonts/",
+        "dist/assets/",
+        "dist/icons/"
+      ],
+      "generatedOutputs": [],
+      "dependencies": []
+    },
+    {
+      "id": "developer-tools",
+      "name": "Build, kiểm thử và bản đồ nguồn",
+      "description": "Manifest, assembler, các công cụ build/đóng gói và kiểm thử.",
+      "sourceFiles": [
+        "source/editor/manifest.json",
+        "source/module-map.json",
+        "scripts/",
+        "test/",
+        "package.json",
+        "package-lock.json"
+      ],
+      "generatedOutputs": [],
+      "dependencies": []
+    },
+    {
+      "id": "historical-baseline",
+      "name": "Bản tham chiếu lịch sử",
+      "description": "HTML và checksum gốc giữ để kiểm tra hồi quy; không phải nguồn module đang chỉnh.",
+      "sourceFiles": [
+        "source/buong-toi-original.html",
+        "source/engine-sha256.json",
+        "source/rolls.literal.js",
+        "source/intro-compression.json"
+      ],
+      "generatedOutputs": [],
+      "dependencies": []
+    },
+    {
+      "id": "portable-web",
+      "name": "Chạy web độc lập",
+      "description": "Server local và bản xuất static/Worker để tiếp tục phát triển ngoài Sites.",
+      "sourceFiles": [
+        "scripts/serve-local.mjs",
+        "scripts/build-web.mjs",
+        "server/portable-worker.mjs",
+        "wrangler.portable.jsonc"
+      ],
+      "generatedOutputs": [],
+      "dependencies": [
+        "api",
+        "assets",
+        "developer-tools"
+      ]
+    }
+  ]
+}

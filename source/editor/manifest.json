@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "output": "dist/darkroom/index.html",
+  "template": "source/editor/index.template.html",
+  "styleToken": "{{RAY_EDITOR_STYLE}}",
+  "scriptToken": "{{RAY_EDITOR_SCRIPT}}",
+  "styles": [
+    "source/editor/ui/base.css"
+  ],
+  "scripts": [
+    {
+      "path": "source/editor/core/00-state.js",
+      "module": "editor-state"
+    },
+    {
+      "path": "source/editor/filters/01-native-presets.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/filters/02-slider-definitions.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/core/03-math-color.js",
+      "module": "editor-state"
+    },
+    {
+      "path": "source/editor/filters/04-color-lut.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/export/05-date-glyphs.js",
+      "module": "image-export"
+    },
+    {
+      "path": "source/editor/filters/06-film-emulsion.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/lighting/07-glow.js",
+      "module": "lighting"
+    },
+    {
+      "path": "source/editor/filters/08-print-gloss.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/filters/09-print-clear.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/body/10-warp.js",
+      "module": "body"
+    },
+    {
+      "path": "source/editor/render/11-render-image.js",
+      "module": "renderer"
+    },
+    {
+      "path": "source/editor/workspace/12-preview-import.js",
+      "module": "workspace"
+    },
+    {
+      "path": "source/editor/filters/13-filter-controls.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/lighting/14-focus-sun-controls.js",
+      "module": "lighting"
+    },
+    {
+      "path": "source/editor/body/15-body-controls.js",
+      "module": "body"
+    },
+    {
+      "path": "source/editor/body/16-recognition.js",
+      "module": "body"
+    },
+    {
+      "path": "source/editor/makeup/17-state-ai.js",
+      "module": "makeup"
+    },
+    {
+      "path": "source/editor/makeup/18-face-person-regions.js",
+      "module": "makeup"
+    },
+    {
+      "path": "source/editor/makeup/19-skin-hair-blend.js",
+      "module": "makeup"
+    },
+    {
+      "path": "source/editor/makeup/20-face-masks.js",
+      "module": "makeup"
+    },
+    {
+      "path": "source/editor/makeup/21-skin-smoothing.js",
+      "module": "makeup"
+    },
+    {
+      "path": "source/editor/makeup/22-makeup-render.js",
+      "module": "makeup"
+    },
+    {
+      "path": "source/editor/makeup/23-controls-recognition.js",
+      "module": "makeup"
+    },
+    {
+      "path": "source/editor/export/24-date-controls.js",
+      "module": "image-export"
+    },
+    {
+      "path": "source/editor/workspace/25-file-input.js",
+      "module": "workspace"
+    },
+    {
+      "path": "source/editor/filters/26-seed-controls.js",
+      "module": "filters"
+    },
+    {
+      "path": "source/editor/export/27-image-export.js",
+      "module": "image-export"
+    },
+    {
+      "path": "source/editor/workspace/28-bootstrap.js",
+      "module": "workspace"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "appId": "vn.buongtoi.studio",
+  "appName": "RAY PHOTO",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "backgroundColor": "#111214"
+  },
+  "ios": {
+    "backgroundColor": "#111214",
+    "contentInset": "never"
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#111214"
+    }
+  }
+}

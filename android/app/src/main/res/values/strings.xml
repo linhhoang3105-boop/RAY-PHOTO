@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RAY PHOTO</string>
+    <string name="title_activity_main">RAY PHOTO</string>
+    <string name="package_name">vn.buongtoi.studio</string>
+    <string name="custom_url_scheme">vn.buongtoi.studio</string>
+</resources>

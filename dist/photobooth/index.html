@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <base href="../">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f6f3ec">
+  <meta name="description" content="Một buồng chụp nhỏ mang thương nhớ Hải Phòng. Chọn từ 2 đến 6 ảnh, ghép khung báo hoặc phông của bạn và lưu ảnh ngay trên máy.">
+  <title>Linh Linh - Phố Cảng — Một buồng chụp nhỏ</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css?v=12">
+  <link rel="stylesheet" href="media.css?v=12">
+<link rel="stylesheet" href="booth-app.css?v=101">
+<link rel="stylesheet" href="fonts/fonts.css"></head>
+<body class="embedded-booth">
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 6h4l2-3h4l2 3h4a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v13m-5-5 5 5 5-5M4 17v4h16v-4"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7a9 9 0 0 0-15-2L2 8m0-6v6h6m-4 9a9 9 0 0 0 15 2l3-3m0 6v-6h-6"/></symbol>
+    <symbol id="i-flip" viewBox="0 0 24 24"><path d="M12 2v20M3 6l5 3v6l-5 3V6Zm18 0-5 3v6l5 3V6Z"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L20 5"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V6a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 16V2m-5 5 5-5 5 5M5 10H3v12h18V10h-2"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+  </defs></svg>
+
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="Linh Linh - Phố Cảng Photobooth, về đầu trang">
+      <svg class="brand-flower" viewBox="0 0 64 64" aria-hidden="true"><g fill="currentColor"><ellipse cx="32" cy="18" rx="10" ry="16"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(72 32 32)"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(144 32 32)"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(216 32 32)"/><ellipse cx="32" cy="18" rx="10" ry="16" transform="rotate(288 32 32)"/></g><circle cx="32" cy="32" r="5" fill="#efc58a"/></svg>
+      <span class="brand-name">Linh Linh - Phố Cảng<small>PHOTOBOOTH</small></span>
+    </a>
+    <span class="header-note">MỘT BUỒNG CHỤP NHỎ, MỘT NGÀY THẬT XINH.</span>
+    <button class="text-button help-open">Cách chơi <span aria-hidden="true">↗</span></button>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div><p class="eyebrow"><span></span> HẢI PHÒNG, VỚI THƯƠNG MẾN</p><h1>Ghé chơi.<br class="mobile-br"> <em>Giữ một nụ cười.</em></h1><p class="intro-copy">Chọn một chiếc phông, thả dáng một chút.<br class="mobile-br"> Còn những khoảnh khắc, để Phố Cảng giữ giùm.</p></div>
+      <div class="postmark" aria-hidden="true"><span>HẢI PHÒNG</span><strong>with love</strong><span>PHOTO MEMORIES</span></div>
+    </section>
+
+    <nav class="mode-switch" aria-label="Chọn khu chỉnh ảnh"><a href="index.html" class="active" aria-current="page">Photobooth</a><a href="beauty.html">Chỉnh ảnh &amp; trang điểm</a></nav>
+    <div class="workspace">
+      <section class="studio" aria-labelledby="studio-title">
+        <div class="section-heading"><h2 id="studio-title"><span class="step">01</span> Buồng chụp của bạn</h2><span id="cameraStatus" class="status"><i></i> CHƯA BẬT CAMERA</span></div>
+        <div id="countControls" class="count-controls"><div class="count-top"><span class="control-label">MỘT BỘ BAO NHIÊU ẢNH?</span><div id="countGroup" class="segmented count-segmented" role="group" aria-label="Số ảnh trong bộ"><button id="countTwo" data-count="2" aria-pressed="false">2 ảnh</button><button id="countThree" data-count="3" aria-pressed="false">3 ảnh</button><button id="countFour" data-count="4" class="active" aria-pressed="true">4 ảnh</button><button id="countFive" data-count="5" aria-pressed="false">5 ảnh</button><button id="countSix" data-count="6" aria-pressed="false">6 ảnh</button></div></div><p id="countHint">Bốn khoảnh khắc, vừa xinh một trang.</p></div>
+        <div class="shoot-actions"><button id="shootAll" class="button primary shoot-main" disabled><span class="shutter-dot"></span><span id="shootLabel">Chụp 4 kiểu</span></button><button id="cancelShoot" class="button secondary" hidden>Dừng chụp</button><button id="importPhotos" class="button secondary"><svg class="icon"><use href="#i-upload"/></svg> Ảnh / video</button></div>
+        <div class="viewfinder" id="viewfinder">
+          <video id="video" autoplay muted playsinline aria-label="Hình ảnh trực tiếp từ camera" hidden></video>
+          <img id="selectedImage" alt="Ảnh đang được chỉnh" hidden>
+          <canvas id="selectedMotion" aria-label="Khung hình GIF hoặc video đang chỉnh" hidden></canvas>
+          <div class="camera-empty" id="cameraEmpty">
+            <div class="viewfinder-grid" aria-hidden="true"></div>
+            <svg class="camera-drawing" viewBox="0 0 120 100" aria-hidden="true"><path d="M18 28h22l9-13h24l9 13h20a9 9 0 0 1 9 9v46a9 9 0 0 1-9 9H18a9 9 0 0 1-9-9V37a9 9 0 0 1 9-9Z"/><circle cx="61" cy="59" r="23"/><circle cx="61" cy="59" r="16"/><path d="M89 39h11M2 17l9 5M13 3l5 10M111 6l-7 10"/></svg>
+            <p>Một, hai, ba… <em>cười nào!</em></p><span>Bật camera hoặc chọn ảnh từ máy để bắt đầu.</span>
+            <button id="startCamera" class="button primary"><svg class="icon"><use href="#i-camera"/></svg> Bật camera</button>
+            <button id="importHero" class="empty-import">Dùng ảnh, GIF hoặc video có sẵn <span aria-hidden="true">↗</span></button>
+          </div>
+          <span class="viewfinder-corner corner-tl" aria-hidden="true"></span><span class="viewfinder-corner corner-tr" aria-hidden="true"></span><span class="viewfinder-corner corner-bl" aria-hidden="true"></span><span class="viewfinder-corner corner-br" aria-hidden="true"></span>
+          <div class="camera-badge" id="cameraBadge" hidden><span class="live-dot"></span> LIVE <span class="badge-divider">/</span> <span id="shotCounter">01 — 04</span></div>
+          <div class="countdown" id="countdown" aria-live="assertive" hidden>3</div>
+          <div class="flash" id="flash" aria-hidden="true"></div>
+          <button id="quickShoot" class="in-camera-shutter" hidden disabled><span class="shutter-dot"></span><span id="quickShootLabel">Chụp 4 kiểu</span></button>
+          <div class="editing-label" id="editingLabel" hidden>Kéo ảnh để chỉnh vị trí</div>
+          <div class="camera-message" id="cameraMessage" role="status" hidden></div>
+        </div>
+
+        <div class="camera-toolbar">
+          <div class="camera-controls"><button id="flip" class="tool-button" aria-label="Lật gương camera" aria-pressed="true" title="Lật gương"><svg class="icon"><use href="#i-flip"/></svg><span>Lật gương</span></button><button id="switchCamera" class="tool-button" aria-label="Đổi camera trước hoặc sau" title="Đổi camera" disabled><svg class="icon"><use href="#i-refresh"/></svg><span>Đổi camera</span></button><button id="stopCamera" class="tool-button small-text" hidden>Tắt camera</button></div>
+          <label class="timer-label" for="timer">Đếm ngược <select id="timer"><option value="3">3 giây</option><option value="5">5 giây</option><option value="0">Tắt</option></select></label>
+        </div>
+
+
+        <section class="lab-section" aria-labelledby="labTitle"><div class="lab-title"><span id="labTitle">MÀU ẢNH <small>9 bộ lọc + Gốc · Nắng hoa</small></span><button id="rerollFX" class="text-button" title="Đổi vị trí hạt phim">↻ Rắc lại</button></div><label class="lab-pick" for="labRoll">Chọn màu<select id="labRoll"></select></label><p class="lab-note" id="effectTarget">Chọn một ô ảnh để chỉnh màu riêng. Mỗi ảnh giữ màu của mình.</p><button id="applyAllFX" class="text-button">Dùng chỉnh sửa này cho cả bộ</button></section>
+        <section class="beauty-controls" aria-label="Chỉnh da"><div class="beauty-heading"><span class="control-label">CHỈNH DA</span><span>riêng cho ảnh đang chọn</span></div><div class="effect-sliders"><label for="beauty-smooth"><span>Mịn da<output id="beauty-smooth-value">0%</output></span><input id="beauty-smooth" type="range" min="0" max="100" value="0" step="1"></label><label for="beauty-brighten"><span>Sáng da<output id="beauty-brighten-value">0%</output></span><input id="beauty-brighten" type="range" min="0" max="100" value="0" step="1"></label></div></section>
+        <details id="effectsControls" class="effects-controls"><summary>Chỉnh thêm hạt &amp; ánh sáng <span>＋</span></summary><div class="effects-heading"><span class="control-label">HIỆU ỨNG ẢNH</span><select id="fxPreset" aria-label="Bộ hiệu ứng nhanh"><option value="clean">Sạch / Gốc</option><option value="film">Phim hạt</option><option value="flash">Flash booth</option><option value="dream">Mơ màng</option><option value="custom">Tự chỉnh</option></select></div><div class="effect-sliders"><label for="fx-grain"><span>Hạt phim<output id="fx-grain-value">0%</output></span><input id="fx-grain" type="range" min="0" max="100" value="0" step="1"></label><label for="fx-flash"><span>Flash mềm<output id="fx-flash-value">0%</output></span><input id="fx-flash" type="range" min="0" max="100" value="0" step="1"></label><label for="fx-vignette"><span>Viền tối<output id="fx-vignette-value">0%</output></span><input id="fx-vignette" type="range" min="0" max="100" value="0" step="1"></label><label for="fx-leak"><span>Lọt sáng<output id="fx-leak-value">0%</output></span><input id="fx-leak" type="range" min="0" max="100" value="0" step="1"></label></div><p>Chụp hoặc chọn ảnh để xem hiệu ứng. Các hiệu ứng được giữ trong ảnh PNG tải về.</p></details>
+
+        <p class="capture-tip" id="captureTip">Mỗi kiểu cách nhau 3 giây. Cứ tự nhiên, ở đây chỉ có bạn thôi.</p>
+
+        <div class="photo-tray-heading"><span class="control-label">NHỮNG KHOẢNH KHẮC</span><span id="photoCount">0 / 4 ảnh</span></div>
+        <div id="photoTray" class="photo-tray" aria-label="Ảnh đã chụp, bấm vào một ô để sửa"></div>
+        <div id="photoEditor" class="photo-editor" hidden>
+          <div class="editor-top"><strong id="editorTitle">Chỉnh ảnh 1</strong><button id="closeEditor" class="text-button">Xong <svg class="icon"><use href="#i-check"/></svg></button></div>
+          <label class="range-label" for="zoom">Phóng ô <input id="zoom" type="range" min="1" max="3" step="0.01" value="1"><span id="zoomValue">1.0×</span></label>
+          <div class="crop-shortcuts" role="group" aria-label="Chỉnh vị trí ô đang chọn"><button id="zoomOut" type="button" aria-label="Thu nhỏ nội dung">−</button><button id="zoomIn" type="button" aria-label="Phóng to nội dung">＋</button><button id="centerPhoto" type="button">Về giữa</button><button id="previousSlot" type="button" aria-label="Đổi với ô trước">‹ Đổi ô</button><button id="nextSlot" type="button" aria-label="Đổi với ô sau">Đổi ô ›</button></div>
+          <div class="rotation-controls" role="group" aria-label="Xoay ảnh hoặc video đang chọn"><span>Xoay ảnh / video</span><button id="rotateLeft" type="button" aria-label="Xoay trái 90 độ">↶ Trái 90°</button><button id="rotateRight" type="button" aria-label="Xoay phải 90 độ">↷ Phải 90°</button><button id="rotateHalf" type="button">Xoay 180°</button><output id="rotationValue" aria-live="polite">0°</output></div>
+          <div id="clipEditor" class="clip-editor" hidden><p id="clipInfo"></p><div class="clip-fields"><label for="clipStart">Lấy từ giây<input id="clipStart" type="number" min="0" step="0.05" value="0"></label><label for="clipEnd">Đến giây<input id="clipEnd" type="number" min="0.02" step="0.05" value="5"></label><label for="clipOffset">Bắt đầu chuyển động từ<input id="clipOffset" type="number" min="0" max="20" step="0.1" value="0"></label><label for="clipSpeed">Tốc độ<select id="clipSpeed"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="1.5">1,5×</option><option value="2">2×</option></select></label></div><label class="clip-loop"><input id="clipLoop" type="checkbox"> Lặp đoạn đã chọn</label><p class="clip-note">Trước khi bắt đầu chuyển động, ô giữ hình đầu; hết đoạn thì giữ hình cuối hoặc lặp.</p></div>
+          <div class="editor-actions"><button id="editInDarkroom" class="text-button" hidden>Chỉnh bằng RAY PHOTO ↗</button><button id="downloadSingle" class="text-button"><svg class="icon"><use href="#i-download"/></svg> Lưu ảnh này</button><button id="retake" class="text-button"><svg class="icon"><use href="#i-camera"/></svg> Chụp lại ô này</button><button id="replacePhoto" class="text-button"><svg class="icon"><use href="#i-upload"/></svg> Thay ảnh</button><button id="flipPhoto" class="text-button">Lật gương</button><button id="deletePhoto" class="text-button danger">Xóa</button></div>
+        </div>
+        <div class="privacy-note"><svg class="icon"><use href="#i-lock"/></svg> Ảnh được ghép ngay trên thiết bị của bạn.</div>
+      </section>
+
+      <aside class="print-desk" aria-labelledby="print-title">
+        <div class="section-heading"><h2 id="print-title"><span class="step">02</span> Chiếc phông hôm nay</h2><span class="tiny-note">MADE FOR YOUR MEMORIES</span></div>
+        <div id="themeGroup" class="theme-options" role="group" aria-label="Chọn phông"><button data-theme="hellonews" class="theme-card" aria-pressed="false"><span class="theme-art hello-news-art"><b>HELLO<br>VIỆT NAM</b><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Báo Hello <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="portnews" class="theme-card" aria-pressed="false"><span class="theme-art port-news-art"><b>Bến Bạch Đằng</b><span class="mini-waterfront" aria-hidden="true"></span><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Báo bến cảng <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="cinema" class="theme-card" aria-pressed="false"><span class="theme-art cinema-art"><b>Movie</b><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Vé xem phim <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="ticket" class="theme-card" aria-pressed="false"><span class="theme-art ticket-art"><b>Special Day</b><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Vé Special Day <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="airmail" class="theme-card" aria-pressed="false"><span class="theme-art airmail-art"><b>POSTCARD</b><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Tem thư <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="collage" class="theme-card" aria-pressed="false"><span class="theme-art collage-art"><b>little moments</b><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Ghép ảnh nền mờ <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="newspaper" class="theme-card active" aria-pressed="true"><span class="theme-art newspaper-art"><b>LINH LINH<br>PHỐ CẢNG</b><i></i><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Lên báo <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="harbor" class="theme-card" aria-pressed="false"><span class="theme-art harbor-art"><b>Hải Phòng</b><i></i><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small><span class="mini-flower">✿</span></span><span class="theme-name">Hẹn phố Cảng <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="scrapbook" class="theme-card" aria-pressed="false"><span class="theme-art scrapbook-art"><b>dear, today.</b><i></i><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small><span class="mini-flower">♡</span></span><span class="theme-name">Sổ kỷ niệm <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="midnight" class="theme-card" aria-pressed="false"><span class="theme-art midnight-art"><b>AFTER<br>HOURS</b><i></i><i></i><i></i><i></i><small>Linh Linh - Phố Cảng</small></span><span class="theme-name">Đêm lấp lánh <svg class="icon"><use href="#i-check"/></svg></span></button><button data-theme="custom" id="customTheme" class="theme-card" aria-pressed="false"><span class="theme-art custom-art"><svg class="icon"><use href="#i-upload"/></svg><span>Phông<br>của riêng bạn</span></span><span class="theme-name">Tải phông lên <svg class="icon"><use href="#i-check"/></svg></span></button></div>
+        <div class="layout-row"><span class="control-label">BỐ CỤC</span><div class="segmented" id="layoutGroup" role="group" aria-label="Bố cục ảnh"><button data-layout="grid" class="active" aria-pressed="true">Bưu thiếp</button><button data-layout="strip" aria-pressed="false">Photobooth dọc</button><button data-layout="double" aria-pressed="false">Dải dọc đôi</button></div></div>
+        <div id="customControls" class="custom-controls" hidden><label for="customMode">Loại phông <select id="customMode"><option value="background">Ảnh nền JPG / PNG</option><option value="overlay">Khung PNG có ô trong suốt</option></select></label><button id="chooseBackground" class="button secondary compact"><svg class="icon"><use href="#i-upload"/></svg> Chọn tệp phông</button><p id="backgroundInfo">Ảnh nền nằm dưới các ô ảnh. PNG: tự nhận 1–6 ô trong suốt. Chữ in sẵn trong tệp phông không sửa được bằng ô chữ của ứng dụng.</p><button id="downloadTemplate" class="text-button">Tải mẫu khung PNG trong suốt ↗</button></div>
+        <section class="motion-panel" aria-labelledby="motionTitle"><div class="motion-heading"><span id="motionTitle" class="control-label">ẢNH &amp; VIDEO TRONG CÙNG KHUNG</span><button id="playTimeline" class="text-button" disabled>▶ Xem chuyển động</button></div><div class="timeline-line"><input id="timelineTime" type="range" min="0" max="5" step="0.05" value="0" aria-label="Thời điểm trong khung ảnh"><output id="timelineValue">0:00.00 / 0:05.00</output></div><div class="motion-settings"><label for="outputDuration">Dài bao nhiêu giây?<input id="outputDuration" type="number" min="1" max="20" step="0.5" value="5"></label><label for="videoQuality">Cỡ video<select id="videoQuality"><option value="1920">1920 px · Khuyên dùng</option><option value="2560">2560 px · Rõ hơn</option><option value="1080">1080 px</option><option value="720">720 px · Tệp nhẹ</option></select></label></div><p id="motionHint">Tải GIF hoặc video vào các ô, rồi bấm từng ô để cắt đoạn và chỉnh tốc độ.</p></section>
+        <div class="preview-desk"><div class="desk-caption"><span>BẢN IN CỦA BẠN</span><span id="dimensions">1200 × 1600 PX</span></div><div class="print-paper" id="printPaper"><span class="paper-tape" aria-hidden="true"></span><canvas id="preview" width="480" height="640" role="img" aria-label="Xem trước ảnh photobooth ghép trong khung báo"></canvas><div id="slotOverlay" class="slot-overlay" role="group" aria-label="Chạm một ô để thêm hoặc kéo nội dung"></div></div><p class="desk-footnote">a little piece of today.</p></div>
+        <section id="frameTextControls" class="frame-text-controls"><div class="frame-text-heading"><span class="control-label">CHỮ TRÊN KHUNG</span><label class="show-text"><input id="showFrameText" type="checkbox" checked> Hiện chữ</label></div><label for="frameTitle"><span id="frameTitleLabel">Tiêu đề</span><input id="frameTitle" type="text" maxlength="60" placeholder="Để trống để xóa tiêu đề"></label><label for="frameSubtitle"><span id="frameSubtitleLabel">Dòng phụ</span><input id="frameSubtitle" type="text" maxlength="100" placeholder="Để trống để xóa dòng phụ"></label><div class="text-actions"><button id="clearFrameText" class="text-button danger">Xóa toàn bộ chữ</button><button id="resetFrameText" class="text-button">Khôi phục chữ mẫu</button></div></section>
+        <div class="caption-controls"><label for="caption">Gửi một lời vào ảnh <span>TÙY THÍCH</span></label><input id="caption" type="text" maxlength="70" placeholder="Hôm nay lên báo vì quá xinh."><div class="date-control"><label for="printDate">Ngày kỷ niệm</label><input id="printDate" type="date"></div></div>
+        <label class="export-kind" for="exportKind">Muốn lưu tệp nào?<select id="exportKind"><option value="image">Ảnh PNG</option><option id="exportVideoOption" value="video">Video</option><option id="exportBothOption" value="both">Cả hai · PNG + video</option></select></label><p id="videoFormatHint" class="video-format-note"></p>
+        <div class="export-actions"><button id="download" class="button primary" disabled><svg class="icon"><use href="#i-download"/></svg> Lưu bộ ảnh</button><button id="share" class="button secondary square" aria-label="Chia sẻ ảnh" title="Chia sẻ ảnh" hidden disabled><svg class="icon"><use href="#i-share"/></svg></button></div>
+        <div id="renderProgress" class="render-progress" hidden><progress id="videoProgress" value="0" max="1"></progress><p id="renderStatus" role="status"></p><button id="cancelVideoExport" class="text-button danger">Dừng xuất video</button></div>
+        <p id="exportHint" class="export-hint">Thêm đủ 4 ảnh để mang kỷ niệm về.</p>
+
+      </aside>
+    </div>
+    <footer class="site-footer"><span>LINH LINH - PHỐ CẢNG <span aria-hidden="true">✳</span> NHỮNG ĐIỀU NHỎ, NHỚ THẬT LÂU.</span><button id="reset" class="text-button">Bắt đầu bộ ảnh mới <svg class="icon"><use href="#i-refresh"/></svg></button></footer>
+  </main>
+  <dialog id="saveFallback" class="save-fallback" aria-labelledby="saveTitle" hidden>
+    <div class="save-top"><h2 id="saveTitle">Ảnh đã sẵn sàng</h2><button id="closeFallback" class="text-button">Quay lại chỉnh ×</button></div>
+    <div id="outputTabs" class="output-tabs" role="group" aria-label="Chọn tệp để lưu" hidden><button id="outputImageTab" aria-pressed="false">Ảnh PNG</button><button id="outputVideoTab" aria-pressed="false">Video</button></div>
+    <div class="saved-photo"><img id="savedImage" alt="Ảnh đã chỉnh, nhấn giữ để lưu"><video id="savedVideo" controls playsinline hidden aria-label="Video đã ghép khung"></video></div>
+    <p id="saveStatus" role="status">Bấm Lưu vào Ảnh / Chia sẻ, hoặc nhấn giữ ảnh để lưu.</p>
+    <div class="save-buttons"><button id="saveToPhotos" class="button primary" hidden>Lưu vào Ảnh / Chia sẻ</button><a id="downloadReady" class="button secondary" download>Tải PNG</a><button id="shareBothFiles" class="button secondary" hidden>Chia sẻ cả 2 tệp</button></div>
+  </dialog>
+  <input id="photoInput" type="file" accept="image/*,video/*,.gif,.mp4,.mov,.m4v,.webm" multiple hidden>
+  <input id="replaceInput" type="file" accept="image/*,video/*,.gif,.mp4,.mov,.m4v,.webm" multiple hidden>
+  <input id="liveInput" type="file" accept="video/*,.mp4,.mov,.m4v,.webm" multiple hidden>
+  <input id="backgroundInput" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <dialog id="helpDialog"><div class="dialog-heading"><p class="eyebrow">CHƠI MỘT CHÚT NHÉ</p><button id="closeHelp" class="tool-button" aria-label="Đóng hướng dẫn"><svg class="icon"><use href="#i-close"/></svg></button></div><h2>Một buồng chụp,<br><em>rất dễ thương.</em></h2><ol><li><strong>Chọn chiếc phông bạn thích.</strong><p>Chọn bộ từ 2 đến 6 ô. Hai mẫu Báo Hello và Báo bến cảng có chữ mở đầu và địa danh sửa riêng trong mục Chữ trên khung. Có thể dùng ảnh tĩnh, GIF và video cùng một khung. Thử khung báo, Hải Phòng, sổ kỷ niệm, đêm lấp lánh hoặc ảnh nền JPG/PNG từ máy. Với khung PNG trong suốt, các ô ảnh hình chữ nhật được tự nhận.</p></li><li><strong>Bật camera, rồi thả dáng.</strong><p>Cho phép camera khi trình duyệt hỏi. Chụp lần lượt từng kiểu sau đếm ngược, hoặc chọn nhiều ảnh có sẵn.</p></li><li><strong>Chỉnh một chút, mang ảnh về.</strong><p>Bấm vào từng ô ảnh để kéo vị trí, phóng to hoặc chụp lại. Mỗi ảnh giữ màu riêng; có thể chỉnh mịn da, sáng da, hạt phim, flash, viền tối hoặc lọt sáng, sửa tiêu đề/lời nhắn hoặc xóa toàn bộ chữ, rồi tải PNG, video hoặc cả hai. Với GIF/video, bấm từng ô để cắt đoạn, chỉnh tốc độ và lặp; dùng thanh thời gian để chọn ảnh tĩnh muốn xuất. Chọn Photobooth dọc hoặc Dải dọc đôi để in thành dải ảnh.</p></li></ol><div class="help-note"><strong>Dùng camera trên điện thoại</strong><p>Nếu mở trong ứng dụng và không bật được camera, hãy mở đường dẫn bằng Safari hoặc Chrome rồi thử lại. Chọn ảnh có sẵn vẫn dùng được.</p><p>Phông là nền/khung ghép quanh ảnh; ứng dụng không tách người khỏi cảnh phía sau. Ảnh của bạn được xử lý trong trình duyệt, không được gửi lên máy chủ của ứng dụng. Tải ảnh trước khi đóng hoặc làm mới trang.</p></div><button id="gotIt" class="button primary">Đã hiểu, vào chụp thôi <svg class="icon"><use href="#i-chevron"/></svg></button></dialog>
+  <script src="booth-core.js?v=12"></script>
+  <script src="booth-designs.js?v=12"></script>
+  <script src="buongtoi-lab.js?v=12"></script>
+  <script src="photo-beauty.js?v=12"></script>
+  <script src="vendor/gifuct/gifuct.js?v=12"></script>
+  <script src="booth-media.js?v=100"></script>
+  <script src="module-native.js"></script>
+  <script src="booth-gestures.js?v=100"></script>
+  <script src="app.js?v=100"></script>
+  <script src="booth-workspace.js?v=101"></script>
+</body>
+</html>

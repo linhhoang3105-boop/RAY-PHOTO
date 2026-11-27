@@ -1,0 +1,36 @@
+{
+  "encoder": "libx264",
+  "profile": "Constrained Baseline",
+  "level": "3.1",
+  "crf": 27,
+  "refs_requested": 2,
+  "gop": 120,
+  "fps": 24,
+  "duration_seconds": 20,
+  "faststart": true,
+  "ssim_reference": "Original converted to 24 fps; both streams use a 1/24 timebase and frame index timestamps.",
+  "files": [
+    {
+      "kind": "portrait",
+      "original_bytes": 3155885,
+      "bytes": 429098,
+      "ssim": 0.991403,
+      "sha256": "02ac118f146d8e39c5faac8aba9a4afbe91bd6e53291d1edda021c9b19c6ff7a",
+      "dimensions": [
+        512,
+        908
+      ]
+    },
+    {
+      "kind": "landscape",
+      "original_bytes": 2671911,
+      "bytes": 353374,
+      "ssim": 0.992374,
+      "sha256": "b7f7709a430948a306cc07456165b4d589358404472056acb2cd40799bd66672",
+      "dimensions": [
+        910,
+        512
+      ]
+    }
+  ]
+}
