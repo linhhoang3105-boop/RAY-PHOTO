@@ -3,7 +3,7 @@
  'use strict';
  const controls={adjustRegion:'all',adjustRegionShape:'ellipse',adjustRegionX:.5,adjustRegionY:.5,adjustRegionRX:.32,adjustRegionRY:.32,adjustRegionAngle:0,adjustRegionFeather:.4,adjustRegionThickness:.06,adjustRegionCurve:.7};
  const defaults={...controls,adjustRegionShow:false,adjustRegionPlaced:false,adjustRegionStack:[],adjustRegionTargets:[],adjustRegionStrokes:[],adjustRegionDrawing:false,adjustRegionPaintMode:'paint',adjustRegionBrushSize:.12};
- const effects=['rayThuNhat','temp','tint','split','contrast','sat','lift','halation','grain','vignette','leak','dust','ca','flash','glow','nang','filmExp','sharp','kinh','bgBlur','motion','spark','paper','gloss','soft','ptex','film','printClear',...Tone.keys];
+ const effects=['rayThuNhat','rayNangPho','temp','tint','split','contrast','sat','lift','halation','grain','vignette','leak','dust','ca','flash','glow','nang','filmExp','sharp','kinh','bgBlur','motion','spark','paper','gloss','soft','ptex','film','printClear','dehaze','detail',...Tone.keys];
  const regional=p=>p?.adjustRegion==='in'||p?.adjustRegion==='out';
  const scoped=p=>regional(p)||(p.adjustRegionStack||[]).some(regional);
  const settings=p=>({...Object.fromEntries(Object.entries(controls).map(([key,value])=>[key,p[key]??value])),...(p.adjustRegionShape==='freehand'?{adjustRegionStrokes:p.adjustRegionStrokes||[]}:{} )});

@@ -3,9 +3,9 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.RayFilterStrengthCore=api;})(typeof globalThis!=='undefined'?globalThis:this,()=>{
  'use strict';
  const VERSION=1,MAX_REFS=32;
- const keys=Object.freeze(['rayThuNhat','temp','tint','split','contrast','sat','lift','halation','grain','vignette','leak','dust','ca','flash','glow','nang','filmExp','sharp','kinh','bgBlur','motion','spark','paper','gloss','soft','ptex','film','printClear','toneExposure','toneBrightness','toneHighlights','toneShadows','toneWhites','toneBlacks','toneLocalEV','toneLocalBrightness','toneLocalWarmth','toneLocalColorAmount']);
+ const keys=Object.freeze(['rayThuNhat','rayNangPho','temp','tint','split','contrast','sat','lift','halation','grain','vignette','leak','dust','ca','flash','glow','nang','filmExp','sharp','kinh','bgBlur','motion','spark','paper','gloss','soft','ptex','film','printClear','dehaze','detail','toneExposure','toneBrightness','toneHighlights','toneShadows','toneWhites','toneBlacks','toneLocalEV','toneLocalBrightness','toneLocalWarmth','toneLocalColorAmount']);
  const signed=new Set(['temp','tint','split','contrast','sat','toneBrightness','toneHighlights','toneShadows','toneWhites','toneBlacks','toneLocalBrightness','toneLocalWarmth']);
- const ranges=Object.fromEntries(keys.map(key=>[key,Object.freeze(signed.has(key)?[-1,1]:key==='toneExposure'||key==='toneLocalEV'?[-2,2]:key==='rayThuNhat'?[0,1.5]:[0,1])]));Object.freeze(ranges);
+ const ranges=Object.fromEntries(keys.map(key=>[key,Object.freeze(signed.has(key)?[-1,1]:key==='toneExposure'||key==='toneLocalEV'?[-2,2]:key==='rayThuNhat'||key==='rayNangPho'?[0,1.5]:[0,1])]));Object.freeze(ranges);
  const fail=message=>new Error('Cường độ bộ lọc: '+message),clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
  function plain(value){
   if(!value||typeof value!=='object'||Array.isArray(value))return false;

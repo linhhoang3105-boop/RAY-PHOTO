@@ -4,6 +4,14 @@
 
 Bản tích hợp trình chỉnh ảnh RAY PHOTO và photobooth Linh Linh – Phố Cảng. Giao diện film tối/ấm, bốn khu Khám phá / Buồng ảnh / Photobooth / Album.
 
+## Màu phim Nắng Phố, Khử mờ và Chi tiết — v116
+
+**Ảnh → Bộ lọc → Trầm & sâu → Nắng Phố** là màu phim đo từ cặp ảnh mẫu trước/sau: đen sâu, tông trung giữ nguyên, trắng cuộn mềm, màu dịu, trời nhạt trong, lá vàng-lục ngả lục lam, trời ngả lam ngọc. Da được giữ khỏi bị đè tối. Engine mới `ray-film-looks.js` dựng màu bằng bảng tra 3D, có thể thêm các màu đo từ ảnh mẫu khác. Cường độ tổng, Màu của tôi và mã chia sẻ dùng được như các màu khác.
+
+Trong **Chất phim**, ngay dưới Độ nét, có hai thanh mới. **Chi tiết** làm nét hai dải tần theo độ phân giải, có bỏ nhiễu và chống viền. **Khử mờ** bỏ lớp sương bằng kênh tối và guided filter, đồng thời cân ám màu theo màu mây/sương.
+
+Trong **AI Composer**, *Cứu ngược sáng*, *Phục hồi sáng & nét* và *Màu phim cứu sáng* tự đo độ sương của hậu cảnh để khử mờ ngoài chủ thể, và thêm lớp **Chi tiết toàn cảnh**. Cả hai đều chỉnh, tắt hoặc xóa riêng được, và công thức cũ vẫn mở được. Engine nhúng gốc không đổi; các thông số mới đi qua adapter như Thu Nhật. [Đo đạc và kiểm chứng v116](docs/qa/film-clarity-v116.md).
+
 ## Mã nguồn theo module và bàn giao dự án — v115
 
 Nguồn lõi editor đã tách thành các phần JS theo chức năng, HTML template và CSS trong **source/editor/**. Các module Bộ lọc, AI Composer, Makeup/tóc, Body, ánh sáng, vùng chọn, xóa/vá nền, sticker, Photobooth, lịch sử/nháp, server và native có trong **source/module-map.json**. Bộ ghép giữ thuật toán và kết quả runtime như bản trước.

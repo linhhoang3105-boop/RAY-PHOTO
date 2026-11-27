@@ -10,8 +10,8 @@ group('Nhóm màu',[
  ['temp','Nhiệt màu'],['tint','Xanh lá · hồng'],['split','Tách tông'],['sat','Độ bão hòa'],['lift','Đen bạc màu']
 ]);
 group('Chất phim',[
- ['rayThuNhat','Độ đậm Thu Nhật'],
- ['flash','Đèn flash'],['sharp','Độ nét'],['glow','Độ bóng'],['kinh','Bóng kính'],['filmExp','Phơi sáng phim'],['halation','Quầng sáng'],['haltint','Màu quầng sáng'],['grain','Hạt phim'],['vignette','Tối góc'],['dust','Bụi & xước'],['ca','Lệch màu viền']
+ ['rayThuNhat','Độ đậm Thu Nhật'],['rayNangPho','Độ đậm Nắng Phố'],
+ ['flash','Đèn flash'],['sharp','Độ nét'],['detail','Chi tiết'],['dehaze','Khử mờ'],['glow','Độ bóng'],['kinh','Bóng kính'],['filmExp','Phơi sáng phim'],['halation','Quầng sáng'],['haltint','Màu quầng sáng'],['grain','Hạt phim'],['vignette','Tối góc'],['dust','Bụi & xước'],['ca','Lệch màu viền']
 ]);
 group('Ánh sáng & hiệu ứng',[
  ['nang','Nắng'],['leak','Vệt nắng'],['spark','Lấp lánh'],['nangSize','Kích cỡ nắng',100,'',.75],['nangAspect','Tỷ lệ nắng',1,'',1],['nangAngle','Góc nắng',1,'°'],['nangSat','Độ rực nắng',100,'',1],['leakBandWidth','Kích cỡ vệt nắng',100,'',.3],['leakAspect','Tỷ lệ vệt nắng',1,'',1],['leakAngle','Góc vệt nắng',1,'°'],['leakHue','Màu vệt nắng',1,'°'],['leakSat','Sắc độ vệt nắng',100,'',1],['bgBlur','Độ mờ nền'],['motion','Mờ chuyển động'],['motionAngle','Góc mờ chuyển động',1,'°',-25]

@@ -471,6 +471,13 @@
     "dot": "#E8A33C"
   },
   {
+    "id": "nangpho",
+    "name": "Nắng Phố",
+    "group": "Trầm & sâu",
+    "dot": "#6b4a3a",
+    "description": "Đen sâu · Màu phim dịu · Trời nhạt trong · Lá ngả lục lam. Đo từ ảnh mẫu trước/sau; giữ da không bị đè tối."
+  },
+  {
     "id": "demflash2",
     "name": "Đêm flash 2",
     "group": "Ánh sáng",

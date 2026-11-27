@@ -8,7 +8,7 @@ async function setup({filmAdapters=false}={}){
  const document={createElement:tag=>tag==='canvas'?make():node(),querySelector:()=>node(),querySelectorAll:()=>[],getElementById:id=>{if(!nodes.has(id))nodes.set(id,node());return nodes.get(id);},body:node()};
  const source=createCanvas(100,80),c=source.getContext('2d'),g=c.createLinearGradient(0,0,100,80);g.addColorStop(0,'#355980');g.addColorStop(1,'#c99d75');c.fillStyle=g;c.fillRect(0,0,100,80);
  let next=0;const h={DOMMatrix,document,source,view:{},BEAUTY:{peek:false,values:{},people:[],ready:{},maps:null,faces:[]},BODY_AI:{busy:false},beautyApply(){},syncControls(){},queue(){},queueMicrotask:f=>f(),uid:()=>String(++next),Rules:{...Rules,validate:r=>Rules.validate(clone(r))},trialBar:node(),trialName:node(),cancelPreview(){},keepTrial(){},$:id=>document.getElementById(id)};h.window=h;vm.createContext(h);vm.runInContext(script,h);
- for(const file of ['tone-core.js',...(filmAdapters?['ray-preset-thu-nhat.js','thu-nhat-adapter.js']:[]),'region-paint-core.js','adjust-scope-core.js','effect-layers.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist/darkroom',file),'utf8'),h);
+ for(const file of ['tone-core.js',...(filmAdapters?['ray-preset-thu-nhat.js','thu-nhat-adapter.js','clarity-core.js','clarity-adapter.js','ray-film-looks.js','film-looks-adapter.js']:[]),'region-paint-core.js','adjust-scope-core.js','effect-layers.js'])vm.runInContext(fs.readFileSync(path.join(__dirname,'../dist/darkroom',file),'utf8'),h);
  vm.runInContext('this.state={P,F,NK,LK};',h);const p=h.state.P;Object.assign(p,h.RayLayers.cleared(p),{stamp:false,frame:'none',adjustRegionShape:'rect',adjustRegionX:.5,adjustRegionY:.5,adjustRegionRX:.22,adjustRegionRY:.22,adjustRegionFeather:0,adjustRegionPlaced:true});
  const snapshot=()=>({p:clone(p),focus:clone(h.state.F),sun:clone(h.state.NK),leak:clone(h.state.LK),layers:clone(h.RayLayers.capture())}),session={record(){},snapshot};h.session=()=>session;h.RaySession=session;
  const my=fs.readFileSync(path.join(__dirname,'../dist/darkroom/my-presets.mjs'),'utf8');vm.runInContext(my.slice(my.indexOf('function applyRecipe('),my.indexOf('\nconst trialBar=')),h);
@@ -60,14 +60,14 @@ function projectStrength(s,model,amount){
 }
 test('ordinary filter strength retains the native full look and zero baseline for every catalog color, including Thu Nhật, without accumulating doses',async()=>{
  const Strength=require('../dist/darkroom/filter-strength-core.js'),html=fs.readFileSync(path.join(__dirname,'../dist/darkroom/index.html'),'utf8'),old=vm.runInNewContext('('+html.match(/const ROLLS = (\[[\s\S]*?\n\]);/)[1]+')'),catalog=require('../dist/darkroom/preset-catalog.js').extend(old),s=await setup({filmAdapters:true}),base=clone(s.p),source=pixels(s.source);let checked=0,visible=0;
- assert.ok(catalog.some(r=>r.id==='thunhat'));assert.equal(catalog.length,89);
+ assert.ok(catalog.some(r=>r.id==='thunhat'));assert.ok(catalog.some(r=>r.id==='nangpho'));assert.equal(catalog.length,90);
  for(const preset of catalog){
   Object.assign(s.p,clone(base),{toneExposure:.17});const neutral=s.draw();Object.assign(s.p,preset.p,{frame:'none',stamp:false,rayBasePreset:preset.id});const full=s.draw();let model=Strength.create({kind:'current',name:preset.name,presetId:preset.id,targets:[{id:'current',p:clone(s.p),keys:Object.keys(preset.p)}]});
   model=projectStrength(s,model,100);assert.deepEqual(s.draw(),full,preset.id+' 100% retains the unmodified native preset');model=projectStrength(s,model,0);assert.deepEqual(s.draw(),neutral,preset.id+' 0% removes only preset-owned parameters');assert.equal(s.p.toneExposure,.17,'independent exposure survives');
   model=projectStrength(s,model,20);const first=s.draw();model=projectStrength(s,model,80);const stronger=s.draw();model=projectStrength(s,model,20);assert.deepEqual(s.draw(),first,preset.id+' repeated intensity changes are reversible');if(!full.equals(neutral)){visible++;assert.notDeepEqual(stronger,first,preset.id+' intermediate strengths produce different native pixels');}
   model=projectStrength(s,model,100);assert.deepEqual(s.draw(),full,preset.id+' returning to 100% restores the full look');assert.equal(s.draw().length,100*80*4);checked++;
  }
- assert.equal(checked,89);assert.ok(visible>80);assert.deepEqual(pixels(s.source),source);assert.deepEqual([s.source.width,s.source.height],[100,80]);
+ assert.equal(checked,90);assert.ok(visible>80);assert.deepEqual(pixels(s.source),source);assert.deepEqual([s.source.width,s.source.height],[100,80]);
 });
 test('personal filter strength targets only the selected layer group and does not revive removed or disabled components',async()=>{
  const Strength=require('../dist/darkroom/filter-strength-core.js'),s=await setup({filmAdapters:true});s.p.toneExposure=.18;s.h.RayLayers.commit('Sáng riêng trước màu');const prior=clone(s.h.RayLayers.capture());s.apply(recipe);const group=clone(s.h.RayLayers.capture().filter(l=>!prior.some(p=>p.id===l.id)));s.p.toneExposure=-.07;let model=Strength.create({kind:'layers',name:recipe.name,targets:group.map(layer=>({id:layer.id,p:layer.p}))}),full=s.draw();

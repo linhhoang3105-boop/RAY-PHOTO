@@ -16,7 +16,7 @@
   {id:'moody',name:'Moody',description:'Trầm có chiều sâu, giữ chủ thể rõ.'},
   {id:'creative',name:'Creative AI',description:'Khám phá tổ hợp màu, ánh sáng và chất phim từ ảnh.'}
  ];
- const NUM={temp:[-1,1],tint:[-1,1],split:[-1,1],contrast:[-1,1],sat:[-1,1],lift:[0,1],halation:[0,1],grain:[0,1],vignette:[0,1],leak:[0,1],dust:[0,1],ca:[0,1],flash:[0,1],glow:[0,1],nang:[0,1],filmExp:[0,1],sharp:[0,1],kinh:[0,1],bgBlur:[0,1],motion:[0,1],spark:[0,1],paper:[0,1],gloss:[0,1],soft:[0,1],ptex:[0,1],film:[0,1],printClear:[0,1],rayThuNhat:[0,1.5],toneExposure:[-2,2],toneBrightness:[-1,1],toneHighlights:[-1,1],toneShadows:[-1,1],toneWhites:[-1,1],toneBlacks:[-1,1],toneLocalEV:[-2,2],toneLocalBrightness:[-1,1],toneLocalWarmth:[-1,1],toneLocalColorAmount:[0,1]};
+ const NUM={temp:[-1,1],tint:[-1,1],split:[-1,1],contrast:[-1,1],sat:[-1,1],lift:[0,1],halation:[0,1],grain:[0,1],vignette:[0,1],leak:[0,1],dust:[0,1],ca:[0,1],flash:[0,1],glow:[0,1],nang:[0,1],filmExp:[0,1],sharp:[0,1],kinh:[0,1],bgBlur:[0,1],motion:[0,1],spark:[0,1],paper:[0,1],gloss:[0,1],soft:[0,1],ptex:[0,1],film:[0,1],printClear:[0,1],dehaze:[0,1],detail:[0,1],rayNangPho:[0,1.5],rayThuNhat:[0,1.5],toneExposure:[-2,2],toneBrightness:[-1,1],toneHighlights:[-1,1],toneShadows:[-1,1],toneWhites:[-1,1],toneBlacks:[-1,1],toneLocalEV:[-2,2],toneLocalBrightness:[-1,1],toneLocalWarmth:[-1,1],toneLocalColorAmount:[0,1]};
  const OPTIONAL={haltint:[0,1],leakAngle:[-180,180],leakBandWidth:[.04,1],leakHue:[-45,75],leakSat:[0,2],nangSat:[0,2],nangSize:[.15,1.4],nangAspect:[.25,4],nangAngle:[-180,180],leakAspect:[.25,4],motionAngle:[-180,180],adjustRegionX:[-4,5],adjustRegionY:[-4,5],adjustRegionRX:[.001,16],adjustRegionRY:[.001,16],adjustRegionAngle:[-180,180],adjustRegionFeather:[0,1],adjustRegionThickness:[.000001,8],adjustRegionCurve:[-1,1],toneLocalOpacity:[0,1],toneLocalFeather:[0,1],toneLocalAngle:[-180,180],toneLocalCurve:[-1,1],toneLocalThickness:[.000001,4]};
  const EFFECTS=Object.keys(NUM),finite=n=>typeof n==='number'&&Number.isFinite(n);
  function normalizedPlane(m,name){
@@ -53,14 +53,14 @@
  }
 
  function recoveryZone(data,W,H,foreground,region,faces,background=false){
-  const hist=new Float64Array(256),residual=[];let n=0,sum=0,shadow=0,highlight=0,texture=0,neutral=0,warm=0,tint=0;
+  const hist=new Float64Array(256),residual=[];let n=0,sum=0,shadow=0,highlight=0,texture=0,neutral=0,warm=0,tint=0,darkSum=0,chromaSum=0;
   const step=Math.max(1,Math.ceil(Math.sqrt(W*H/160000)));
   for(let y=1;y<H-1;y+=step)for(let x=1;x<W-1;x+=step){const u=(x+.5)/W,v=(y+.5)/H,fg=foreground?foreground.at(u,v):clamp(inside(region.focus,u,v)),i=(y*W+x)*4;let w=(background?1-fg:fg)*data[i+3]/255;if(!background)for(const face of faces){const f=face.focus;if(((u-f.cx)/(f.rx*1.1))**2+((v-f.cy)/(f.ry*1.1))**2<1){w=0;break;}}if(w<.02)continue;
    const r=data[i],g=data[i+1],b=data[i+2],l=lum(r,g,b),at=k=>lum(data[k],data[k+1],data[k+2]),left=at(i-4),right=at(i+4),up=at(i-W*4),down=at(i+W*4);n+=w;sum+=l*w;hist[Math.round(l*255)]+=w;shadow+=(l<.35?w:0);highlight+=(l>.85?w:0);texture+=(Math.abs(right-left)+Math.abs(down-up))*.5*w;if(w>.5)residual.push(Math.abs(l-(left+right+up+down)/4));
-   const mx=Math.max(r,g,b),mn=Math.min(r,g,b);if(l>.22&&l<.88&&mx<245&&(mx-mn)/Math.max(1,mx)<.13){neutral+=w;warm+=(r-b)/255*w;tint+=((r+b)/2-g)/255*w;}
+   const mx=Math.max(r,g,b),mn=Math.min(r,g,b);darkSum+=mn/255*w;chromaSum+=(mx-mn)/255*w;if(l>.22&&l<.88&&mx<245&&(mx-mn)/Math.max(1,mx)<.13){neutral+=w;warm+=(r-b)/255*w;tint+=((r+b)/2-g)/255*w;}
   }
   const percentile=q=>{let total=0;for(let i=0;i<256;i++){total+=hist[i];if(total>=n*q)return i/255;}return 0;};residual.sort((a,b)=>a-b);
-  return {mean:n?clamp(sum/n):0,p10:n?percentile(.1):0,p90:n?percentile(.9):0,shadowCoverage:n?clamp(shadow/n):0,highlightCoverage:n?clamp(highlight/n):0,texture:n?clamp(texture/n):0,noise:clamp((residual[Math.floor(residual.length*.5)]||0)*.8),neutralCoverage:n?clamp(neutral/n):0,neutralWarmCast:neutral?clamp(warm/neutral,-1,1):0,neutralTintCast:neutral?clamp(tint/neutral,-1,1):0};
+  return {mean:n?clamp(sum/n):0,p10:n?percentile(.1):0,p90:n?percentile(.9):0,shadowCoverage:n?clamp(shadow/n):0,highlightCoverage:n?clamp(highlight/n):0,texture:n?clamp(texture/n):0,noise:clamp((residual[Math.floor(residual.length*.5)]||0)*.8),neutralCoverage:n?clamp(neutral/n):0,neutralWarmCast:neutral?clamp(warm/neutral,-1,1):0,neutralTintCast:neutral?clamp(tint/neutral,-1,1):0,darkMean:n?clamp(darkSum/n):0,chroma:n?clamp(chromaSum/n):0};
  }
  function recoveryAnalysis(data,W,H,faces,skin,foreground,region){
   const boxes=[];
@@ -262,7 +262,7 @@
    for(const key of ['temp','tint','split','sat','contrast','lift'])if(finite(grade[key]))bodyP[key]=grade[key]*profile.body*certainty;
    const background=makeComponent('film-background','Màu phim cảnh · '+(preset.name||preset.id),'background',backgroundP,outside,a.light,'Phối màu từ preset và chất phim tráng in RAY trong hậu cảnh đã nhận diện; cân mức theo độ đậm màu và vùng sáng của ảnh. Có thể sửa riêng màu, vùng và tương phản.'),body=makeComponent('film-subject','Màu phim chủ thể · giữ da','grade',bodyP,{source:a.region.source,focus:copy(a.region.focus)},a.light,'Phối nhẹ cùng màu phim trên chủ thể, loại vùng mặt để giữ màu da tự nhiên. Không cộng thêm phơi sáng.');
    const detail=plan.components.find(c=>c.id==='texture');if(detail){detail.p.printClear=clamp(detail.p.printClear||0,0,.12);detail.p.sharp=clamp(detail.p.sharp||0,0,.07);detail.p.grain=0;detail.p=clean(detail.p);detail.title='Chi tiết tự nhiên';detail.reason='Giữ kết cấu nguồn bằng độ trong và tăng nét RAY; không thêm hạt hoặc làm mềm chủ thể.';detail.targetIntent.baseline.p=copy(detail.p);}
-   const layers=plan.components.filter(c=>c.id!=='texture');layers.push(background,body);if(detail)layers.push(detail);
+   const clarity=plan.components.find(c=>c.id==='clarity'),layers=plan.components.filter(c=>c.id!=='texture'&&c.id!=='clarity');layers.push(background,body);if(clarity)layers.push(clarity);if(detail)layers.push(detail);
    const result={...plan,id:'ray-ai-'+a.fingerprint+'-film-recovery-'+plan.seed,style:'film-recovery',title:'Màu phim cứu sáng · '+profile.name,basePreset:{id:preset.id,name:preset.name||preset.names?.at(-1)||preset.id},components:layers};
    return a.empty?scale(result,0):result;
   });
@@ -321,6 +321,12 @@
     balance.toneExposure=clamp(Math.log2(.51/median)*.035,-.035,.055);balance.toneShadows=balance.toneHighlights=balance.toneWhites=balance.toneBlacks=balance.contrast=balance.temp=balance.tint=balance.sat=0;
     Object.assign(subject,bodyRegion,{toneExposure:0,filmExp:clamp((.07+bodyNeed*.16)*profile.body*certainty,0,.24),toneShadows:clamp((.012+bodyNeed*.025)*profile.body*certainty,0,.055),toneBrightness:clamp(bodyNeed*.004*profile.body*certainty,0,.006),toneHighlights:-clamp((.035+zoneSubject.highlightCoverage*.05)*profile.body,0,.075)});
     Object.assign(depth,{toneExposure:0,toneShadows:clamp(sceneNeed*(style==='backlight'?.22:.14)*profile.scene*certainty,0,.16),toneHighlights:-clamp(((a.p95-.91)*.45+a.clippedHighlights*.25)*profile.scene,0,.085),toneWhites:-clamp(a.clippedHighlights*.13*profile.scene,0,.025),toneBlacks:-clamp(sceneNeed*.035,0,.015),sat:0,contrast:clamp(sceneNeed*.035,0,.025)});
+    // Hậu cảnh mờ sương / bạc màu: khử mờ khí quyển RAY (kênh tối + guided filter) và cân ám màu theo sương.
+    // Mức theo độ "sương" đo được: kênh tối cao, độ rực thấp. Cảnh trong sẵn chỉ nhận mức rất nhẹ.
+    const haze=clamp((Number(zoneBackground.darkMean??.2)-.20)*1.6+(.14-Number(zoneBackground.chroma??.14))*2);
+    depth.dehaze=clamp(((style==='restore-detail'?.30:.22)+haze*.55)*profile.scene*(f.source==='estimated'?.7:1),0,.8);
+    depth.sat=clamp(haze*.10*profile.color,0,.08);
+    // Khử mờ RAY cân trắng hậu cảnh theo màu sương/mây trước bảng màu, nên không cộng thêm nhiệt màu ở đây.
     const bodyFocus=f.focus,dirX=clamp(bodyFocus.cx+(a.light.x-bodyFocus.cx)*.2),dirY=clamp(bodyFocus.cy+(a.light.y-bodyFocus.cy)*.15),confidence=clamp(zoneSubject.neutralCoverage/.15),warm=zoneSubject.neutralWarmCast||0,tintCast=zoneSubject.neutralTintCast||0;
     const color=confidence>.25?(tintCast>.025?'#ddffe2':warm<-.02?'#ffe6ca':warm>.03?'#d9eaff':'#ffffff'):'#ffffff',colorAmount=confidence>.25?clamp((Math.abs(warm)+Math.abs(tintCast))*.65*profile.color,0,.055):0;
     Object.assign(lightP,{...bodyRegion,adjustRegionShape:variant%2?'beam':'curve',adjustRegionX:dirX,adjustRegionY:dirY,adjustRegionRX:clamp(bodyFocus.rx*1.25,.08,.60),adjustRegionRY:clamp(bodyFocus.ry*.65,.08,.6),adjustRegionAngle:clamp(a.light.angle-90,-180,180),adjustRegionCurve:variant%2?.2:.35,adjustRegionThickness:clamp(bodyFocus.rx*.8,.045,.20),adjustRegionFeather:.85,adjustRegionStrokes:[],adjustRegionStack:[copy(f.p),...faceOut],toneExposure:0,temp:0,nang:0,glow:0,toneLocalEnabled:true,toneLocalMode:'all',toneLocalEV:clamp(bodyNeed*.10*profile.light*certainty,0,.12),toneLocalBrightness:0,toneLocalWarmth:0,toneLocalColor:color,toneLocalColorAmount:colorAmount,toneLocalOpacity:1,toneLocalShape:'ellipse',toneLocalShow:false});
@@ -339,6 +345,11 @@
      const target=(r.confidence>.7?(detail?.47:.44):.40)+(variant-1.5)*(detail?.016:.013),need=Math.max(0,Math.log2(linear(target)/Math.max(.0008,linear(r.mean)))),confidence=r.confidence,amount=clamp(need*(confidence>.7?.95:.88),0,confidence>.7?(r.noise>.035?1.5:2):.8),foc=copy(r.focus),highlightRisk=confidence>.7&&need>1&&r.p90>.35,p={adjustRegion:'in',adjustRegionShape:'ellipse',adjustRegionX:foc.cx,adjustRegionY:foc.cy,adjustRegionRX:foc.rx,adjustRegionRY:foc.ry,adjustRegionAngle:0,adjustRegionFeather:.50,adjustRegionStack:f.source==='ai'?[copy(f.p)]:[],toneExposure:Math.max(0,amount-(highlightRisk?.12:0)),toneShadows:clamp((.30-r.mean)*.55,0,confidence>.7?(r.noise>.035?.10:.18):.07),toneBrightness:clamp((need-amount)*.08,0,confidence>.7?(r.noise>.035?.07:.12):.035),toneHighlights:-Math.max(highlightRisk?.10:0,clamp((r.p90-.65)*.4,0,.15)),temp:clamp((.07-r.warmCast)*.22,-.035,.055)*clamp(need),tint:clamp(-r.tintCast*.4,-.055,.055)*clamp(need)};
      components.push(makeComponent('face-'+index,'Ánh sáng khuôn mặt '+(index+1),'skin',p,{focus:foc,source:confidence>.7?'face':'ai'},light,confidence>.7?'Đo sáng riêng khuôn mặt; giữ áo và mây ngoài vùng chỉnh.':'Vùng da ứng viên theo AI, mức bù nhẹ; kiểm tra lại vị trí vùng.'));
     }
+   }
+   if(backlight){
+    // Chi tiết thật toàn cảnh: dải nét mịn + dải rõ khối theo độ phân giải, giảm theo nhiễu đo được.
+    const recs=a.recovery?.faces||[],noise=Math.max(zoneSubject?.noise||0,zoneBackground?.noise||0,...recs.map(r=>r.noise)),budget=clamp(1-noise*7,.35,1);
+    components.push(makeComponent('clarity','Chi tiết toàn cảnh','texture',{detail:clamp((style==='restore-detail'?.46:.30)*profile.detail*budget,0,.65)},null,light,'Làm rõ chi tiết thật của cả ảnh bằng hai dải tần trên kênh sáng; bỏ nhiễu nhỏ và giới hạn viền sáng. Chỉnh hoặc tắt riêng được.'));
    }
    if(backlight){const index=components.findIndex(c=>c.id==='texture'),last=components.splice(index,1)[0];components.push(last);for(let i=components.length-1;i>=0;i--)if(!keepNeutralComponents&&!EFFECTS.some(k=>Math.abs(Number(components[i].p[k])||0)>.001))components.splice(i,1);}
    const name=styles.find(s=>s.id===style).name,title=name+' · '+(backlight?profile.name:['Cân bằng','Ánh sáng','Sắc độ','Chất phim','Khám phá'][variant]);

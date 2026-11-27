@@ -84,7 +84,7 @@
  const visiblePresets=new Set();
  rollButtons.forEach((button,index)=>{
   const chooseColor=button.onclick;
-  button.onclick=function(e){const choose=()=>{const chosenFrame=P.frame;P.film=0;P.printClear=0;P.rayThuNhat=0;try{return chooseColor.call(this,e);}finally{P.frame=chosenFrame;P.rayBasePreset=button.dataset.preset;syncControls();queue();}};return window.RayFilterStrength?window.RayFilterStrength.selectPreset(ROLLS[index],choose):choose();};
+  button.onclick=function(e){const choose=()=>{const chosenFrame=P.frame;P.film=0;P.printClear=0;P.rayThuNhat=0;P.rayNangPho=0;P.dehaze=0;P.detail=0;try{return chooseColor.call(this,e);}finally{P.frame=chosenFrame;P.rayBasePreset=button.dataset.preset;syncControls();queue();}};return window.RayFilterStrength?window.RayFilterStrength.selectPreset(ROLLS[index],choose):choose();};
   const text=document.createElement('span');text.className='roll-name';text.textContent=ROLLS[index].name;
   const thumb=document.createElement('canvas');thumb.className='roll-thumb';thumb.width=84;thumb.height=64;thumb.setAttribute('aria-hidden','true');
   const ctx=thumb.getContext('2d');ctx.fillStyle=ROLLS[index].dot;ctx.fillRect(0,0,84,64);

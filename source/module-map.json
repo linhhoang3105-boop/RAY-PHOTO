@@ -88,6 +88,22 @@
       "type": "classic"
     },
     {
+      "path": "dist/darkroom/clarity-core.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/clarity-adapter.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/ray-film-looks.js",
+      "type": "classic"
+    },
+    {
+      "path": "dist/darkroom/film-looks-adapter.js",
+      "type": "classic"
+    },
+    {
       "path": "dist/darkroom/preset-catalog.js",
       "type": "classic"
     },
@@ -395,6 +411,10 @@
         "dist/darkroom/preset-catalog.js",
         "dist/darkroom/ray-preset-thu-nhat.js",
         "dist/darkroom/thu-nhat-adapter.js",
+        "dist/darkroom/ray-film-looks.js",
+        "dist/darkroom/film-looks-adapter.js",
+        "dist/darkroom/clarity-core.js",
+        "dist/darkroom/clarity-adapter.js",
         "dist/darkroom/filter-strength-core.js",
         "dist/darkroom/filter-strength.js",
         "dist/presets.json"

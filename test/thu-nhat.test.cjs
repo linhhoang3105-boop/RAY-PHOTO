@@ -5,13 +5,13 @@ const read=n=>fs.readFileSync(path.join(__dirname,'../dist/darkroom',n),'utf8'),
 function harness(integrated){
  const script=read('index.html').match(/<script>([\s\S]*?)<\/script>/)[1].split('/* ============ nối dây giao diện ============ */')[0];
  const h={DOMMatrix,document:{createElement:make,body:{classList:{contains:()=>false}}},view:{},beautyApply(){},BEAUTY:{peek:false,values:{},people:[],ready:{},maps:null,faces:[]}};h.window=h;vm.createContext(h);vm.runInContext(script,h);vm.runInContext(read('tone-core.js'),h);
- if(integrated)for(const n of ['ray-preset-thu-nhat.js','thu-nhat-adapter.js'])vm.runInContext(read(n),h);
+ if(integrated)for(const n of ['ray-preset-thu-nhat.js','thu-nhat-adapter.js','clarity-core.js','clarity-adapter.js','ray-film-looks.js','film-looks-adapter.js'])vm.runInContext(read(n),h);
  vm.runInContext('this.e={P,render};',h);const defaults={...h.e.P,stamp:false,frame:'none'};
  return{draw(src,p={}){Object.assign(h.e.P,defaults,p);const out=make();Scope.renderScoped(out,src,h.e.P,h.e.render,make);return out;}};
 }
 function scene(){const c=createCanvas(160,120),ctx=c.getContext('2d'),g=ctx.createLinearGradient(0,0,160,120);g.addColorStop(0,'#345a38');g.addColorStop(.4,'#d0a58a');g.addColorStop(1,'#99c1df');ctx.fillStyle=g;ctx.fillRect(0,0,160,120);return c;}
 test('every existing preset retains identical full-resolution pixels and relative order',()=>{
- const old=harness(false),next=harness(true),src=scene(),html=read('index.html'),rolls=vm.runInNewContext('('+html.match(/const ROLLS = (\[[\s\S]*?\n\]);/)[1]+')'),existing=Catalog.extend(rolls).filter(r=>r.id!=='thunhat');
+ const old=harness(false),next=harness(true),src=scene(),html=read('index.html'),rolls=vm.runInNewContext('('+html.match(/const ROLLS = (\[[\s\S]*?\n\]);/)[1]+')'),existing=Catalog.extend(rolls).filter(r=>r.id!=='thunhat'&&r.id!=='nangpho');
  for(const r of existing)assert.deepEqual(pixels(next.draw(src,r.p)),pixels(old.draw(src,r.p)),r.id);
  // Frozen v114 order also works in a source ZIP without a .git directory.
  assert.deepEqual(existing.map(r=>r.id),require('./fixtures/preset-order-v114.json').order);
