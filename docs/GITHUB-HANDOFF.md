@@ -1,8 +1,10 @@
-# RAY PHOTO v115 trên GitHub
+# RAY PHOTO trên GitHub
 
 Repo đích: https://github.com/linhhoang3105-boop/RAY-PHOTO
 
-Bản nhập này bổ sung dự án đầy đủ từ nguồn RAY v115 đã phát hành, gồm 598 file nguồn/tài nguyên: editor, các engine chức năng, backend, mô hình AI, font, kiểm thử, cấu hình build và wrapper Android/iOS. Nguồn được đối chiếu với ZIP đã kiểm chứng SHA-256 `a49f66acd5a105088be27fdd99c3acb1416d28b6f04495a471432b8100113a3b`; commit nguồn RAY là `9c186b9f9d93356b10fbf7f3e3ec48f633766fbe`.
+**Bản hiện hành: v116.** Bổ sung Nắng Phố, Khử mờ và Chi tiết từ bản sửa của Claude; bảo vệ vùng sáng và tương thích các lớp/nháp cũ khi tích hợp. Hướng dẫn chạy và xuất lại mã nguồn được cập nhật trong [SOURCE-HANDOFF.md](SOURCE-HANDOFF.md).
+
+Lần nhập nguồn v115 ban đầu bổ sung dự án đầy đủ từ nguồn RAY v115 đã phát hành, gồm 598 file nguồn/tài nguyên: editor, các engine chức năng, backend, mô hình AI, font, kiểm thử, cấu hình build và wrapper Android/iOS. Nguồn được đối chiếu với ZIP đã kiểm chứng SHA-256 `a49f66acd5a105088be27fdd99c3acb1416d28b6f04495a471432b8100113a3b`; commit nguồn RAY là `9c186b9f9d93356b10fbf7f3e3ec48f633766fbe`.
 
 ## Bắt đầu
 
@@ -29,4 +31,4 @@ Repo GitHub không tự triển khai lên website RAY đang chạy. Các quy tr�
 
 ## Kiểm chứng bản nhập
 
-Runtime/editor và engine giữ nguyên bản v115 đã kiểm thử: 785 kiểm thử đạt, 0 lỗi, 2 kiểm thử mô hình tùy chọn bỏ qua. Báo cáo chi tiết: [modular-source-v115.md](qa/modular-source-v115.md). Bản nhập GitHub chỉ bổ sung chỉ dẫn README/tài liệu repo, không thay thuật toán.
+Bản v116 đã qua 796 kiểm thử: 794 đạt, 0 lỗi, 2 kiểm thử mô hình tùy chọn bỏ qua. 29 phần JS lõi và native bridge giữ nguyên nội dung; các engine Nắng Phố/Khử mờ/Chi tiết ở file độc lập. Bảo vệ vùng sáng, lớp cũ và nháp cũ được hậu kiểm khi đưa lên Sites. Báo cáo hiện hành: [film-clarity-v116.md](qa/film-clarity-v116.md). Commit nguồn Sites cùng phiên bản: `0366c30b9a5b07dd2ec30b0474bbe667c4551b38`.

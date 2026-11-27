@@ -23,7 +23,7 @@
    window.RayPhotoEdit?.restore(snap.photo);
    BEAUTY.job++;if(BEAUTY.busy)beautyWorkerStop();BEAUTY.busy=false;BEAUTY.peek=false;
    if(window.RayFilterStrength||Object.hasOwn(P,'rayFilterStrength'))P.rayFilterStrength=null;
-   Object.assign(P,{stampScale:1},window.RayTone?.defaults,window.RayAdjustScope?.defaults,snap.p);Object.assign(F,snap.focus);Object.assign(NK,snap.sun);Object.assign(LK,snap.leak);exportLong=snap.exportLong??null;
+   Object.assign(P,{stampScale:1,rayNangPho:0,dehaze:0,detail:0},window.RayTone?.defaults,window.RayAdjustScope?.defaults,snap.p);Object.assign(F,snap.focus);Object.assign(NK,snap.sun);Object.assign(LK,snap.leak);exportLong=snap.exportLong??null;
    window.RayLayers?.restore(snap.layers);window.RayFilterStrength?.onRestore();
    BODY.parts=snap.body.map(p=>({...p}));BODY.sel=snap.bodySelected;BODY.peek=false;BODY_HIST.undo.length=BODY_HIST.redo.length=0;BODY_HIST.pending=null;
    window.RayBodyPeople?.restore(snap.bodyProfiles);

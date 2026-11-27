@@ -18,8 +18,23 @@ test('dehaze opens hazy texture, neutralizes a mid-tone purple cast and keeps da
  const src=hazy(),out=copy(src);Clarity.apply(out,{dehaze:.6});
  const land=[0,72,240,108],before=stats(src,land),after=stats(out,land);assert.ok(after.sd>before.sd*1.35,'hazy land texture gains real contrast: '+before.sd.toFixed(3)+' → '+after.sd.toFixed(3));
  const cast=(d,i)=>d[i+2]-(d[i]+d[i+1])/2,cloud=[0,0,240,48];assert.ok(stats(out,cloud,cast).mean<stats(src,cloud,cast).mean*.7,'purple/blue cast of neutral clouds is reduced');
- for(let i=0;i<out.data.length;i+=4)assert.ok(Math.max(out.data[i],out.data[i+1],out.data[i+2])<255||Math.max(src.data[i],src.data[i+1],src.data[i+2])>=250,'no new clipped highlights');
+ for(let i=0;i<out.data.length;i+=4)assert.ok(Math.max(out.data[i],out.data[i+1],out.data[i+2])<255||Math.max(src.data[i],src.data[i+1],src.data[i+2])===255,'no new clipped highlights');
  const clear=image(120,80,(x,y)=>x%8<4?[40,60,30]:[180,170,150]),kept=copy(clear);Clarity.apply(kept,{dehaze:.6});assert.ok(Math.abs(stats(kept,[0,0,120,80]).mean-stats(clear,[0,0,120,80]).mean)<.06,'a clear, contrasty scene changes only mildly');
+});
+test('dehaze preserves warm highlight texture and hue through recovery and exposure compensation',()=>{
+ const box=[70,50,170,110],hue=c=>Math.atan2(Math.sqrt(3)*(c[1]-c[2]),2*c[0]-c[1]-c[2])*180/Math.PI;
+ // Warm highlights exceed atmospheric light during recovery. A dark surround also
+ // triggers exposure compensation, which used to clip an otherwise intact patch.
+ for(const [background,color]of [[180,[245,220,180]],[180,[240,170,130]],[30,[220,180,140]]]){
+  const src=image(240,160,(x,y)=>{if(x<box[0]||x>=box[2]||y<box[1]||y>=box[3])return[background,background,background];const t=x%8<4?-2:2;return color.map(v=>v+t);});
+  for(const dehaze of [.3,.6,1]){
+   const out=copy(src);Clarity.apply(out,{dehaze});
+   for(let i=0;i<out.data.length;i+=4)assert.ok(Math.max(out.data[i],out.data[i+1],out.data[i+2])<255,'unclipped warm scene stays below 255: '+JSON.stringify({background,color,dehaze}));
+   assert.ok(stats(out,box).sd>.001,'warm highlight texture survives rather than flattening: '+JSON.stringify({background,color,dehaze}));
+   const i=(80*src.width+120)*4,c=[...out.data.subarray(i,i+3)];assert.ok(c[0]>c[1]&&c[1]>c[2]&&c[0]-c[2]>35,'warm highlights retain their color');
+   if(background===30)assert.ok(Math.abs(hue(c)-hue([...src.data.subarray(i,i+3)]))<1,'exposure compensation preserves warm hue: '+c);
+  }
+ }
 });
 test('detail sharpens real edges, ignores flat areas and has no seams between processing strips',()=>{
  const W=200,H=300,src=image(W,H,(x,y)=>x<100?[90,90,90]:[150,150,150]),out=copy(src);Clarity.apply(out,{detail:.7});

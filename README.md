@@ -1,6 +1,8 @@
 # RAY PHOTO — xưởng ảnh phim
 
-**Bản nguồn đầy đủ v115 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
+**Bản nguồn đầy đủ v116 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
+
+Website hiện tại: [RAY PHOTO](https://pho-cang-photobooth.linhhoang3105.chatgpt.site). Việc cập nhật website cần phát hành qua Sites như mô tả trong hướng dẫn GitHub.
 
 Bản tích hợp trình chỉnh ảnh RAY PHOTO và photobooth Linh Linh – Phố Cảng. Giao diện film tối/ấm, bốn khu Khám phá / Buồng ảnh / Photobooth / Album.
 

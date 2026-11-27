@@ -1,6 +1,6 @@
-# Bàn giao mã nguồn RAY PHOTO — v115
+# Bàn giao mã nguồn RAY PHOTO — v116
 
-Gói `RAY-PHOTO-source-v115.zip` là dự án đầy đủ để tiếp tục phát triển: mã JavaScript/TypeScript, HTML/CSS, backend chia sẻ công thức, cấu hình cơ sở dữ liệu, Android/iOS, kiểm thử, tài nguyên AI, font và giấy phép. Các module nguồn là file văn bản có thể sửa trực tiếp. Bản HTML một file chỉ là bản đóng gói trình chỉnh ảnh; ZIP nguồn mới là dự án để bàn giao.
+Gói `RAY-PHOTO-source-v116.zip` là dự án đầy đủ để tiếp tục phát triển: mã JavaScript/TypeScript, HTML/CSS, backend chia sẻ công thức, cấu hình cơ sở dữ liệu, Android/iOS, kiểm thử, tài nguyên AI, font và giấy phép. Các module nguồn là file văn bản có thể sửa trực tiếp. Bản HTML một file chỉ là bản đóng gói trình chỉnh ảnh; ZIP nguồn mới là dự án để bàn giao.
 
 ## Chạy trên máy riêng
 
@@ -26,6 +26,7 @@ Danh sách máy đọc được nằm trong `source/module-map.json`. Nguồn l�
 | HTML/CSS nền của editor | `source/editor/index.template.html`, `source/editor/ui/base.css` |
 | Bộ lọc, Thu Nhật, công thức cá nhân | `dist/darkroom/preset-catalog.js`, `preset-rules.mjs`, `my-presets.mjs`, `ray-preset-thu-nhat.js` và các adapter cùng nhóm |
 | Cường độ tổng Bộ lọc | `dist/darkroom/filter-strength-core.js`, `filter-strength.js` |
+| Nắng Phố, Khử mờ và Chi tiết | `dist/darkroom/ray-film-looks.js`, `film-looks-adapter.js`, `clarity-core.js`, `clarity-adapter.js` |
 | AI Composer | `dist/darkroom/ai-composer-*.js`, `ai-composer.css` |
 | Nhận diện da/tóc, nhuộm tóc, chân mày | `dist/darkroom/beauty-runtime.js`, `hair-core.js`, `hair-editor.js`, `brow-core.js`, `brows.js` và phần Makeup trong `source/editor/` |
 | Điều chỉnh sáng, ánh sáng màu, nắng | `dist/darkroom/tone-*.js`, `light-core.js`, `photo-controls.js`, `brush-*.js` |
@@ -106,8 +107,8 @@ Cần Android Studio/SDK cho Android; cần macOS/Xcode cho iOS. Gói nguồn kh
 Có Python3 để tạo/kiểm tra ZIP bằng thư viện chuẩn:
 
 ```sh
-npm run source:zip -- --version v116 --output exports/RAY-PHOTO-source-v116.zip
-node scripts/package-source.mjs --verify exports/RAY-PHOTO-source-v116.zip
+npm run source:zip -- --version v117 --output exports/RAY-PHOTO-source-v117.zip
+node scripts/package-source.mjs --verify exports/RAY-PHOTO-source-v117.zip
 ```
 
 Khi còn dùng Git, đưa file mới vào index bằng `git add` trước khi xuất; script lấy danh sách file được quản lý trong Git. Sau khi giải nén ở nơi khác không có Git, script dùng manifest và duyệt các thư mục nguồn để đóng gói tiếp.

@@ -49,7 +49,20 @@ Trên ảnh núi mây của người dùng (chủ thể và mặt khoanh tay đ�
 
 ## Kiểm chứng
 
-- `test/film-clarity.test.cjs` (6 bài): mức 0 giữ nguyên điểm ảnh và alpha; khử mờ tăng tương phản vùng sương, giảm ám tím của mây, không tạo thêm điểm cháy; chi tiết tăng tương phản cạnh, vùng phẳng không đổi, không có vệt giữa các dải xử lý, nhiễu mịn được lọc; Nắng Phố (đen sâu, trắng cuộn mềm, lá ngả lục lam, da không bị đè tối, bảng 3D khớp công thức trực tiếp); adapter native; độ khử mờ theo độ sương và công thức AI lưu/mở lại, gồm công thức cũ.
+- `test/film-clarity.test.cjs` (7 bài): mức 0 giữ nguyên điểm ảnh và alpha; khử mờ tăng tương phản vùng sương, giảm ám tím của mây, không tạo thêm điểm cháy; chi tiết tăng tương phản cạnh, vùng phẳng không đổi, không có vệt giữa các dải xử lý, nhiễu mịn được lọc; Nắng Phố (đen sâu, trắng cuộn mềm, lá ngả lục lam, da không bị đè tối, bảng 3D khớp công thức trực tiếp); adapter native; độ khử mờ theo độ sương và công thức AI lưu/mở lại, gồm công thức cũ. Bổ sung chín tổ hợp cảnh/vị trí sáng và mức Khử mờ để bảo vệ màu, vân và trần sáng.
 - Kiểm thử cũ được nạp thêm adapter mới: pixel và thứ tự mọi preset cũ giữ nguyên; 13 kiểm thử dựng ảnh AI Composer (trời không bị đẩy sáng hay cháy, mặt và áo trắng được bảo vệ) đạt khi bật Khử mờ/Chi tiết; Cường độ tổng 0/20/80/100% với cả 90 màu, gồm Nắng Phố.
-- Hồi quy toàn bộ `npm test`: **793 bài, 791 đạt, 0 lỗi, 2 bỏ qua** (suy luận LaMa tùy chọn).
-- Chromium (Playwright) trên `npm run dev:local`: thanh Chi tiết và Khử mờ nằm sau Độ nét, nút Nắng Phố áp `{rayNangPho:1, detail:.18}`, không có lỗi JavaScript. Chưa thử trên iPhone/Android thật.
+- Hồi quy toàn bộ `npm test` khi tích hợp Sites: **796 bài, 794 đạt, 0 lỗi, 2 bỏ qua** (suy luận LaMa tùy chọn).
+- Bản sửa ban đầu của Claude có báo cáo kiểm tra Chromium (Playwright) trên `npm run dev:local`: thanh Chi tiết và Khử mờ nằm sau Độ nét, nút Nắng Phố áp `{rayNangPho:1, detail:.18}`, không có lỗi JavaScript. Lượt tích hợp Sites này không chạy trình duyệt hoặc iPhone/Android thật.
+
+## Hậu kiểm khi đưa lên Sites — 2026-11-27
+
+Nguồn Claude được lấy từ commit `ea626ab8e92feed83fd232617ac551ca4ccacaab` trên nhánh `claude/inspiring-maxwell-oqbeiu`, dựa trên nguồn GitHub v115 `c0c2fcaee0d34d9f8d86b5884e2dd30f1735a82e`.
+
+Đã sửa hai lỗi tái hiện được trước khi phát hành:
+
+1. Khử mờ có thể đẩy kênh màu vùng sáng ấm lên 255, làm mất vân; phần bù phơi sáng dùng sai tâm khi tính trần màu. Bổ sung đường cuộn sáng đơn điệu với cùng hệ số RGB và tính giới hạn theo độ sáng sau bù. Kiểm thử giữ vân, hue và alpha, đồng thời không sinh thêm kênh cháy ở vùng nguồn chưa cháy.
+2. Các lớp hoặc snapshot trước v116 thiếu `rayNangPho`, `dehaze`, `detail` nên thừa hưởng giá trị đang chỉnh, có thể khiến xuất ảnh khác preview đã cache. Khi dựng lớp cũ và mở/hoàn tác nháp cũ, ba giá trị thiếu được đưa về 0 trước khi áp thông số đã lưu. Metadata lớp cũ không bị viết lại. `test/clarity-compatibility.test.cjs` kiểm tra cả ba hiệu ứng, preview/xuất ảnh, nguồn ảnh bất biến và hoàn tác/làm lại/mở lại nháp.
+
+`npm run build:native` và `npm run source:check` thành công. Native bridge và 29 phần JS lõi giữ nguyên nội dung; hash script nhúng vẫn là `9ec934f1561ed7ff6d201ce59d264e1d37f3014c2f510d4d04540dcd8421b12d`. HTML editor có hash `2776dbb411b8057b8c4fd2c08ef34fa12730c6927a55f36a0c574aa67879aa08`, chỉ thêm khai báo nạp các engine/adapter mới ngoài khối script gốc.
+
+Build hosting Sites, HTML standalone và frontend portable đều thành công. Standalone có 87 script classic được kiểm tra cú pháp; `build/web` có 200 file public khớp nguồn. Các engine đã sửa, session/layers, editor, service worker và metadata preset trong `dist/client` đều khớp từng byte với nguồn đã kiểm thử. Bundle backend có ba tham số mới của công thức chia sẻ. Bản đồ nguồn vẫn gồm 40 nhóm chức năng.

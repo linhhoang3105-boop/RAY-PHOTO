@@ -7,6 +7,14 @@
 (function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.RayClarity=api;})(typeof globalThis!=='undefined'?globalThis:this,()=>{
  'use strict';
  const clamp=(v,a,b)=>v<a?a:v>b?b:v,smooth=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t);};
+ // Nén mềm phần sáng tăng thêm, cùng một hệ số cho RGB để giữ hue. Chừa một mức
+ // trước 255 khi ảnh gốc chưa cháy; đường cong đơn điệu vẫn giữ vân vùng sáng.
+ function highlightScale(peak,sourcePeak){
+  if(sourcePeak>=1)return 1;
+  const start=Math.max(.9,sourcePeak);if(peak<=start)return 1;
+  const room=Math.max(0,254/255-start),excess=peak-start;
+  return(start+(room?room*excess/(room+excess):0))/peak;
+ }
  function boxBlur(src,dst,tmp,W,H,r){
   // Trung bình trượt hai chiều (tách được); ba lượt ≈ Gaussian. Mảng Float32 hoặc Uint16 cùng kiểu.
   if(r<1){dst.set(src);return;}
@@ -72,6 +80,7 @@
     const keep=smooth(.0,.10,l);t=1-(1-t)*keep;
     let R=(r-Ar)/t+Ar,G=(g-Ag)/t+Ag,B=(b-Ab)/t+Ab;
     const lo=Math.min(R,G,B);if(lo<0){const l2=Math.max(0,R*.2126+G*.7152+B*.0722),s=l2/(l2-lo+1e-6);R=l2+(R-l2)*s;G=l2+(G-l2)*s;B=l2+(B-l2)*s;}
+    const hs=highlightScale(Math.max(R,G,B),Math.max(data[i],data[i+1],data[i+2])/255);R*=hs;G*=hs;B*=hs;
     data[i]=clamp(R,0,1)*255;data[i+1]=clamp(G,0,1)*255;data[i+2]=clamp(B,0,1)*255;
     const l1=clamp(R*.2126+G*.7152+B*.0722,0,1),bin=(l*255)|0;outL[bin]+=l1;cnt[bin]++;before+=l;after+=l1;n++;
    }
@@ -79,7 +88,7 @@
   // Bù phơi sáng tông trung: khử mờ làm ảnh tối đi; kéo lại trung bình mà vẫn giữ đen sâu và trần sáng.
   if(n&&after>1e-4){
    const gain=clamp(Math.pow(before/after,.85),1,1.6);if(gain>1.002){const lut=new Uint8ClampedArray(256);for(let i=0;i<256;i++){const v=i/255,lifted=1-Math.pow(1-v,gain),w=smooth(.02,.25,v)*(1-smooth(.80,1,v)*.6);lut[i]=Math.round((v+(lifted-v)*w)*255);}
-    for(let i=0;i<data.length;i+=4){if(!data[i+3])continue;const r=data[i],g=data[i+1],b=data[i+2],l=(r*54+g*183+b*19)>>8,nl=lut[l];if(nl===l)continue;const k=nl/Math.max(1,l);if(k>1){const hi=Math.max(r,g,b),cap=hi*k>255?(255-l)/Math.max(1,hi-l):1;data[i]=Math.min(255,nl+(r-l)*Math.min(k,cap));data[i+1]=Math.min(255,nl+(g-l)*Math.min(k,cap));data[i+2]=Math.min(255,nl+(b-l)*Math.min(k,cap));}}}
+    for(let i=0;i<data.length;i+=4){if(!data[i+3])continue;const r=data[i],g=data[i+1],b=data[i+2],l=(r*54+g*183+b*19)>>8,nl=lut[l];if(nl===l)continue;const k=nl/Math.max(1,l);if(k>1){const hi=Math.max(r,g,b),cap=hi*k>255?(255-nl)/Math.max(1,hi-l):1,chroma=Math.min(k,cap),R=nl+(r-l)*chroma,G=nl+(g-l)*chroma,B=nl+(b-l)*chroma,hs=highlightScale(Math.max(R,G,B)/255,hi/255);data[i]=Math.min(255,R*hs);data[i+1]=Math.min(255,G*hs);data[i+2]=Math.min(255,B*hs);}}}
   }
  }
  // ---------- Chi tiết ----------

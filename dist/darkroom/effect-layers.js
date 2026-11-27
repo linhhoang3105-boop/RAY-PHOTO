@@ -40,7 +40,7 @@
   const originalRender=render,makeCanvas=()=>document.createElement('canvas');
   const strip=document.createElement('div');strip.className='effect-layers';strip.setAttribute('aria-label','Các lớp hiệu ứng đã giữ');strip.hidden=true;document.querySelector('.editor-tabs').before(strip);
   const capture=()=>({p:{...P},focus:{...F},sun:{...NK},leak:{...LK}});
-  function setState(state){Object.assign(P,window.RayTone?.defaults,window.RayAdjustScope?.defaults,state.p);Object.assign(F,state.focus);Object.assign(NK,state.sun);Object.assign(LK,state.leak);}
+  function setState(state){Object.assign(P,{rayNangPho:0,dehaze:0,detail:0},window.RayTone?.defaults,window.RayAdjustScope?.defaults,state.p);Object.assign(F,state.focus);Object.assign(NK,state.sun);Object.assign(LK,state.leak);}
   function pass(target,src,state,retouch,decorate){
    const saved=capture(),beautyPeek=BEAUTY.peek,bodyPeek=BODY.peek;
    try{setState(state);if(!decorate){P.frame='none';P.stamp=false;}if(!retouch)BEAUTY.peek=BODY.peek=true;return originalRender(target,src);}
