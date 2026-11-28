@@ -116,18 +116,19 @@ test('missing sky is reported honestly and older recipes open without invented s
  const legacy=controller.recipe('Công thức trước màu cảnh');legacy.components=legacy.components.filter(c=>!c.id.startsWith('palette-'));delete legacy.analysis.palette;const fresh=harness();await fresh.body.querySelector('#rayAIComposerButton').click();await fresh.h.RayAIComposer.controller.loadRecipe(legacy,{adapt:false});await fresh.flush();assert.equal(fresh.h.RayAIComposer.controller.state.error,null);assert.equal(fresh.body.querySelectorAll('.aic-palette-swatches').length,0);assert.equal(fresh.body.querySelector('#rayAIComposerPaletteNote').hidden,true);assert.ok(fresh.body.querySelector('.aic-mix'));assert.deepEqual(fresh.h.RayAIComposer.recipe.components.map(c=>c.id),legacy.components.map(c=>c.id));
 });
 
-function refinementUI(infer){
+function refinementUI(infer,options={}){
  const Runtime=require('../dist/darkroom/ai-composer-runtime.js'),Selection=require('../dist/darkroom/remove-selection-core.js');let host,pauses=0,resumes=0;
  const h=harness({configure(c){
   // napi-rs maps a zero canvas dimension to its default size; observe the
   // actual zero-size cleanup calls instead of that Node-only getter behavior.
   const create=c.document.createElement;c.document.createElement=tag=>{const el=create(tag);if(tag==='canvas'){el.resetDimensions=new Set();for(const key of ['width','height']){let proto=el,descriptor;while(proto&&!descriptor){descriptor=Object.getOwnPropertyDescriptor(proto,key);proto=Object.getPrototypeOf(proto);}Object.defineProperty(el,key,{get(){return descriptor.get.call(el);},set(value){if(value===0)el.resetDimensions.add(key);descriptor.set.call(el,value);}});}}return el;};
+  if(options.legacyCore){c.RayAIComposerCore={...c.RayAIComposerCore};delete c.RayAIComposerCore.needsPersonRefinement;}
   c.BODY_AI_ASSETS={roots:['local-models']};c.RayRemoveSelection=Selection;c.RayRemoveAI={infer,segment(){throw Error('Composer must never use the shared selector job');}};c.RayPreview={pause(){pauses++;return()=>{resumes++;};},layoutChanged(){}};c.RayAIComposerRuntime={...Runtime,create(value){host=value;return Runtime.create(value);}};}});
  return{...h,refine:(recognition,a)=>host.refineRecognition(h.h.source,recognition,a,()=>{}),get pauses(){return pauses;},get resumes(){return resumes;}};
 }
 const selectedFace=(x=.45)=>[{x:x-.07,y:.28},{x,y:.35},{x:x+.07,y:.28},{x:x+.07,y:.42},{x:x-.07,y:.42}];
 function darkPersonRecognition(faces=[selectedFace()]){const W=16,H=16;return{maps:{width:W,height:H,foreground:new Uint8Array(W*H).fill(255),skin:new Uint8Array(W*H).fill(120),hair:new Uint8Array(W*H).fill(30)},faces};}
-function darkPersonAnalysis(x=.45){return{backgroundBrightness:.55,recovery:{faces:[{confidence:.95,mean:.08,p90:.16,focus:{cx:x,cy:.35,rx:.09,ry:.10}}]}};}
+function darkPersonAnalysis(x=.45){return{backgroundBrightness:.55,recovery:{faces:[{confidence:.95,mean:.08,p10:.04,p90:.16,focus:{cx:x,cy:.35,rx:.09,ry:.10}}]}};}
 function rawPerson(point){const W=16,H=16,data=new Float32Array(W*H),cx=Math.floor(point.x*W);for(let y=3;y<16;y++)for(let x=Math.max(0,cx-2);x<=Math.min(W-1,cx+2);x++)data[y*W+x]=.95;return{width:W,height:H,data};}
 test('severe-person refinement uses isolated native inference at bounded resolution and retains skin, hair and source pixels',async()=>{
  let input,calls=0;const h=refinementUI(async(c,kind,point,assets)=>{calls++;input=c;assert.equal(kind,'object');assert.equal(c.width,512);assert.equal(c.height,384);assert.equal(assets.root,'local-models');assert.equal(assets.object,'local-models/magic_touch.tflite');assert.equal(assets.refine,false);return rawPerson(point);});
@@ -142,8 +143,21 @@ test('failed, uncertain, face-only or partially detected people keep the complet
  for(const infer of cases){let input;const h=refinementUI(async(...args)=>{input=args[0];return infer(...args);}),r=darkPersonRecognition([selectedFace(.3),selectedFace(.7)]),out=await h.refine(r,darkPersonAnalysis(.7));assert.equal(out,r);assert.equal(out.maps.personGuided,undefined);assert.ok(input.resetDimensions.has('width'));assert.ok(input.resetDimensions.has('height'));assert.equal(h.resumes,1);}
 });
 test('normal light and more than three known people skip optional segmentation rather than dropping anyone',async()=>{
- let calls=0;const h=refinementUI(async(...args)=>{calls++;return rawPerson(args[2]);}),r=darkPersonRecognition(),a=darkPersonAnalysis();a.recovery.faces[0].mean=.28;assert.equal(await h.refine(r,a),r);const group=darkPersonRecognition([selectedFace(.2),selectedFace(.4),selectedFace(.6),selectedFace(.8)]);assert.equal(await h.refine(group,darkPersonAnalysis(.4)),group);assert.equal(calls,0);assert.equal(h.pauses,0);
+ let calls=0;const h=refinementUI(async(...args)=>{calls++;return rawPerson(args[2]);}),r=darkPersonRecognition(),a=darkPersonAnalysis();Object.assign(a.recovery.faces[0],{mean:.45,p10:.30,p90:.62});assert.equal(await h.refine(r,a),r);const group=darkPersonRecognition([selectedFace(.2),selectedFace(.4),selectedFace(.6),selectedFace(.8)]);assert.equal(await h.refine(group,darkPersonAnalysis(.4)),group);assert.equal(calls,0);assert.equal(h.pauses,0);
 });
 test('changing photo while isolated person inference is pending discards its mask and still releases the canvas',async()=>{
  let resolve,input;const promise=new Promise(r=>{resolve=r;}),h=refinementUI(async(c)=>{input=c;return promise;}),r=darkPersonRecognition(),work=h.refine(r,darkPersonAnalysis());h.h.source=h.image(true);resolve(rawPerson({x:.45,y:.35}));assert.equal(await work,r);assert.ok(input.resetDimensions.has('width'));assert.ok(input.resetDimensions.has('height'));assert.equal(h.resumes,1);
+});
+
+test('the shared diffuse-light gate adds one guided person mask and excludes the earlier mixed-light portrait',async()=>{
+ const Core=require('../dist/darkroom/ai-composer-core.js');assert.equal(typeof Core.needsPersonRefinement,'function');let calls=0;const h=refinementUI(async(c,kind,point)=>{calls++;return rawPerson(point);}),r=darkPersonRecognition(),a=darkPersonAnalysis();Object.assign(a.recovery.faces[0],{mean:.29,p10:.17,p90:.37});a.backgroundBrightness=.65;const out=await h.refine(r,a);assert.notEqual(out,r);assert.equal(out.maps.personGuided,true);assert.equal(calls,1);assert.equal(h.resumes,1);
+ const mixed=darkPersonAnalysis();Object.assign(mixed.recovery.faces[0],{mean:.275,p10:.098,p90:.475});mixed.backgroundBrightness=.65;assert.equal(await h.refine(r,mixed),r);assert.equal(calls,1,'a brighter split-light face does not load another person model');
+});
+test('an older Core without the adaptive gate retains the conservative deep-shadow refinement path',async()=>{
+ let calls=0;const h=refinementUI(async(c,kind,point)=>{calls++;return rawPerson(point);},{legacyCore:true}),r=darkPersonRecognition();assert.notEqual(await h.refine(r,darkPersonAnalysis()),r);const diffuse=darkPersonAnalysis();Object.assign(diffuse.recovery.faces[0],{mean:.29,p10:.17,p90:.37});assert.equal(await h.refine(r,diffuse),r);assert.equal(calls,1);
+});
+test('extra skin regions have their own label while existing face layers retain their face label',async()=>{
+ const h=harness();await compose(h);const controller=h.h.RayAIComposer.controller,recipe=controller.recipe('Da ngoài mặt'),base=copy(recipe.components[0]);
+ Object.assign(base,{id:'face-0',title:'Ánh sáng mặt thử',role:'skin',p:{toneExposure:.2,adjustRegion:'in',adjustRegionShape:'ellipse',adjustRegionX:.5,adjustRegionY:.4,adjustRegionRX:.1,adjustRegionRY:.1,adjustRegionFeather:.5}});base.targetIntent={role:'skin',adaptive:true,regionSource:'face',baseline:{p:copy(base.p),focus:copy(base.focus),sun:copy(base.sun),leak:copy(base.leak)}};recipe.components.push(base,{...copy(base),id:'face-extra-0',title:'Da cổ và tay thử'});assert.equal(await controller.loadRecipe(recipe,{adapt:false}),true);await h.flush();
+ const cards=h.body.querySelectorAll('.aic-component'),face=cards.find(c=>c.querySelector('strong')?.textContent==='Ánh sáng mặt thử'),extra=cards.find(c=>c.querySelector('strong')?.textContent==='Da cổ và tay thử');assert.ok(face);assert.ok(extra);assert.match(face.querySelector('.aic-used-tools').textContent,/Khuôn mặt/);assert.match(extra.querySelector('.aic-used-tools').textContent,/Vùng da ngoài mặt/);assert.doesNotMatch(extra.querySelector('.aic-used-tools').textContent,/Khuôn mặt/);
 });

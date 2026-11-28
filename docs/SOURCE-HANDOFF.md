@@ -1,6 +1,6 @@
-# Bàn giao mã nguồn RAY PHOTO — v118
+# Bàn giao mã nguồn RAY PHOTO — v119
 
-Gói `RAY-PHOTO-source-v118.zip` là dự án đầy đủ để tiếp tục phát triển: mã JavaScript/TypeScript, HTML/CSS, backend chia sẻ công thức, cấu hình cơ sở dữ liệu, Android/iOS, kiểm thử, tài nguyên AI, font và giấy phép. Các module nguồn là file văn bản có thể sửa trực tiếp. Bản HTML một file chỉ là bản đóng gói trình chỉnh ảnh; ZIP nguồn mới là dự án để bàn giao.
+Gói `RAY-PHOTO-source-v119.zip` là dự án đầy đủ để tiếp tục phát triển: mã JavaScript/TypeScript, HTML/CSS, backend chia sẻ công thức, cấu hình cơ sở dữ liệu, Android/iOS, kiểm thử, tài nguyên AI, font và giấy phép. Các module nguồn là file văn bản có thể sửa trực tiếp. Bản HTML một file chỉ là bản đóng gói trình chỉnh ảnh; ZIP nguồn mới là dự án để bàn giao.
 
 ## Chạy trên máy riêng
 
@@ -109,8 +109,8 @@ Cần Android Studio/SDK cho Android; cần macOS/Xcode cho iOS. Gói nguồn kh
 Có Python3 để tạo/kiểm tra ZIP bằng thư viện chuẩn:
 
 ```sh
-npm run source:zip -- --version v119 --output exports/RAY-PHOTO-source-v119.zip
-node scripts/package-source.mjs --verify exports/RAY-PHOTO-source-v119.zip
+npm run source:zip -- --version v120 --output exports/RAY-PHOTO-source-v120.zip
+node scripts/package-source.mjs --verify exports/RAY-PHOTO-source-v120.zip
 ```
 
 Khi còn dùng Git, đưa file mới vào index bằng `git add` trước khi xuất; script lấy danh sách file được quản lý trong Git. Sau khi giải nén ở nơi khác không có Git, script dùng manifest và duyệt các thư mục nguồn để đóng gói tiếp.

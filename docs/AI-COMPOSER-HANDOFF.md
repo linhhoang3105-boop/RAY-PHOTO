@@ -55,3 +55,13 @@ Nhận diện theo điểm dùng lại `RayRemoveAI.infer` riêng biệt, không
 Thứ tự native được xác nhận trực tiếp: Tone áp trong `bodyWarp`, trước `buildLUT` (gồm Film Exposure). Với ảnh tối sâu, tăng EV có giới hạn rồi chỉ nâng đường cong phim rất ít; tránh nền xám làm mặt/thân trông như mảng tô. Phần bóng bổ sung giữ khoảng trống kênh màu còn lại. Khi nhận diện tóc gần như trống ở ảnh tối, không dùng oval dự phòng để tô sáng lên vùng tóc.
 
 Công thức cảnh có kiểm tra histogram hai cụm sáng/tối để phân biệt chạng vạng với sương núi. Không hứa khôi phục chi tiết đã đen hoặc cháy hoàn toàn; kiểm tra ảnh thật và để người dùng điều chỉnh lại vùng/cường độ. Nguồn ảnh tham chiếu và kết quả chỉ nằm trong scratch.
+
+## Phân vùng da và trang phục — v119
+
+`Core.needsPersonRefinement(analysis)` là gate dùng chung cho runtime/UI, gồm tối sâu và tối đều trước cảnh sáng. Nhánh tối đều đo cả trung bình, span percentile và chênh sáng với cảnh; không đánh đồng với mặt có bóng tay và vùng da sáng hỗn hợp. Phương án mới dùng EV/tương phản và rất ít Film Exposure để giữ điểm đen.
+
+Chỉ khi có đúng một người đủ tin cậy và mask theo điểm đã chấp nhận mới đo `recovery.faces[0].extraSkin` và `recovery.zones.clothing`. ExtraSkin có vùng vector và đo sáng/màu riêng; component `face-extra-0` xử lý cổ/tay ngoài mặt và giữ tay đã sáng. Vùng da này được loại khỏi lớp trang phục, màu thân và làm nét để tránh cộng dồn. Nhiều người vẫn dùng vùng mặt riêng, không áp một vùng da toàn ảnh cho từng người.
+
+Codec cho phép hai trường phân tích tùy chọn có giới hạn; extraSkin không lồng extraSkin, không chứa raster/pixel. Giữ `personLightVersion:1` vì đây là dấu bảo vệ bước đã xóa, không dùng nó làm số phiên bản thuật toán. ID `face-extra-*` cùng prefix face để tự bỏ vùng thích ứng khi ảnh mới không có mặt. Mở công thức cũ giữ các chỉnh sửa; muốn dùng thuật toán mới trên ảnh gốc thì Tự phối/Phối lại.
+
+Ảnh tối sâu dùng tối đa hai lần EV native (mỗi lần trong phạm vi 0–2), tính tổng theo dữ liệu/không gian kênh RGB và nhiễu tương đối; hạn chế tăng sáng vật liệu gần đen. Không coi noise median 0 ở ảnh ít sắc độ là bằng chứng có kết cấu sạch. Vùng da được mềm mép theo kích thước mặt; cân ám xanh có giới hạn và chỉnh được. Chỉ thay điều phối, không sửa engine pixel.

@@ -51,14 +51,15 @@
   try{c.getContext('2d').drawImage(image,0,0,c.width,c.height);engine=await RayBeautyRuntime.engine({...BEAUTY_ASSETS,kinds:['segment','face'],refineHeads:false});return await engine.detect(c,notify);}
   finally{await engine?.close?.();c.width=c.height=0;resume?.();}
  }
+ const needsPersonRefinement=a=>typeof Core.needsPersonRefinement==='function'?!!Core.needsPersonRefinement(a):(a?.recovery?.faces||[]).some(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10);
  // Isolated calls reuse the object selector without touching its shared cancel/job state.
  async function refineRecognition(image,recognition,a,notify){
-  const severe=(a?.recovery?.faces||[]).some(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10),selection=window.RayRemoveSelection,infer=window.RayRemoveAI?.infer,maps=recognition?.maps,faces=recognition?.faces;
+  const severe=needsPersonRefinement(a),selection=window.RayRemoveSelection,infer=window.RayRemoveAI?.infer,maps=recognition?.maps,faces=recognition?.faces;
   if(!severe||typeof infer!=='function'||typeof selection?.component!=='function'||typeof selection?.at!=='function'||!maps||!Number.isInteger(maps.width)||!Number.isInteger(maps.height)||maps.width<1||maps.height<1||maps.width*maps.height>1048576||!Array.isArray(faces)||!faces.length||faces.length>3)return recognition;
   const valid=p=>Number.isFinite(p?.x)&&Number.isFinite(p?.y)&&p.x>=0&&p.x<=1&&p.y>=0&&p.y<=1,people=faces.map(face=>{const points=Array.isArray(face)?face.filter(valid):[],point=face?.[1];if(points.length<4||!valid(point))return null;const xs=points.map(p=>p.x),ys=points.map(p=>p.y),left=Math.min(...xs),right=Math.max(...xs),top=Math.min(...ys),bottom=Math.max(...ys);return{point:{x:point.x,y:point.y},points,area:(right-left)*(bottom-top),cx:(left+right)/2,cy:(top+bottom)/2};});
   if(people.some(p=>!p||p.area<=0))return recognition;
   // Recovery records are sorted by area; match locations instead of sharing indices.
-  const matched=(a.recovery?.faces||[]).filter(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10).some(f=>people.some(p=>Math.hypot((p.cx-f.focus.cx)/Math.max(.001,f.focus.rx),(p.cy-f.focus.cy)/Math.max(.001,f.focus.ry))<1.5));if(!matched)return recognition;
+  const matched=(a.recovery?.faces||[]).filter(f=>needsPersonRefinement({...a,recovery:{...a.recovery,faces:[f]}})).some(f=>people.some(p=>Math.hypot((p.cx-f.focus.cx)/Math.max(.001,f.focus.rx),(p.cy-f.focus.cy)/Math.max(.001,f.focus.ry))<1.5));if(!matched)return recognition;
   const c=make(),scale=Math.min(1,512/Math.max(image.width,image.height)),root=typeof BODY_AI_ASSETS!=='undefined'?BODY_AI_ASSETS.roots[0]:new URL('../vendor/mediapipe/',location.href).href.replace(/\/$/,''),foreground=new Uint8Array(maps.width*maps.height),resume=window.RayPreview?.pause?.();c.width=Math.max(2,Math.round(image.width*scale));c.height=Math.max(2,Math.round(image.height*scale));
   try{
    c.getContext('2d').drawImage(image,0,0,c.width,c.height);
@@ -87,7 +88,7 @@
   if(p.toneLocalEnabled!==false&&Number(p.toneLocalOpacity??1)>.001&&has(['toneLocalEV','toneLocalBrightness','toneLocalWarmth','toneLocalColorAmount']))tools.push('Ánh sáng màu');
   return tools.filter((name,i)=>tools.indexOf(name)===i);
  }
- function regionLabel(c){if(c.id==='palette-sky')return 'Vùng trời';if(c.id==='palette-clouds')return 'Vùng mây';if(c.id==='palette-vegetation')return 'Vùng cây cối';if(c.id==='palette-land')return 'Vùng cảnh';if(c.p.adjustRegion==='out')return c.role==='background'?'Hậu cảnh':'Ngoài vùng chọn';if(c.p.adjustRegion==='in')return c.role==='skin'?'Khuôn mặt':['beam','line','curve'].includes(c.p.adjustRegionShape)?'Vùng ánh sáng':c.role==='subject'||c.id==='film-subject'?'Chủ thể':'Trong vùng chọn';return 'Toàn ảnh';}
+ function regionLabel(c){if(c.id==='palette-sky')return 'Vùng trời';if(c.id==='palette-clouds')return 'Vùng mây';if(c.id==='palette-vegetation')return 'Vùng cây cối';if(c.id==='palette-land')return 'Vùng cảnh';if(c.p.adjustRegion==='out')return c.role==='background'?'Hậu cảnh':'Ngoài vùng chọn';if(c.p.adjustRegion==='in')return c.role==='skin'?(/^face-extra-/.test(c.id)?'Vùng da ngoài mặt':'Khuôn mặt'):['beam','line','curve'].includes(c.p.adjustRegionShape)?'Vùng ánh sáng':c.role==='subject'||c.id==='film-subject'?'Chủ thể':'Trong vùng chọn';return 'Toàn ảnh';}
  function activeComponents(plan){return(plan?.components||[]).filter(c=>c.enabled!==false&&usedTools(c).length&&RayLayers.active({...neutral,...c.p}));}
  function mixedSources(mix){return mix?.strength>0?(mix.sources||[]).filter(s=>s.weight>0):[];}
  function mixSummary(mix){const sources=mixedSources(mix),sum=sources.reduce((n,s)=>n+s.weight,0);return sources.length?sources.map(s=>s.name+' '+Math.round(s.weight/sum*100)+'%').join(' + '):'Phối màu đang tắt';}

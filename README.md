@@ -1,10 +1,16 @@
 # RAY PHOTO — xưởng ảnh phim
 
-**Bản nguồn đầy đủ v118 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
+**Bản nguồn đầy đủ v119 trên GitHub.** Chạy dự án bằng `npm ci` rồi `npm run dev:local`. Nguồn editor hiện hành nằm trong `source/editor/`; các engine và module còn lại được chỉ rõ trong [bản đồ module](source/module-map.json). Hai file HTML đã có ở gốc repo được giữ làm bản cũ. [Hướng dẫn riêng cho repo GitHub](docs/GITHUB-HANDOFF.md).
 
 Website hiện tại: [RAY PHOTO](https://pho-cang-photobooth.linhhoang3105.chatgpt.site). Việc cập nhật website cần phát hành qua Sites như mô tả trong hướng dẫn GitHub.
 
 Bản tích hợp trình chỉnh ảnh RAY PHOTO và photobooth Linh Linh – Phố Cảng. Giao diện film tối/ấm, bốn khu Khám phá / Buồng ảnh / Photobooth / Album.
+
+## Sáng da, giữ sắc đen trang phục — v119
+
+Trong **AI Composer → Cứu sáng & nét**, AI mở rộng chọn người cho cả mặt tối đều trước cảnh sáng, rồi cân riêng mặt, phần da cổ/tay, trang phục và cảnh. Da dùng phơi sáng/tương phản theo ảnh và ít nâng nền xám; áo đen được giữ đậm. Cổ/tay có phép đo màu và mức sáng riêng, bảo vệ tay đã sáng. Với nhiều người, giữ vùng mặt riêng để tránh cộng sáng nhầm da người khác.
+
+Ảnh rất tối nhận bù sáng da theo khoảng trống màu còn lại, mềm mép theo kích thước mặt và hạn chế tăng sáng áo/tóc ít sắc độ. Cảnh hoàng hôn giữ màu trời; cảnh núi dùng công cụ khử mờ riêng. Các lớp vẫn sửa/tắt/xóa/lưu được. Giữ nguyên 90 màu Bộ lọc và engine gốc; ảnh thiếu dữ liệu vẫn còn hạt hoặc bệt, không coi là khôi phục chi tiết đã mất. [Kiểm chứng v119](docs/qa/ai-composer-regional-v119.md).
 
 ## Một chạm với người ngược sáng nặng — v118
 

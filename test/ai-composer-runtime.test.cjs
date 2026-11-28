@@ -173,7 +173,7 @@ test('the real adaptive core and validated recipes work through every style and 
 
 function personRefinementFixture(refine){
  const f=fixture(),analyze=f.deps.core.analyze;let calls=0;
- f.deps.core.analyze=(...args)=>({...analyze(...args),backgroundBrightness:.55,recovery:{faces:[{confidence:.95,mean:.09,p90:.17}]}});
+ f.deps.core.analyze=(...args)=>({...analyze(...args),backgroundBrightness:.55,recovery:{faces:[{confidence:.95,mean:.09,p10:.04,p90:.17}]}});
  f.host.refineRecognition=async(...args)=>{calls++;return refine?refine(...args):{...args[1],maps:{...args[1]?.maps,foreground:new Uint8Array([220])}};};
  Object.defineProperty(f,'calls',{get:()=>calls});return f;
 }
@@ -191,4 +191,13 @@ test('cancelled or replaced-photo person refinement cannot repaint or cache its 
 });
 test('a later composition shares one pending person refinement and applies only the newest style',async()=>{
  const pending=deferred(),f=personRefinementFixture(()=>pending.promise),first=f.controller.compose('natural');await waitFor(()=>f.calls===1);const second=f.controller.compose('moody');pending.resolve({maps:{width:1,height:1,foreground:new Uint8Array([210])},faces:[]});assert.equal(await first,false);assert.equal(await second,true);assert.equal(f.calls,1);assert.equal(f.reads,1);assert.equal(f.paints,1);assert.equal(f.controller.state.style,'moody');assert.equal(f.deps.calls.analyze.length,2);
+});
+
+test('the shared adaptive gate refines a diffuse underlit face once while keeping the mixed sun-and-shadow face unchanged',async()=>{
+ const Core=require('../dist/darkroom/ai-composer-core.js');assert.equal(typeof Core.needsPersonRefinement,'function');
+ for(const [name,metrics,expected] of [
+  ['diffuse shade',{mean:.29,p10:.17,p90:.37},1],
+  ['mixed sunlight',{mean:.275,p10:.098,p90:.475},0],
+  ['well lit',{mean:.48,p10:.32,p90:.67},0]
+ ]){const f=personRefinementFixture(),analyze=f.deps.core.analyze;f.deps.core.needsPersonRefinement=Core.needsPersonRefinement;f.deps.core.analyze=(...args)=>{const a=analyze(...args);Object.assign(a.recovery.faces[0],metrics);a.backgroundBrightness=.65;return a;};assert.equal(await f.controller.compose('restore-detail'),true,name);assert.equal(f.calls,expected,name);await f.controller.compose('natural');await f.controller.reroll();assert.equal(f.calls,expected,name+': recognition is reused across styles');assert.equal(f.reads,1);}
 });

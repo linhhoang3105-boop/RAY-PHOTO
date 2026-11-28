@@ -2,7 +2,7 @@
 
 Repo đích: https://github.com/linhhoang3105-boop/RAY-PHOTO
 
-**Bản hiện hành: v118.** Một chạm khoanh người theo điểm mặt khi ngược sáng nặng, bù sáng riêng người và xử lý cảnh theo chạng vạng/sương núi. Giữ nguyên90 màu Bộ lọc, các engine và kết quả cứu sáng hỗn hợp v117. [Hướng dẫn sửa tiếp AI](AI-COMPOSER-HANDOFF.md).
+**Bản hiện hành: v119.** AI Composer bù sáng riêng da mặt, cổ/tay và trang phục; thích ứng ảnh tối đều lẫn hoàng hôn tối sâu, giữ áo đen và màu trời. Giữ nguyên 90 màu Bộ lọc, các engine và kết quả cứu sáng hỗn hợp v117. [Hướng dẫn sửa tiếp AI](AI-COMPOSER-HANDOFF.md).
 
 Lần nhập nguồn v115 ban đầu bổ sung dự án đầy đủ từ nguồn RAY v115 đã phát hành, gồm 598 file nguồn/tài nguyên: editor, các engine chức năng, backend, mô hình AI, font, kiểm thử, cấu hình build và wrapper Android/iOS. Nguồn được đối chiếu với ZIP đã kiểm chứng SHA-256 `a49f66acd5a105088be27fdd99c3acb1416d28b6f04495a471432b8100113a3b`; commit nguồn RAY là `9c186b9f9d93356b10fbf7f3e3ec48f633766fbe`.
 
@@ -30,6 +30,12 @@ Hai file `index.html` và `RAY-PHOTO-v48.html` từng được tải lên gốc 
 Repo GitHub không tự triển khai lên website RAY đang chạy. Các quy trình GitHub Pages hoặc hosting khác cần được cấu hình riêng. API chia sẻ cần database riêng; ảnh/nháp trên thiết bị và dữ liệu database của website hiện hành không nằm trong mã nguồn.
 
 ## Kiểm chứng bản hiện hành
+
+Bản v119: **839 bài, 837 đạt, 0 lỗi, 2 bỏ qua** (mô hình tùy chọn). Kiểm tra trên ảnh núi và hoàng hôn bằng các engine RAY: da sáng riêng, áo đen giữ đậm, trời hoàng hôn gần nguyên; hạt và phần chi tiết yếu của ảnh gốc vẫn còn. Ảnh, landmark và mask không nằm trong repo. Build hosting/standalone/portable đã kiểm tra: 200 tài nguyên public, 87 script standalone và 40 nhóm module; 41 file engine/preset/editor được bảo vệ giữ nguyên. [Báo cáo v119](qa/ai-composer-regional-v119.md). Commit nguồn Sites: `38700d3e46307e76fbdd22fa91e9ab149ffcb1b2`. Tag nguồn riêng: `v119`.
+
+Công thức cũ không tự đổi. Chọn **AI Composer → Cứu sáng & nét → Tự phối ảnh/Phối lại** để tạo công thức bằng điều phối v119. Từng vùng/bước vẫn chỉnh, tắt hoặc xóa được.
+
+## Kiểm chứng v118 trước đó
 
 Bản v118: **827 bài,825 đạt,0 lỗi,2 bỏ qua** (mô hình tùy chọn). Ba ảnh tham chiếu nhận diện/khoanh người tự động; ảnh và mask không nằm trong repo. Build hosting/standalone/portable đã kiểm tra:200 tài nguyên public và87 script standalone. [Báo cáo v118](qa/ai-composer-severe-v118.md). Commit nguồn Sites:`e3e4700a9d13ef38449602afb864c9ea3e4e6855`. Tag nguồn riêng:`v118`.
 

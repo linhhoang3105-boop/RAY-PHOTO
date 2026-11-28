@@ -73,7 +73,7 @@
   function readyStatus(prefix='Đã phối ảnh'){
    return prefix+(state.analysis?.recognition==='estimated'?' · vùng xử lý đang được ước lượng từ ảnh.':' · có thể chỉnh từng thành phần.');
   }
-  const severePerson=a=>(a.recovery?.faces||[]).some(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10);
+  const needsPersonRefinement=a=>typeof core.needsPersonRefinement==='function'?!!core.needsPersonRefinement(a):(a.recovery?.faces||[]).some(f=>f.confidence>.7&&f.mean<.22&&f.p90<.4&&Number(a.backgroundBrightness)-f.mean>.10);
   async function analyzePhoto(image,job,needFaces=false){
    const requestFaces=needFaces&&!faceScanAttempted;
    if(analysisCache&&!requestFaces)return analysisCache;
@@ -92,7 +92,7 @@
     let result=core.analyze(pixels.data,pixels.width,pixels.height,{...(recognition||{}),...(pixels.detail?{detail:pixels.detail}:{})});
     // A deeply underlit person may share a fuzzy semantic mask with a railing.
     // Refine once on the same original pixels; a failure keeps useful recognition.
-    if(typeof host.refineRecognition==='function'&&!personScanAttempted&&severePerson(result)&&image===photo&&image===host.getSource()&&state.busy){
+    if(typeof host.refineRecognition==='function'&&!personScanAttempted&&needsPersonRefinement(result)&&image===photo&&image===host.getSource()&&state.busy){
      personScanAttempted=true;
      try{
       const fresh=await host.refineRecognition(image,recognition,result,message=>{if(image===photo&&image===host.getSource()&&state.busy){state.status=String(message||'Đang khoanh rõ người trong bóng…');emit();}});
